@@ -3,6 +3,73 @@
 @tailwind utilities;
 @plugin "daisyui";
 
+/* Import Design System */
+@import './design-system.css';
+
+/* Import Inter Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Base Styles */
+body {
+  font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Landing Page 3D Phone Effect */
+.phone-3d {
+  transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
+}
+
+@media (max-width: 1024px) {
+  .phone-3d {
+    transform: none;
+  }
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Account Dropdown Styling */
+.account-dropdown .ant-dropdown-menu,
+.account-dropdown-modern .ant-dropdown-menu {
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 12px;
+  border: 1px solid #E5E7EB;
+  background: white;
+}
+
+.account-dropdown .ant-dropdown-menu-item,
+.account-dropdown-modern .ant-dropdown-menu-item {
+  border-radius: 12px;
+  margin: 4px 0;
+  padding: 0;
+  height: auto;
+  line-height: normal;
+}
+
+.account-dropdown .ant-dropdown-menu-item:hover,
+.account-dropdown-modern .ant-dropdown-menu-item:hover {
+  background-color: transparent;
+}
+
+.account-dropdown-modern .ant-dropdown-menu-item-divider {
+  margin: 8px 0;
+  border-color: #E5E7EB;
+}
+
 .hide-scrollbar {
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -406,5 +473,101 @@ button:hover {
 
     100% {
         background-position: 200% 0;
+    }
+}
+
+/* Account Dropdown Custom Styles */
+.account-dropdown .ant-dropdown-menu {
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    min-width: 200px;
+    background: white;
+}
+
+.account-dropdown .ant-dropdown-menu-item {
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 2px 0;
+    transition: all 0.2s ease;
+}
+
+.account-dropdown .ant-dropdown-menu-item:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateX(4px);
+}
+
+.account-dropdown .ant-dropdown-menu-item:first-child:hover {
+    background: transparent;
+    transform: none;
+}
+
+/* Header gradient animation */
+@keyframes gradient-shift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+header {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+}
+
+/* Landing Page Enhanced Styles */
+@keyframes gradient-text {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-text 3s ease infinite;
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus states for accessibility */
+*:focus-visible {
+    outline: 2px solid rgba(34, 197, 94, 0.6);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Improved button transitions */
+button, a {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced backdrop blur support */
+.backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.backdrop-blur-md {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Smooth animations for landing page */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
