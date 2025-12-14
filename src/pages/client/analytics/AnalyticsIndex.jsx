@@ -9,7 +9,7 @@ const AnalyticsIndex = () => {
             title: "Phân tích Nguyên nhân",
             description: "Phân tích biến động, phát hiện bất thường và thói quen chi tiêu",
             icon: Search,
-            path: "/analytics/diagnostic",
+            path: "/analytics",
             color: "#10B981",
         },
         {

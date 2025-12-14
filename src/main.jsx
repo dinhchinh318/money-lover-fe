@@ -1,3 +1,6 @@
+// Import patch cho React 19 trước khi import bất kỳ component nào sử dụng antd
+import '@ant-design/v5-patch-for-react-19';
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
@@ -12,7 +15,6 @@ import ReportsTime from "./pages/client/reports/ReportsTime.jsx";
 import ReportsCategory from "./pages/client/reports/ReportsCategory.jsx";
 import ReportsWallet from "./pages/client/reports/ReportsWallet.jsx";
 import AnalyticsLayout from "./components/analytics/AnalyticsLayout.jsx";
-import AnalyticsDashboard from "./pages/client/analytics/AnalyticsDashboard.jsx";
 import AnalyticsDiagnostic from "./pages/client/analytics/AnalyticsDiagnostic.jsx";
 import AnalyticsPredictive from "./pages/client/analytics/AnalyticsPredictive.jsx";
 import AnalyticsPrescriptive from "./pages/client/analytics/AnalyticsPrescriptive.jsx";
@@ -49,7 +51,7 @@ const router = createBrowserRouter([
         path: "/analytics",
         element: <AnalyticsLayout />,
         children: [
-          { index: true, element: <AnalyticsDashboard /> },
+          { index: true, element: <AnalyticsDiagnostic /> },
           { path: "diagnostic", element: <AnalyticsDiagnostic /> },
           { path: "predictive", element: <AnalyticsPredictive /> },
           { path: "prescriptive", element: <AnalyticsPrescriptive /> },

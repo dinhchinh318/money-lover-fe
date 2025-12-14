@@ -24,9 +24,10 @@ const ReportsTime = () => {
     const [wallets, setWallets] = useState([]);
     const [categories, setCategories] = useState([]);
     const [filters, setFilters] = useState({
-        startDate: dayjs().startOf("month").format("YYYY-MM-DD"),
+        // Mặc định lấy 6 tháng gần nhất để có nhiều dữ liệu hơn
+        startDate: dayjs().subtract(5, "month").startOf("month").format("YYYY-MM-DD"),
         endDate: dayjs().endOf("month").format("YYYY-MM-DD"),
-        period: "week",
+        period: "month",
         type: "all",
         walletId: "all",
         categoryId: "all",
@@ -35,42 +36,73 @@ const ReportsTime = () => {
     useEffect(() => {
         loadWallets();
         loadCategories();
-        loadData();
     }, []);
+
+    useEffect(() => {
+        loadData();
+    }, [filters]);
 
     const loadWallets = async () => {
         try {
             const res = await getWalletsAPI();
-            if (res?.EC === 0 && res?.data) {
-                setWallets(res.data);
+            // Backend trả về: { status: true, error: 0, data: [...] }
+            if ((res?.status === true || res?.error === 0 || res?.EC === 0) && res?.data) {
+                const walletsData = Array.isArray(res.data) ? res.data : [];
+                setWallets(walletsData);
+            } else {
+                setWallets([]);
             }
         } catch (error) {
-            console.error("Error loading wallets:", error);
+            setWallets([]);
         }
     };
 
     const loadCategories = async () => {
         try {
             const res = await getCategoriesAPI();
-            if (res?.EC === 0 && res?.data) {
-                setCategories(res.data);
+            // Backend trả về: { status: true, error: 0, data: [...] }
+            if ((res?.status === true || res?.error === 0 || res?.EC === 0) && res?.data) {
+                const categoriesData = Array.isArray(res.data) ? res.data : [];
+                setCategories(categoriesData);
+            } else {
+                setCategories([]);
             }
         } catch (error) {
-            console.error("Error loading categories:", error);
+            setCategories([]);
         }
     };
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const res = await getTimeBasedReportAPI(filters);
-            if (res?.EC === 0 && res?.data) {
-                setTimeData(res.data || []);
+            // Đảm bảo có period trong filters
+            const params = {
+                ...filters,
+                period: filters.period || "day",
+            };
+            
+            const res = await getTimeBasedReportAPI(params);
+            // Backend trả về: { status: true, error: 0, data: [...] }
+            if ((res?.status === true || res?.error === 0 || res?.EC === 0) && res?.data) {
+                const rawData = Array.isArray(res.data) ? res.data : [];
+                
+                // Transform data từ backend format sang frontend format
+                // Backend: { date/label, totalIncome, totalExpense, balance }
+                // Frontend: { period, income, expense, balance }
+                const transformedData = rawData.map((item) => ({
+                    period: item.label || item.date || item.period || "N/A",
+                    income: Number(item.totalIncome || item.income || 0),
+                    expense: Number(item.totalExpense || item.expense || 0),
+                    balance: Number(item.balance || (item.totalIncome || 0) - (item.totalExpense || 0)),
+                }));
+                
+                setTimeData(transformedData);
             } else {
-                message.error(res?.EM || "Không thể tải dữ liệu");
+                setTimeData([]);
+                message.error(res?.message || res?.EM || "Không thể tải dữ liệu");
             }
         } catch (error) {
-            console.error("Error loading time report:", error);
+            setTimeData([]);
             message.error("Có lỗi xảy ra khi tải dữ liệu");
         } finally {
             setLoading(false);
@@ -78,8 +110,13 @@ const ReportsTime = () => {
     };
 
     const handleFilterChange = (newFilters) => {
-        setFilters(newFilters);
-        loadData();
+        // Merge filters với newFilters
+        const updatedFilters = {
+            ...filters,
+            ...newFilters,
+        };
+        setFilters(updatedFilters);
+        // useEffect sẽ tự động gọi loadData() khi filters thay đổi
     };
 
     const formatCurrency = (value) => {
@@ -152,6 +189,10 @@ const ReportsTime = () => {
                     showCategory={true}
                     wallets={wallets}
                     categories={categories}
+                    defaultDateRange={[
+                        dayjs(filters.startDate),
+                        dayjs(filters.endDate)
+                    ]}
                 />
 
                 {loading ? (

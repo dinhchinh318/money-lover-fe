@@ -215,11 +215,17 @@ const FilterBar = ({
                         }
                         className="w-[180px]"
                         placeholder="Chọn ví"
+                        showSearch
+                        allowClear
+                        filterOption={(input, option) =>
+                            (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                        notFoundContent={wallets.length === 0 ? "Chưa có ví" : "Không tìm thấy"}
                     >
                         <Option value="all">Tất cả ví</Option>
-                        {wallets.map((wallet) => (
-                            <Option key={wallet._id} value={wallet._id}>
-                                {wallet.name}
+                        {Array.isArray(wallets) && wallets.length > 0 && wallets.map((wallet) => (
+                            <Option key={wallet._id || wallet.id} value={wallet._id || wallet.id}>
+                                {wallet.name || wallet.walletName}
                             </Option>
                         ))}
                     </Select>
@@ -234,11 +240,17 @@ const FilterBar = ({
                         }
                         className="w-[180px]"
                         placeholder="Chọn danh mục"
+                        showSearch
+                        allowClear
+                        filterOption={(input, option) =>
+                            (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                        notFoundContent={categories.length === 0 ? "Chưa có danh mục" : "Không tìm thấy"}
                     >
                         <Option value="all">Tất cả danh mục</Option>
-                        {categories.map((category) => (
-                            <Option key={category._id} value={category._id}>
-                                {category.name}
+                        {Array.isArray(categories) && categories.length > 0 && categories.map((category) => (
+                            <Option key={category._id || category.id} value={category._id || category.id}>
+                                {category.name || category.categoryName}
                             </Option>
                         ))}
                     </Select>

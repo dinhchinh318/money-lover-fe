@@ -11,8 +11,7 @@ const AnalyticsLayout = () => {
     };
 
     const navItems = [
-        { path: "/analytics", label: "Dashboard" },
-        { path: "/analytics/diagnostic", label: "Phân tích Nguyên nhân" },
+        { path: "/analytics", label: "Phân tích Nguyên nhân" },
         { path: "/analytics/predictive", label: "Dự đoán Tài chính" },
         { path: "/analytics/prescriptive", label: "Khuyến nghị Hành động" },
     ];
