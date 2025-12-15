@@ -25,11 +25,29 @@ const deleteWalletAPI = (id) => {
     return axios.delete(urlBackend);
 }
 
+const setDefaultWalletAPI = (id) => {
+    const urlBackend = `/v1/api/wallet/${id}/default`;
+    return axios.patch(urlBackend);
+}
+
+const archiveWalletAPI = (id) => {
+    const urlBackend = `/v1/api/wallet/${id}/archive`;
+    return axios.patch(urlBackend);
+}
+
+const unarchiveWalletAPI = (id) => {
+    const urlBackend = `/v1/api/wallet/${id}/unarchive`;
+    return axios.patch(urlBackend);
+}
+
 export {
     getWalletsAPI,
     getWalletByIdAPI,
     createWalletAPI,
     updateWalletAPI,
     deleteWalletAPI,
+    setDefaultWalletAPI,
+    archiveWalletAPI,
+    unarchiveWalletAPI,
 };
 

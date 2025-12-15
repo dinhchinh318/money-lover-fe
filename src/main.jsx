@@ -18,6 +18,18 @@ import AnalyticsLayout from "./components/analytics/AnalyticsLayout.jsx";
 import AnalyticsDiagnostic from "./pages/client/analytics/AnalyticsDiagnostic.jsx";
 import AnalyticsPredictive from "./pages/client/analytics/AnalyticsPredictive.jsx";
 import AnalyticsPrescriptive from "./pages/client/analytics/AnalyticsPrescriptive.jsx";
+import WalletLayout from "./components/wallets/WalletLayout.jsx";
+import WalletsIndex from "./pages/client/wallets/WalletsIndex.jsx";
+import WalletDetail from "./pages/client/wallets/WalletDetail.jsx";
+import TransactionsIndex from "./pages/client/transactions/TransactionsIndex.jsx";
+import TransactionDetail from "./pages/client/transactions/TransactionDetail.jsx";
+import CategoriesIndex from "./pages/client/categories/CategoriesIndex.jsx";
+import BudgetsIndex from "./pages/client/budgets/BudgetsIndex.jsx";
+import BudgetDetail from "./pages/client/budgets/BudgetDetail.jsx";
+import RecurringBillsIndex from "./pages/client/recurringBills/RecurringBillsIndex.jsx";
+import SavingGoalsIndex from "./pages/client/savingGoals/SavingGoalsIndex.jsx";
+import ProfilePage from "./pages/client/profile/Profile.jsx";
+import SavingGoalDetail from "./pages/client/savingGoals/SavingGoalDetail.jsx";
 import { AppContextProvider, useCurrentApp } from "./components/context/app.context.jsx";
 // import "antd/dist/reset.css"; // nếu dùng Ant Design
 
@@ -56,6 +68,54 @@ const router = createBrowserRouter([
           { path: "predictive", element: <AnalyticsPredictive /> },
           { path: "prescriptive", element: <AnalyticsPrescriptive /> },
         ],
+      },
+      // Wallet Routes with Layout
+      {
+        path: "/wallets",
+        element: <WalletLayout />,
+        children: [
+          { index: true, element: <WalletsIndex /> },
+          { path: ":id", element: <WalletDetail /> },
+        ],
+      },
+      // Transaction Routes
+      {
+        path: "/transactions",
+        children: [
+          { index: true, element: <TransactionsIndex /> },
+          { path: ":id", element: <TransactionDetail /> },
+        ],
+      },
+      // Category Routes
+      {
+        path: "/categories",
+        element: <CategoriesIndex />,
+      },
+      // Budget Routes
+      {
+        path: "/budgets",
+        children: [
+          { index: true, element: <BudgetsIndex /> },
+          { path: ":id", element: <BudgetDetail /> },
+        ],
+      },
+      // Recurring Bills Routes
+      {
+        path: "/recurring-bills",
+        element: <RecurringBillsIndex />,
+      },
+      // Saving Goals Routes
+      {
+        path: "/saving-goals",
+        children: [
+          { index: true, element: <SavingGoalsIndex /> },
+          { path: ":id", element: <SavingGoalDetail /> },
+        ],
+      },
+      // Profile
+      {
+        path: "/profile",
+        element: <ProfilePage />,
       },
     ],
   },

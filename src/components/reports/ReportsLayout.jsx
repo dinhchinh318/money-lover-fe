@@ -1,4 +1,5 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
+import { Home, Clock3, List, Wallet } from "lucide-react";
 
 const ReportsLayout = () => {
     const location = useLocation();
@@ -11,10 +12,10 @@ const ReportsLayout = () => {
     };
 
     const navItems = [
-        { path: "/reports", label: "Dashboard" },
-        { path: "/reports/time", label: "Báo cáo theo thời gian" },
-        { path: "/reports/category", label: "Báo cáo theo danh mục" },
-        { path: "/reports/wallet", label: "Báo cáo theo ví" },
+        { path: "/reports", label: "Tổng quan", icon: Home },
+        { path: "/reports/time", label: "Báo cáo theo thời gian", icon: Clock3 },
+        { path: "/reports/category", label: "Báo cáo theo danh mục", icon: List },
+        { path: "/reports/wallet", label: "Báo cáo theo ví", icon: Wallet },
     ];
 
     return (
@@ -26,13 +27,19 @@ const ReportsLayout = () => {
                         <Link
                             key={item.path}
                             to={item.path}
-                            className={`block px-4 py-3 rounded-lg font-medium transition-all ${
+                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-all text-sm ${
                                 isActive(item.path)
-                                    ? "bg-[#10B981] text-white shadow-sm font-semibold"
+                                    ? "bg-[#E8F8EF] text-[#0EA25E] border border-[#C4F1DC] shadow-sm"
                                     : "text-gray-600 hover:bg-gray-100"
                             }`}
                         >
-                            {item.label}
+                            {item.icon && (
+                                <item.icon
+                                    size={18}
+                                    className={isActive(item.path) ? "text-[#0EA25E]" : "text-gray-500"}
+                                />
+                            )}
+                            <span>{item.label}</span>
                         </Link>
                     ))}
                 </div>

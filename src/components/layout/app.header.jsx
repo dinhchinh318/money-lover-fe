@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { User, LogOut, Wallet, Menu as MenuIcon, X, Home, TrendingUp, BarChart3, FileText, Settings, UserCircle, Bell } from "lucide-react";
+import { User, LogOut, Wallet, Menu as MenuIcon, X, Home, TrendingUp, BarChart3, FileText, Settings, UserCircle, Bell, Folder, PiggyBank, CalendarClock, PieChart } from "lucide-react";
 import { useState } from "react";
 import { Dropdown, message, Avatar, Badge } from "antd";
 import { useCurrentApp } from "../context/app.context";
@@ -28,9 +28,12 @@ const AppHeader = () => {
 
   const navLinks = [
     { key: "home", label: "Home", path: "/", icon: Home },
-    { key: "dashboard", label: "Dashboard", path: "/dashboard", icon: BarChart3 },
     { key: "transactions", label: "Transactions", path: "/transactions", icon: Wallet },
     { key: "wallets", label: "Wallets", path: "/wallets", icon: Wallet },
+    { key: "categories", label: "Categories", path: "/categories", icon: Folder },
+    { key: "budgets", label: "Budgets", path: "/budgets", icon: PieChart },
+    { key: "recurring-bills", label: "Recurring Bills", path: "/recurring-bills", icon: CalendarClock },
+    { key: "saving-goals", label: "Saving Goals", path: "/saving-goals", icon: PiggyBank },
     { key: "reports", label: "Reports", path: "/reports", icon: FileText },
     { key: "analytics", label: "Analytics", path: "/analytics", icon: TrendingUp },
   ];
@@ -147,33 +150,39 @@ const AppHeader = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-[1000] bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-lg shadow-gray-100/50">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 md:h-20 items-center justify-between">
-          {/* Logo với animation */}
-        <Link
-          to="/"
-            className="flex items-center gap-3 group transition-all duration-300 hover:scale-105"
-          >
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
-              <div className="relative w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Wallet className="text-white w-5 h-5" />
+    <header className="sticky top-0 z-[1000] bg-white/95 backdrop-blur-md border-b border-gray-200/60 shadow-lg shadow-gray-100/50">
+      <div className="mx-auto w-full max-w-[1360px] px-3 sm:px-6 lg:px-7">
+        <div className="flex h-16 md:h-20 items-center gap-3 md:gap-4 w-full">
+          {/* Logo với animation - luôn bám trái */}
+          <div className="flex-shrink-0">
+            <Link
+              to="/"
+              className="flex items-center gap-3 group transition-all duration-300 hover:scale-105"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                <div className="relative w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Wallet className="text-white w-5 h-5" />
+                </div>
               </div>
-            </div>
-            <div>
-              <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent tracking-tight">
-          MoneyLover
-              </span>
-              <p className="text-xs text-gray-500 hidden sm:block">Quản lý tài chính thông minh</p>
-            </div>
-        </Link>
+              <div>
+                <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent tracking-tight">
+                  MoneyLover
+                </span>
+                <p className="text-xs text-gray-500 hidden sm:block">Quản lý tài chính thông minh</p>
+              </div>
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-2 flex-1 justify-center ml-8">
+          {/* Desktop Navigation - bám giữa nhờ flex-1 */}
+          <nav className="hidden lg:flex items-center gap-2 flex-1 justify-center">
             {navLinks.map((link) => {
               const Icon = link.icon;
-              const isActive = location.pathname === link.path || (link.path === "/" && location.pathname === "/");
+              const isActive =
+                location.pathname === link.path ||
+                (link.path === "/" && location.pathname === "/") ||
+                (link.path === "/reports" && location.pathname.startsWith("/reports")) ||
+                (link.path === "/analytics" && location.pathname.startsWith("/analytics"));
               return (
                 <Link
                   key={link.key}

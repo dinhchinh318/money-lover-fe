@@ -91,15 +91,15 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]" style={{ minHeight: 'calc(100vh - 64px - 200px)' }}>
+    <div className="min-h-screen bg-[#F3F5F8]" style={{ minHeight: 'calc(100vh - 64px - 200px)' }}>
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8" style={{ padding: '24px 32px' }}>
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-10" style={{ padding: '28px 32px' }}>
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#111827] mb-2" style={{ fontSize: '24px' }}>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#111827] mb-2">
             {user?.name ? `Xin chào, ${user.name}` : "Xin chào"}
           </h1>
-          <p className="text-[#6B7280] text-sm" style={{ fontSize: '14px' }}>
+          <p className="text-[#6B7280] text-sm">
             Chào mừng bạn trở lại với MoneyLover
           </p>
         </div>
@@ -107,71 +107,86 @@ function HomePage() {
         {/* Quick Stats Cards - 4 cards ngang */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Card 1: Tổng số dư */}
-          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow" style={{ borderRadius: '12px', padding: '24px' }}>
+          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-[#16A34A]/10 rounded-lg flex items-center justify-center">
-                <Wallet className="text-[#16A34A] w-6 h-6" />
+              <div className="w-12 h-12 rounded-full bg-[#2563EB]/10 flex items-center justify-center">
+                <Wallet className="text-[#2563EB] w-6 h-6" />
               </div>
+              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#2563EB]/10 text-[#2563EB]">Hiện tại</span>
             </div>
             <p className="text-[#6B7280] text-sm mb-1">Tổng số dư</p>
-            <p className="text-2xl font-bold text-[#16A34A]">
+            <p className="text-2xl font-bold text-[#2563EB]">
               {loading ? "..." : formatCurrency(stats.totalBalance)}
             </p>
           </div>
 
           {/* Card 2: Thu nhập tháng này */}
-          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow" style={{ borderRadius: '12px', padding: '24px' }}>
+          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-[#10B981]/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-[#10B981]/10 flex items-center justify-center">
                 <TrendingUp className="text-[#10B981] w-6 h-6" />
               </div>
+              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#10B981]/10 text-[#0F9F74]">Tháng này</span>
             </div>
-            <p className="text-[#6B7280] text-sm mb-1">Thu nhập tháng này</p>
+            <p className="text-[#6B7280] text-sm mb-1">Thu nhập</p>
             <p className="text-2xl font-bold text-[#10B981]">
               {loading ? "..." : formatCurrency(stats.monthlyIncome)}
             </p>
           </div>
 
           {/* Card 3: Chi tiêu tháng này */}
-          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow" style={{ borderRadius: '12px', padding: '24px' }}>
+          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-[#EF4444]/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-[#EF4444]/10 flex items-center justify-center">
                 <TrendingDown className="text-[#EF4444] w-6 h-6" />
               </div>
+              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#FEE2E2] text-[#B91C1C]">Tháng này</span>
             </div>
-            <p className="text-[#6B7280] text-sm mb-1">Chi tiêu tháng này</p>
+            <p className="text-[#6B7280] text-sm mb-1">Chi tiêu</p>
             <p className="text-2xl font-bold text-[#EF4444]">
               {loading ? "..." : formatCurrency(stats.monthlyExpense)}
             </p>
           </div>
 
           {/* Card 4: Số giao dịch */}
-          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow" style={{ borderRadius: '12px', padding: '24px' }}>
+          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-[#6B7280]/10 rounded-lg flex items-center justify-center">
-                <BarChart3 className="text-[#6B7280] w-6 h-6" />
+              <div className="w-12 h-12 rounded-full bg-[#3B82F6]/10 flex items-center justify-center">
+                <BarChart3 className="text-[#3B82F6] w-6 h-6" />
               </div>
+              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#E5EDFF] text-[#2563EB]">Tháng này</span>
             </div>
             <p className="text-[#6B7280] text-sm mb-1">Giao dịch</p>
-            <p className="text-2xl font-bold text-[#6B7280]">
+            <p className="text-2xl font-bold text-[#1F2937]">
               {loading ? "..." : stats.transactionCount}
             </p>
           </div>
         </div>
 
         {/* Recent Transactions Section */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm mb-8" style={{ borderRadius: '12px' }}>
-          <div className="p-6 border-b border-[#E5E7EB] flex items-center justify-between" style={{ padding: '24px' }}>
+        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm mb-8">
+          <div className="p-6 border-b border-[#E5E7EB] flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <h2 className="text-xl font-semibold text-[#111827]">Giao dịch gần đây</h2>
-            <Link
-              to="/transactions"
-              className="text-[#16A34A] hover:underline flex items-center gap-1 text-sm font-medium"
-            >
-              Xem tất cả
-              <ArrowRight size={16} />
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <button className="px-3 py-2 text-sm rounded-lg border border-[#E5E7EB] text-[#374151] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors">
+                7 ngày
+              </button>
+              <button className="px-3 py-2 text-sm rounded-lg border border-[#E5E7EB] text-[#374151] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors">
+                30 ngày
+              </button>
+              <button className="px-3 py-2 text-sm rounded-lg border border-[#E5E7EB] text-[#374151] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors">
+                Tất cả ví
+              </button>
+              <Link
+                to="/transactions"
+                className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-[#2563EB] hover:underline"
+              >
+                Xem tất cả
+                <ArrowRight size={16} />
+              </Link>
+            </div>
           </div>
-          <div className="p-6" style={{ padding: '24px' }}>
+          <div className="p-6">
             {loading ? (
               <div className="space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -190,7 +205,7 @@ function HomePage() {
                 {recentTransactions.map((transaction) => (
                   <div
                     key={transaction.id}
-                    className="flex items-center gap-4 p-4 rounded-lg hover:bg-[#F9FAFB] transition-colors"
+                    className="flex items-center gap-4 p-4 rounded-lg hover:bg-[#F9FAFB] transition-colors border border-transparent hover:border-[#E5E7EB]"
                   >
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center ${
@@ -205,8 +220,8 @@ function HomePage() {
                         <TrendingDown className="text-[#EF4444]" size={20} />
                       )}
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-[#111827]">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-[#111827] truncate">
                         {transaction.category}
                       </p>
                       <p className="text-sm text-[#6B7280]">
@@ -218,7 +233,7 @@ function HomePage() {
                         transaction.type === "income"
                           ? "text-[#10B981]"
                           : "text-[#EF4444]"
-                      }`}
+                      } text-right`}
                     >
                       {transaction.type === "income" ? "+" : "-"}
                       {formatCurrency(Math.abs(transaction.amount))}
@@ -232,7 +247,7 @@ function HomePage() {
                 <p className="text-[#6B7280] mb-4">Chưa có giao dịch nào</p>
                 <Link
                   to="/transactions"
-                  className="inline-flex items-center gap-2 text-[#16A34A] hover:underline font-medium"
+                  className="inline-flex items-center gap-2 text-[#2563EB] hover:underline font-medium"
                 >
                   Thêm giao dịch đầu tiên
                   <ArrowRight size={16} />
@@ -246,8 +261,7 @@ function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <Link
             to="/transactions?action=add"
-            className="bg-[#16A34A] text-white rounded-xl p-6 flex items-center justify-between hover:bg-[#15803d] transition-colors shadow-sm hover:shadow-md"
-            style={{ borderRadius: '12px' }}
+            className="bg-[#2563EB] text-white rounded-xl p-6 flex items-center justify-between hover:bg-[#1D4ED8] transition-colors shadow-sm hover:shadow-md"
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
@@ -263,11 +277,10 @@ function HomePage() {
 
           <Link
             to="/wallets?action=add"
-            className="bg-white border-2 border-[#16A34A] text-[#16A34A] rounded-xl p-6 flex items-center justify-between hover:bg-[#F9FAFB] transition-colors shadow-sm hover:shadow-md"
-            style={{ borderRadius: '12px' }}
+            className="bg-white border-2 border-[#2563EB] text-[#2563EB] rounded-xl p-6 flex items-center justify-between hover:bg-[#F8FAFF] transition-colors shadow-sm hover:shadow-md"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#16A34A]/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#2563EB]/10 rounded-lg flex items-center justify-center">
                 <Wallet className="w-6 h-6" />
               </div>
               <div>
@@ -280,11 +293,10 @@ function HomePage() {
 
           <Link
             to="/reports"
-            className="bg-white border-2 border-[#16A34A] text-[#16A34A] rounded-xl p-6 flex items-center justify-between hover:bg-[#F9FAFB] transition-colors shadow-sm hover:shadow-md"
-            style={{ borderRadius: '12px' }}
+            className="bg-white border-2 border-[#2563EB] text-[#2563EB] rounded-xl p-6 flex items-center justify-between hover:bg-[#F8FAFF] transition-colors shadow-sm hover:shadow-md"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#16A34A]/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#2563EB]/10 rounded-lg flex items-center justify-center">
                 <BarChart3 className="w-6 h-6" />
               </div>
               <div>

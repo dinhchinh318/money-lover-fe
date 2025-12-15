@@ -1,4 +1,5 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
+import { Activity, LineChart, Sparkles } from "lucide-react";
 
 const AnalyticsLayout = () => {
     const location = useLocation();
@@ -11,9 +12,9 @@ const AnalyticsLayout = () => {
     };
 
     const navItems = [
-        { path: "/analytics", label: "Phân tích Nguyên nhân" },
-        { path: "/analytics/predictive", label: "Dự đoán Tài chính" },
-        { path: "/analytics/prescriptive", label: "Khuyến nghị Hành động" },
+        { path: "/analytics", label: "Phân tích Nguyên nhân", icon: Activity },
+        { path: "/analytics/predictive", label: "Dự đoán Tài chính", icon: LineChart },
+        { path: "/analytics/prescriptive", label: "Khuyến nghị Hành động", icon: Sparkles },
     ];
 
     return (
@@ -25,13 +26,19 @@ const AnalyticsLayout = () => {
                         <Link
                             key={item.path}
                             to={item.path}
-                            className={`block px-4 py-3 rounded-lg font-medium transition-all ${
+                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-all text-sm ${
                                 isActive(item.path)
-                                    ? "bg-[#10B981] text-white shadow-sm font-semibold"
+                                    ? "bg-[#E8F8EF] text-[#0EA25E] border border-[#C4F1DC] shadow-sm"
                                     : "text-gray-600 hover:bg-gray-100"
                             }`}
                         >
-                            {item.label}
+                            {item.icon && (
+                                <item.icon
+                                    size={18}
+                                    className={isActive(item.path) ? "text-[#0EA25E]" : "text-gray-500"}
+                                />
+                            )}
+                            <span>{item.label}</span>
                         </Link>
                     ))}
                 </div>
