@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Wallet, Plus, MoreVertical, Edit, Trash2, Archive, Star, Building2 } from "lucide-react";
+import { Plus, Edit, Trash2, Wallet, Building2, Star, Archive, TrendingUp, AlertTriangle } from "lucide-react";
 import { message, Dropdown, Modal } from "antd";
 import { getWalletsAPI, deleteWalletAPI, setDefaultWalletAPI, archiveWalletAPI, unarchiveWalletAPI } from "../../../services/api.wallet";
 import WalletModal from "../../../components/wallets/WalletModal";
@@ -10,14 +10,14 @@ const WalletsIndex = () => {
     const [wallets, setWallets] = useState([]);
     const [filteredWallets, setFilteredWallets] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeFilter, setActiveFilter] = useState("all"); // all, active, archived
+    const [activeTab, setActiveTab] = useState("all"); // all, active, archived
     const [modalOpen, setModalOpen] = useState(false);
     const [editingWallet, setEditingWallet] = useState(null);
     const [summary, setSummary] = useState({
+        totalWallets: 0,
         totalBalance: 0,
-        activeCount: 0,
-        archivedCount: 0,
-        defaultWalletName: "",
+        cashWallets: 0,
+        bankWallets: 0,
     });
 
     useEffect(() => {
@@ -26,15 +26,16 @@ const WalletsIndex = () => {
 
     useEffect(() => {
         filterWallets();
-    }, [wallets, activeFilter]);
+        calculateSummary();
+    }, [wallets, activeTab]);
 
     const loadWallets = async () => {
         try {
             setLoading(true);
             const res = await getWalletsAPI();
-            if (res.EC === 0 && res.data) {
-                setWallets(res.data);
-                calculateSummary(res.data);
+            if (res.status || res.EC === 0) {
+                const walletsData = res.data?.wallets || res.data || [];
+                setWallets(Array.isArray(walletsData) ? walletsData : []);
             } else {
                 message.error("Không thể tải danh sách ví!");
             }
@@ -45,28 +46,30 @@ const WalletsIndex = () => {
         }
     };
 
-    const calculateSummary = (walletList) => {
-        const total = walletList.reduce((sum, w) => sum + (w.balance || 0), 0);
-        const active = walletList.filter((w) => !w.is_archived).length;
-        const archived = walletList.filter((w) => w.is_archived).length;
-        const defaultWallet = walletList.find((w) => w.is_default);
-        
-        setSummary({
-            totalBalance: total,
-            activeCount: active,
-            archivedCount: archived,
-            defaultWalletName: defaultWallet?.name || "Chưa có",
-        });
-    };
-
     const filterWallets = () => {
         let filtered = [...wallets];
-        if (activeFilter === "active") {
-            filtered = filtered.filter((w) => !w.is_archived);
-        } else if (activeFilter === "archived") {
-            filtered = filtered.filter((w) => w.is_archived);
+
+        if (activeTab === "active") {
+            filtered = filtered.filter((wallet) => !wallet.is_archived);
+        } else if (activeTab === "archived") {
+            filtered = filtered.filter((wallet) => wallet.is_archived);
         }
+
         setFilteredWallets(filtered);
+    };
+
+    const calculateSummary = () => {
+        const total = wallets.length;
+        const totalBalance = wallets.reduce((sum, w) => sum + (w.balance || 0), 0);
+        const cashWallets = wallets.filter((w) => w.type === "cash" && !w.is_archived).length;
+        const bankWallets = wallets.filter((w) => w.type === "bank" && !w.is_archived).length;
+
+        setSummary({
+            totalWallets: total,
+            totalBalance,
+            cashWallets,
+            bankWallets,
+        });
     };
 
     const formatCurrency = (amount, currency = "VND") => {
@@ -96,7 +99,7 @@ const WalletsIndex = () => {
             onOk: async () => {
                 try {
                     const res = await deleteWalletAPI(wallet._id);
-                    if (res.EC === 0) {
+                    if (res.status || res.EC === 0) {
                         message.success("Xóa ví thành công!");
                         loadWallets();
                     } else {
@@ -112,7 +115,7 @@ const WalletsIndex = () => {
     const handleSetDefault = async (wallet) => {
         try {
             const res = await setDefaultWalletAPI(wallet._id);
-            if (res.EC === 0) {
+            if (res.status || res.EC === 0) {
                 message.success("Đặt ví mặc định thành công!");
                 loadWallets();
             } else {
@@ -126,7 +129,7 @@ const WalletsIndex = () => {
     const handleArchive = async (wallet) => {
         try {
             const res = await archiveWalletAPI(wallet._id);
-            if (res.EC === 0) {
+            if (res.status || res.EC === 0) {
                 message.success("Lưu trữ ví thành công!");
                 loadWallets();
             } else {
@@ -140,7 +143,7 @@ const WalletsIndex = () => {
     const handleUnarchive = async (wallet) => {
         try {
             const res = await unarchiveWalletAPI(wallet._id);
-            if (res.EC === 0) {
+            if (res.status || res.EC === 0) {
                 message.success("Khôi phục ví thành công!");
                 loadWallets();
             } else {
@@ -170,6 +173,8 @@ const WalletsIndex = () => {
             });
         }
 
+        items.push({ type: "divider" });
+
         if (!wallet.is_archived) {
             items.push({
                 key: "archive",
@@ -186,13 +191,10 @@ const WalletsIndex = () => {
             });
         }
 
-        if (!wallet.is_default && !wallet.is_archived) {
-            items.push({
-                type: "divider",
-            });
+        if (!wallet.is_default) {
             items.push({
                 key: "delete",
-                label: "Xóa ví",
+                label: "Xóa",
                 icon: <Trash2 size={16} />,
                 danger: true,
                 onClick: () => handleDeleteWallet(wallet),
@@ -201,6 +203,12 @@ const WalletsIndex = () => {
 
         return items;
     };
+
+    const tabs = [
+        { key: "all", label: "Tất cả" },
+        { key: "active", label: "Đang hoạt động" },
+        { key: "archived", label: "Đã lưu trữ" },
+    ];
 
     return (
         <div className="min-h-screen bg-[#F9FAFB]">
@@ -224,8 +232,20 @@ const WalletsIndex = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     <div className="ds-card">
                         <div className="flex items-center justify-between mb-4">
+                            <div className="w-12 h-12 bg-[#3B82F6]/10 rounded-lg flex items-center justify-center">
+                                <Wallet className="text-[#3B82F6] w-6 h-6" />
+                            </div>
+                        </div>
+                        <p className="ds-text-secondary mb-1">Tổng số ví</p>
+                        <p className="text-2xl font-bold text-[#3B82F6]">
+                            {loading ? "..." : summary.totalWallets}
+                        </p>
+                    </div>
+
+                    <div className="ds-card">
+                        <div className="flex items-center justify-between mb-4">
                             <div className="w-12 h-12 bg-[#10B981]/10 rounded-lg flex items-center justify-center">
-                                <Wallet className="text-[#10B981] w-6 h-6" />
+                                <TrendingUp className="text-[#10B981] w-6 h-6" />
                             </div>
                         </div>
                         <p className="ds-text-secondary mb-1">Tổng số dư</p>
@@ -236,130 +256,95 @@ const WalletsIndex = () => {
 
                     <div className="ds-card">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#3B82F6]/10 rounded-lg flex items-center justify-center">
-                                <Wallet className="text-[#3B82F6] w-6 h-6" />
-                            </div>
-                        </div>
-                        <p className="ds-text-secondary mb-1">Số ví đang dùng</p>
-                        <p className="text-2xl font-bold text-[#3B82F6]">
-                            {loading ? "..." : summary.activeCount}
-                        </p>
-                    </div>
-
-                    <div className="ds-card">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#6B7280]/10 rounded-lg flex items-center justify-center">
-                                <Archive className="text-[#6B7280] w-6 h-6" />
-                            </div>
-                        </div>
-                        <p className="ds-text-secondary mb-1">Số ví đã lưu trữ</p>
-                        <p className="text-2xl font-bold text-[#6B7280]">
-                            {loading ? "..." : summary.archivedCount}
-                        </p>
-                    </div>
-
-                    <div className="ds-card">
-                        <div className="flex items-center justify-between mb-4">
                             <div className="w-12 h-12 bg-[#F59E0B]/10 rounded-lg flex items-center justify-center">
-                                <Star className="text-[#F59E0B] w-6 h-6" />
+                                <Wallet className="text-[#F59E0B] w-6 h-6" />
                             </div>
                         </div>
-                        <p className="ds-text-secondary mb-1">Ví mặc định</p>
-                        <p className="text-lg font-semibold text-[#111827] truncate">
-                            {loading ? "..." : summary.defaultWalletName}
+                        <p className="ds-text-secondary mb-1">Ví tiền mặt</p>
+                        <p className="text-2xl font-bold text-[#F59E0B]">
+                            {loading ? "..." : summary.cashWallets}
+                        </p>
+                    </div>
+
+                    <div className="ds-card">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="w-12 h-12 bg-[#8B5CF6]/10 rounded-lg flex items-center justify-center">
+                                <Building2 className="text-[#8B5CF6] w-6 h-6" />
+                            </div>
+                        </div>
+                        <p className="ds-text-secondary mb-1">Ví ngân hàng</p>
+                        <p className="text-2xl font-bold text-[#8B5CF6]">
+                            {loading ? "..." : summary.bankWallets}
                         </p>
                     </div>
                 </div>
 
                 {/* Filter Tabs */}
                 <div className="flex gap-2 mb-6 bg-white p-1 rounded-lg border border-[#E5E7EB] inline-flex">
-                    <button
-                        onClick={() => setActiveFilter("all")}
-                        className={`px-4 py-2 rounded-md font-medium transition-all ${
-                            activeFilter === "all"
-                                ? "bg-[#10B981] text-white shadow-sm"
-                                : "text-[#6B7280] hover:bg-[#F9FAFB]"
-                        }`}
-                    >
-                        Tất cả
-                    </button>
-                    <button
-                        onClick={() => setActiveFilter("active")}
-                        className={`px-4 py-2 rounded-md font-medium transition-all ${
-                            activeFilter === "active"
-                                ? "bg-[#10B981] text-white shadow-sm"
-                                : "text-[#6B7280] hover:bg-[#F9FAFB]"
-                        }`}
-                    >
-                        Đang dùng
-                    </button>
-                    <button
-                        onClick={() => setActiveFilter("archived")}
-                        className={`px-4 py-2 rounded-md font-medium transition-all ${
-                            activeFilter === "archived"
-                                ? "bg-[#10B981] text-white shadow-sm"
-                                : "text-[#6B7280] hover:bg-[#F9FAFB]"
-                        }`}
-                    >
-                        Đã lưu trữ
-                    </button>
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`px-4 py-2 rounded-md font-medium transition-all ${activeTab === tab.key
+                                    ? "bg-[#10B981] text-white shadow-sm"
+                                    : "text-[#6B7280] hover:bg-[#F9FAFB]"
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
 
-                {/* Wallets Grid */}
+                {/* Wallets List */}
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div className="space-y-4">
+                        {[1, 2, 3, 4, 5].map((i) => (
                             <div key={i} className="ds-card ds-skeleton" style={{ height: "200px" }}></div>
                         ))}
                     </div>
                 ) : filteredWallets.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredWallets.map((wallet) => (
-                            <div
-                                key={wallet._id}
-                                className="ds-card relative cursor-pointer hover:scale-[1.02] transition-transform"
-                                style={{
-                                    border: wallet.is_default ? "2px solid #10B981" : "1px solid #E5E7EB",
-                                }}
-                                onClick={() => navigate(`/wallets/${wallet._id}`)}
-                            >
-                                {/* Badges */}
-                                <div className="absolute top-4 right-4 flex gap-2">
-                                    {wallet.is_default && (
-                                        <span className="ds-badge ds-badge-success">Mặc định</span>
-                                    )}
-                                    {wallet.is_archived && (
-                                        <span className="ds-badge ds-badge-warning">Đã lưu trữ</span>
-                                    )}
-                                </div>
-
-                                {/* Actions Menu */}
+                        {filteredWallets.map((wallet) => {
+                            return (
                                 <div
-                                    className="absolute top-4 right-4 z-10"
-                                    onClick={(e) => e.stopPropagation()}
+                                    key={wallet._id}
+                                    className="ds-card relative cursor-pointer hover:shadow-lg transition-shadow"
+                                    onClick={() => navigate(`/wallets/${wallet._id}`)}
+                                    style={{
+                                        border: wallet.is_default ? "2px solid #10B981" : "1px solid #E5E7EB",
+                                    }}
                                 >
-                                    <Dropdown
-                                        menu={{ items: getWalletMenuItems(wallet) }}
-                                        trigger={["click"]}
-                                        placement="bottomRight"
-                                    >
-                                        <button
-                                            className="p-2 hover:bg-[#F9FAFB] rounded-lg transition-colors"
-                                            onClick={(e) => e.stopPropagation()}
+                                    {/* Actions Menu */}
+                                    <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
+                                        <Dropdown
+                                            menu={{ items: getWalletMenuItems(wallet) }}
+                                            trigger={["click"]}
+                                            placement="bottomRight"
                                         >
-                                            <MoreVertical size={18} className="text-[#6B7280]" />
-                                        </button>
-                                    </Dropdown>
-                                </div>
+                                            <button className="p-2 hover:bg-[#F9FAFB] rounded-lg transition-colors">
+                                                <svg
+                                                    className="w-5 h-5 text-[#6B7280]"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </Dropdown>
+                                    </div>
 
-                                {/* Wallet Icon */}
-                                <div className="mb-4">
+                                    {/* Wallet Icon */}
                                     <div
-                                        className={`w-16 h-16 rounded-lg flex items-center justify-center ${
-                                            wallet.type === "bank"
+                                        className={`w-16 h-16 rounded-lg flex items-center justify-center mb-4 ${wallet.type === "bank"
                                                 ? "bg-[#3B82F6]/10"
                                                 : "bg-[#10B981]/10"
-                                        }`}
+                                            }`}
                                     >
                                         {wallet.type === "bank" ? (
                                             <Building2 className="text-[#3B82F6] w-8 h-8" />
@@ -367,60 +352,57 @@ const WalletsIndex = () => {
                                             <Wallet className="text-[#10B981] w-8 h-8" />
                                         )}
                                     </div>
-                                </div>
 
-                                {/* Wallet Info */}
-                                <div>
-                                    <h3 className="ds-heading-3 mb-2">{wallet.name}</h3>
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <span
-                                            className={`ds-badge ${
-                                                wallet.type === "bank"
-                                                    ? "ds-badge-primary"
-                                                    : "ds-badge-success"
-                                            }`}
-                                        >
-                                            {wallet.type === "bank" ? "Ngân hàng" : "Tiền mặt"}
-                                        </span>
-                                    </div>
-                                    <p className="text-2xl font-bold text-[#10B981] mb-2">
-                                        {formatCurrency(wallet.balance || 0, wallet.currency)}
-                                    </p>
-                                    {wallet.type === "bank" && wallet.bankName && (
-                                        <div className="mt-3 pt-3 border-t border-[#E5E7EB]">
-                                            <p className="ds-text-small mb-1">
-                                                <span className="font-medium">Ngân hàng:</span> {wallet.bankName}
-                                            </p>
-                                            {wallet.bankAccount && (
-                                                <p className="ds-text-small">
-                                                    <span className="font-medium">Số TK:</span>{" "}
-                                                    {wallet.bankAccount.replace(/(.{4})(.*)/, "****$2")}
-                                                </p>
+                                    {/* Wallet Info */}
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="ds-heading-3">{wallet.name}</h3>
+                                            {wallet.is_default && (
+                                                <Star className="text-[#10B981] w-5 h-5 fill-[#10B981]" />
                                             )}
                                         </div>
-                                    )}
+
+                                        <div className="flex items-center gap-2">
+                                            <span
+                                                className={`ds-badge ${wallet.type === "bank"
+                                                        ? "ds-badge-primary"
+                                                        : "ds-badge-success"
+                                                    }`}
+                                            >
+                                                {wallet.type === "bank" ? "Ngân hàng" : "Tiền mặt"}
+                                            </span>
+                                            {wallet.is_archived && (
+                                                <span className="ds-badge ds-badge-warning">Đã lưu trữ</span>
+                                            )}
+                                        </div>
+
+                                        <p className="text-2xl font-bold text-[#10B981] mt-4">
+                                            {formatCurrency(wallet.balance || 0, wallet.currency)}
+                                        </p>
+
+                                        {wallet.type === "bank" && wallet.bankName && (
+                                            <p className="ds-text-small text-[#6B7280]">
+                                                {wallet.bankName}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     <div className="ds-empty-state">
                         <Wallet className="ds-empty-state-icon" size={64} />
                         <p className="ds-empty-state-text">
-                            {activeFilter === "archived"
+                            {activeTab === "archived"
                                 ? "Chưa có ví nào được lưu trữ"
-                                : activeFilter === "active"
-                                ? "Chưa có ví đang dùng"
-                                : "Chưa có ví nào"}
+                                : activeTab === "active"
+                                    ? "Chưa có ví đang hoạt động"
+                                    : "Chưa có ví nào"}
                         </p>
-                        {activeFilter !== "archived" && (
-                            <button
-                                onClick={handleAddWallet}
-                                className="ds-button-primary mt-4"
-                            >
-                                Thêm ví đầu tiên
-                            </button>
-                        )}
+                        <button onClick={handleAddWallet} className="ds-button-primary mt-4">
+                            Thêm ví đầu tiên
+                        </button>
                     </div>
                 )}
             </div>

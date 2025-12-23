@@ -25,11 +25,17 @@ const deleteCategoryAPI = (id) => {
     return axios.delete(urlBackend);
 }
 
+const setDefaultCategoryAPI = (id) => {
+    const urlBackend = `/v1/api/category/${id}/default`;
+    return axios.patch(urlBackend);
+}
+
 export {
     getCategoriesAPI,
     getCategoryByIdAPI,
     createCategoryAPI,
     updateCategoryAPI,
     deleteCategoryAPI,
+    setDefaultCategoryAPI,
 };
 

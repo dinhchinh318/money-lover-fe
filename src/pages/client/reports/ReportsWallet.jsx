@@ -88,7 +88,7 @@ const ReportsWallet = () => {
                 // getWalletExpenseDistribution trả về { distribution: [...], totalExpense: ... }
                 const distribution = data.distribution || data || [];
                 const expenseTotal = data.totalExpense || 0;
-                
+
                 // Transform data để đảm bảo có đầy đủ field
                 const transformedData = Array.isArray(distribution) ? distribution.map((item) => {
                     const walletType = item.walletType || item.type || "cash";
@@ -102,7 +102,7 @@ const ReportsWallet = () => {
                                 return "💵";
                         }
                     };
-                    
+
                     return {
                         walletId: item.walletId || item._id,
                         walletName: item.walletName || item.name || "Chưa xác định",
@@ -116,7 +116,7 @@ const ReportsWallet = () => {
                         transactionCount: Number(item.count || item.transactionCount || 0),
                     };
                 }) : [];
-                
+
                 setPieData(transformedData);
                 setTotalExpense(expenseTotal);
             } else {
@@ -131,7 +131,7 @@ const ReportsWallet = () => {
                 const transformedLineData = lineDataArray.map((item) => {
                     let periodLabel = "";
                     const period = item.period || {};
-                    
+
                     if (period.date) {
                         periodLabel = dayjs(period.date).format("DD/MM/YYYY");
                     } else if (period.year && period.month) {
@@ -143,7 +143,7 @@ const ReportsWallet = () => {
                     } else {
                         periodLabel = "N/A";
                     }
-                    
+
                     return {
                         period: periodLabel,
                         walletId: item.walletId,
@@ -151,7 +151,7 @@ const ReportsWallet = () => {
                         amount: Number(item.totalExpense || item.amount || 0),
                     };
                 });
-                
+
                 setLineData(transformedLineData);
             } else {
                 setLineData([]);
@@ -190,7 +190,7 @@ const ReportsWallet = () => {
             key: "walletName",
             render: (text, record, index) => (
                 <div className="flex items-center gap-3">
-                    <div 
+                    <div
                         className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold"
                         style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     >
@@ -303,201 +303,220 @@ const ReportsWallet = () => {
 
     return (
         <div className="max-w-7xl mx-auto p-6">
-                {/* Header */}
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">
-                        Báo cáo theo Ví
-                    </h1>
-                    <p className="text-gray-600 mt-1">
-                        Phân tích chi tiêu theo ví
-                    </p>
+            {/* Header */}
+            <div className="mb-6">
+                <h1 className="text-2xl font-bold text-gray-900">
+                    Báo cáo theo Ví
+                </h1>
+                <p className="text-gray-600 mt-1">
+                    Phân tích chi tiêu theo ví
+                </p>
+            </div>
+
+            {/* Filter Bar */}
+            <FilterBar
+                onFilterChange={handleFilterChange}
+                showPeriod={true}
+                defaultDateRange={[
+                    dayjs(filters.startDate),
+                    dayjs(filters.endDate)
+                ]}
+            />
+
+            {loading ? (
+                <div className="flex justify-center items-center py-20">
+                    <Spin size="large" />
                 </div>
-
-                {/* Filter Bar */}
-                <FilterBar 
-                    onFilterChange={handleFilterChange}
-                    showPeriod={true}
-                    defaultDateRange={[
-                        dayjs(filters.startDate),
-                        dayjs(filters.endDate)
-                    ]}
-                />
-
-                {loading ? (
-                    <div className="flex justify-center items-center py-20">
-                        <Spin size="large" />
-                    </div>
-                ) : (
-                    <>
-                        {/* Summary Card */}
-                        {pieData.length > 0 && (
-                            <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-sm">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <p className="text-sm text-gray-600 mb-1">Tổng thu nhập</p>
-                                        <p className="text-2xl font-bold text-[#10B981]">
-                                            {formatCurrency(pieData.reduce((sum, item) => sum + (item.income || 0), 0))}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-gray-600 mb-1">Tổng chi tiêu</p>
-                                        <p className="text-2xl font-bold text-[#EF4444]">
-                                            {formatCurrency(totalExpense)}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-gray-600 mb-1">Số dư</p>
-                                        <p className="text-2xl font-bold text-[#2563EB]">
-                                            {formatCurrency(pieData.reduce((sum, item) => sum + (item.balance || 0), 0))}
-                                        </p>
-                                    </div>
+            ) : (
+                <>
+                    {/* Summary Card */}
+                    {pieData.length > 0 && (
+                        <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-sm">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Tổng thu nhập</p>
+                                    <p className="text-2xl font-bold text-[#10B981]">
+                                        {formatCurrency(pieData.reduce((sum, item) => sum + (item.income || 0), 0))}
+                                    </p>
                                 </div>
-                                <p className="text-sm text-gray-500 mt-3">
-                                    Tổng {pieData.length} ví
-                                </p>
-                            </Card>
-                        )}
-
-                        {/* Charts Section */}
-                        {pieData.length > 0 ? (
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                                {/* Pie Chart */}
-                                <Card className="shadow-sm">
-                                    <h3 className="text-lg font-semibold mb-4">
-                                        Phân bổ chi tiêu theo ví
-                                    </h3>
-                                    {pieData.some(item => item.amount > 0) ? (
-                                        <ResponsiveContainer width="100%" height={400}>
-                                            <PieChart>
-                                                <Pie
-                                                    data={pieData.filter(item => item.amount > 0)}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    labelLine={false}
-                                                    label={false}
-                                                    outerRadius={120}
-                                                    innerRadius={60}
-                                                    fill="#8884d8"
-                                                    dataKey="amount"
-                                                    paddingAngle={2}
-                                                >
-                                                    {pieData.filter(item => item.amount > 0).map((entry, index) => (
-                                                        <Cell
-                                                            key={`cell-${index}`}
-                                                            fill={COLORS[index % COLORS.length]}
-                                                            stroke="#fff"
-                                                            strokeWidth={2}
-                                                        />
-                                                    ))}
-                                                </Pie>
-                                                <Tooltip
-                                                    formatter={(value) => formatCurrency(value)}
-                                                    contentStyle={{ 
-                                                        backgroundColor: "#fff", 
-                                                        border: "1px solid #E5E7EB", 
-                                                        borderRadius: "8px",
-                                                        padding: "12px"
-                                                    }}
-                                                />
-                                                <Legend />
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                    ) : (
-                                        <div className="flex items-center justify-center h-[400px] text-gray-400">
-                                            <div className="text-center">
-                                                <p className="text-lg mb-2">Chưa có chi tiêu</p>
-                                                <p className="text-sm">Tất cả ví đều chưa có giao dịch chi tiêu trong khoảng thời gian này</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </Card>
-
-                                {/* Multi-line Chart */}
-                                <Card className="shadow-sm">
-                                    <h3 className="text-lg font-semibold mb-4">
-                                        So sánh chi tiêu các ví theo thời gian
-                                    </h3>
-                                    {lineChartData.length > 0 && lineKeys.length > 0 ? (
-                                        <ResponsiveContainer width="100%" height={400}>
-                                            <LineChart data={lineChartData}>
-                                                <CartesianGrid
-                                                    strokeDasharray="3 3"
-                                                    stroke="#E5E7EB"
-                                                />
-                                                <XAxis
-                                                    dataKey="period"
-                                                    stroke="#6B7280"
-                                                />
-                                                <YAxis 
-                                                    stroke="#6B7280"
-                                                    tickFormatter={(value) => formatCurrency(value)}
-                                                />
-                                                <Tooltip
-                                                    formatter={(value) => formatCurrency(value)}
-                                                    contentStyle={{ 
-                                                        backgroundColor: "#fff", 
-                                                        border: "1px solid #E5E7EB", 
-                                                        borderRadius: "8px",
-                                                        padding: "12px"
-                                                    }}
-                                                />
-                                                <Legend />
-                                                {lineKeys.map((key, index) => (
-                                                    <Line
-                                                        key={key}
-                                                        type="monotone"
-                                                        dataKey={key}
-                                                        name={key}
-                                                        stroke={COLORS[index % COLORS.length]}
-                                                        strokeWidth={2}
-                                                        dot={{ r: 4 }}
-                                                    />
-                                                ))}
-                                            </LineChart>
-                                        </ResponsiveContainer>
-                                    ) : (
-                                        <div className="flex items-center justify-center h-[400px] text-gray-400">
-                                            <div className="text-center">
-                                                <p className="text-lg mb-2">Chưa có dữ liệu</p>
-                                                <p className="text-sm">Không có chi tiêu trong khoảng thời gian này</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </Card>
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Tổng chi tiêu</p>
+                                    <p className="text-2xl font-bold text-[#EF4444]">
+                                        {formatCurrency(totalExpense)}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Số dư</p>
+                                    <p className="text-2xl font-bold text-[#2563EB]">
+                                        {formatCurrency(pieData.reduce((sum, item) => sum + (item.balance || 0), 0))}
+                                    </p>
+                                </div>
                             </div>
-                        ) : (
-                            <Card className="shadow-sm mb-6">
-                                <div className="flex items-center justify-center h-[400px] text-gray-400">
-                                    <div className="text-center">
-                                        <p className="text-lg mb-2">Chưa có dữ liệu chi tiêu</p>
-                                        <p className="text-sm">Vui lòng thêm giao dịch chi tiêu trong khoảng thời gian này</p>
-                                    </div>
-                                </div>
-                            </Card>
-                        )}
+                            <p className="text-sm text-gray-500 mt-3">
+                                Tổng {pieData.length} ví
+                            </p>
+                        </Card>
+                    )}
 
-                        {/* Wallets Table */}
-                        {pieData.length > 0 && (
+                    {/* Charts Section */}
+                    {pieData.length > 0 ? (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            {/* Pie Chart */}
                             <Card className="shadow-sm">
                                 <h3 className="text-lg font-semibold mb-4">
-                                    Bảng thống kê ví
+                                    Phân bổ chi tiêu theo ví
                                 </h3>
-                                <Table
-                                    columns={tableColumns}
-                                    dataSource={pieData.map((item, index) => ({
-                                        ...item,
-                                        key: item.walletId || index,
-                                    }))}
-                                    pagination={{
-                                        pageSize: 10,
-                                        showSizeChanger: true,
-                                        showTotal: (total) => `Tổng ${total} ví`,
-                                    }}
-                                />
+                                {pieData.some(item => item.amount > 0) ? (
+                                    <ResponsiveContainer width="100%" height={400}>
+                                        <PieChart>
+                                            <Pie
+                                                data={pieData.filter(item => item.amount > 0)}
+                                                cx="50%"
+                                                cy="50%"
+                                                labelLine={false}
+                                                label={false}
+                                                outerRadius={120}
+                                                innerRadius={60}
+                                                fill="#8884d8"
+                                                dataKey="amount"
+                                                nameKey="walletName"
+                                                paddingAngle={2}
+                                            >
+                                                {pieData.filter(item => item.amount > 0).map((entry, index) => (
+                                                    <Cell
+                                                        key={`cell-${index}`}
+                                                        fill={COLORS[index % COLORS.length]}
+                                                        stroke="#fff"
+                                                        strokeWidth={2}
+                                                    />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                formatter={(value, name) => [
+                                                    formatCurrency(value),
+                                                    name
+                                                ]}
+                                                labelFormatter={(label) => `Ví: ${label}`}
+                                                contentStyle={{
+                                                    backgroundColor: "#fff",
+                                                    border: "1px solid #E5E7EB",
+                                                    borderRadius: "8px",
+                                                    padding: "12px"
+                                                }}
+                                            />
+                                            <Legend
+                                                formatter={(value, entry) => {
+                                                    // Tìm item trong pieData dựa trên walletName hoặc index
+                                                    const filteredData = pieData.filter(item => item.amount > 0);
+                                                    const index = entry.payload?.index ?? entry.dataIndex ?? -1;
+                                                    if (index >= 0 && index < filteredData.length) {
+                                                        return filteredData[index].walletName || value;
+                                                    }
+                                                    // Fallback: tìm theo value
+                                                    const item = filteredData.find(p => p.walletName === value || p.walletId === value);
+                                                    return item ? item.walletName : value;
+                                                }}
+                                                iconType="circle"
+                                                wrapperStyle={{ paddingTop: "20px" }}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="flex items-center justify-center h-[400px] text-gray-400">
+                                        <div className="text-center">
+                                            <p className="text-lg mb-2">Chưa có chi tiêu</p>
+                                            <p className="text-sm">Tất cả ví đều chưa có giao dịch chi tiêu trong khoảng thời gian này</p>
+                                        </div>
+                                    </div>
+                                )}
                             </Card>
-                        )}
-                    </>
-                )}
+
+                            {/* Multi-line Chart */}
+                            <Card className="shadow-sm">
+                                <h3 className="text-lg font-semibold mb-4">
+                                    So sánh chi tiêu các ví theo thời gian
+                                </h3>
+                                {lineChartData.length > 0 && lineKeys.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height={400}>
+                                        <LineChart data={lineChartData}>
+                                            <CartesianGrid
+                                                strokeDasharray="3 3"
+                                                stroke="#E5E7EB"
+                                            />
+                                            <XAxis
+                                                dataKey="period"
+                                                stroke="#6B7280"
+                                            />
+                                            <YAxis
+                                                stroke="#6B7280"
+                                                tickFormatter={(value) => formatCurrency(value)}
+                                            />
+                                            <Tooltip
+                                                formatter={(value) => formatCurrency(value)}
+                                                contentStyle={{
+                                                    backgroundColor: "#fff",
+                                                    border: "1px solid #E5E7EB",
+                                                    borderRadius: "8px",
+                                                    padding: "12px"
+                                                }}
+                                            />
+                                            <Legend />
+                                            {lineKeys.map((key, index) => (
+                                                <Line
+                                                    key={key}
+                                                    type="monotone"
+                                                    dataKey={key}
+                                                    name={key}
+                                                    stroke={COLORS[index % COLORS.length]}
+                                                    strokeWidth={2}
+                                                    dot={{ r: 4 }}
+                                                />
+                                            ))}
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="flex items-center justify-center h-[400px] text-gray-400">
+                                        <div className="text-center">
+                                            <p className="text-lg mb-2">Chưa có dữ liệu</p>
+                                            <p className="text-sm">Không có chi tiêu trong khoảng thời gian này</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </Card>
+                        </div>
+                    ) : (
+                        <Card className="shadow-sm mb-6">
+                            <div className="flex items-center justify-center h-[400px] text-gray-400">
+                                <div className="text-center">
+                                    <p className="text-lg mb-2">Chưa có dữ liệu chi tiêu</p>
+                                    <p className="text-sm">Vui lòng thêm giao dịch chi tiêu trong khoảng thời gian này</p>
+                                </div>
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* Wallets Table */}
+                    {pieData.length > 0 && (
+                        <Card className="shadow-sm">
+                            <h3 className="text-lg font-semibold mb-4">
+                                Bảng thống kê ví
+                            </h3>
+                            <Table
+                                columns={tableColumns}
+                                dataSource={pieData.map((item, index) => ({
+                                    ...item,
+                                    key: item.walletId || index,
+                                }))}
+                                pagination={{
+                                    pageSize: 10,
+                                    showSizeChanger: true,
+                                    showTotal: (total) => `Tổng ${total} ví`,
+                                }}
+                            />
+                        </Card>
+                    )}
+                </>
+            )}
         </div>
     );
 };

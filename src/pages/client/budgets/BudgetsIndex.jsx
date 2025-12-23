@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Edit, Trash2, Copy, Pause, TrendingUp, Wallet, AlertTriangle, CheckCircle } from "lucide-react";
-import { message, Dropdown, Modal } from "antd";
+import { Plus, Edit, Trash2, Copy, Pause, TrendingUp, Wallet, AlertTriangle, CheckCircle, Target, DollarSign, BarChart3 } from "lucide-react";
+import { message, Dropdown, Modal, Badge, Alert } from "antd";
 import { getAllBudgetsAPI, deleteBudgetAPI } from "../../../services/api.budget";
 import { getCategoriesAPI } from "../../../services/api.category";
 import BudgetModal from "../../../components/budgets/BudgetModal";
@@ -200,85 +200,104 @@ const BudgetsIndex = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#F9FAFB]">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
             <div className="max-w-7xl mx-auto px-6 py-8">
                 {/* Header Section */}
-                <div className="flex items-center justify-between mb-6">
-                    <h1 className="ds-heading-1" style={{ fontSize: "24px", fontWeight: 700 }}>
-                        Quản lý Ngân sách
-                    </h1>
+                <div className="mb-8">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
+                            <Target className="text-white" size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-gray-900 bg-clip-text text-transparent">
+                                Quản lý Ngân sách
+                            </h1>
+                            <p className="text-gray-600 mt-1 text-sm">
+                                Đặt hạn mức chi tiêu và theo dõi mức độ sử dụng ngân sách
+                            </p>
+                        </div>
+                    </div>
                     <button
                         onClick={handleAddBudget}
-                        className="ds-button-primary"
-                        style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
                     >
-                        <Plus size={18} />
+                        <Plus size={20} />
                         Thêm ngân sách
                     </button>
                 </div>
 
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div className="ds-card">
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-200">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#3B82F6]/10 rounded-lg flex items-center justify-center">
-                                <Wallet className="text-[#3B82F6] w-6 h-6" />
+                            <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
+                                <Target className="text-white w-7 h-7" />
                             </div>
                         </div>
-                        <p className="ds-text-secondary mb-1">Tổng ngân sách</p>
-                        <p className="text-2xl font-bold text-[#3B82F6]">
+                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng ngân sách</p>
+                        <p className="text-3xl font-bold text-blue-600">
                             {loading ? "..." : summary.totalBudgets}
                         </p>
                     </div>
 
-                    <div className="ds-card">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-green-200">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#10B981]/10 rounded-lg flex items-center justify-center">
-                                <TrendingUp className="text-[#10B981] w-6 h-6" />
+                            <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+                                <DollarSign className="text-white w-7 h-7" />
                             </div>
                         </div>
-                        <p className="ds-text-secondary mb-1">Tổng hạn mức</p>
-                        <p className="text-2xl font-bold text-[#10B981]">
+                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng hạn mức</p>
+                        <p className="text-3xl font-bold text-green-600">
                             {loading ? "..." : formatCurrency(summary.totalLimit)}
                         </p>
                     </div>
 
-                    <div className="ds-card">
+                    <div className="bg-gradient-to-br from-red-50 to-rose-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-red-200">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#EF4444]/10 rounded-lg flex items-center justify-center">
-                                <TrendingUp className="text-[#EF4444] w-6 h-6" />
+                            <div className="w-14 h-14 bg-gradient-to-br from-red-400 to-rose-600 rounded-xl flex items-center justify-center shadow-md">
+                                <TrendingUp className="text-white w-7 h-7" />
                             </div>
                         </div>
-                        <p className="ds-text-secondary mb-1">Tổng đã chi</p>
-                        <p className="text-2xl font-bold text-[#EF4444]">
+                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng đã chi</p>
+                        <p className="text-3xl font-bold text-red-600">
                             {loading ? "..." : formatCurrency(summary.totalSpent)}
                         </p>
                     </div>
 
-                    <div className="ds-card">
+                    <div className="bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-amber-200">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#F59E0B]/10 rounded-lg flex items-center justify-center">
-                                <AlertTriangle className="text-[#F59E0B] w-6 h-6" />
+                            <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
+                                <AlertTriangle className="text-white w-7 h-7" />
                             </div>
                         </div>
-                        <p className="ds-text-secondary mb-1">Ngân sách cảnh báo</p>
-                        <p className="text-2xl font-bold text-[#F59E0B]">
+                        <p className="text-gray-600 mb-1 text-sm font-medium">Ngân sách cảnh báo</p>
+                        <p className="text-3xl font-bold text-amber-600">
                             {loading ? "..." : summary.warningCount}
                         </p>
                     </div>
                 </div>
 
+                {/* Warning Alert */}
+                {summary.warningCount > 0 && (
+                    <Alert
+                        message={`Bạn có ${summary.warningCount} ngân sách đang ở mức cảnh báo (≥80%) hoặc đã vượt hạn mức`}
+                        type="warning"
+                        showIcon
+                        className="mb-6 rounded-xl"
+                        closable
+                    />
+                )}
+
                 {/* Filter Tabs */}
-                <div className="flex gap-2 mb-6 bg-white p-1 rounded-lg border border-[#E5E7EB] inline-flex">
+                <div className="flex gap-2 mb-6 bg-white p-1.5 rounded-xl border-2 border-gray-200 shadow-sm inline-flex">
                     {tabs.map((tab) => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`px-4 py-2 rounded-md font-medium transition-all ${
-                                activeTab === tab.key
-                                    ? "bg-[#10B981] text-white shadow-sm"
-                                    : "text-[#6B7280] hover:bg-[#F9FAFB]"
-                            }`}
+                            className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 ${activeTab === tab.key
+                                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
+                                    : "text-gray-600 hover:bg-gray-50"
+                                }`}
                         >
                             {tab.label}
                         </button>
@@ -304,15 +323,14 @@ const BudgetsIndex = () => {
                             return (
                                 <div
                                     key={budget._id}
-                                    className="ds-card relative"
-                                    style={{
-                                        border:
-                                            budgetStatus.status === "danger"
-                                                ? "2px solid #EF4444"
-                                                : budgetStatus.status === "warning"
-                                                ? "2px solid #F59E0B"
-                                                : "1px solid #E5E7EB",
-                                    }}
+                                    className={`relative rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 ${budgetStatus.status === "danger"
+                                            ? "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-300"
+                                            : budgetStatus.status === "warning"
+                                                ? "bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300"
+                                                : budgetStatus.status === "notice"
+                                                    ? "bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300"
+                                                    : "bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200"
+                                        }`}
                                 >
                                     {/* Actions Menu */}
                                     <div className="absolute top-4 right-4 z-10">
@@ -341,8 +359,15 @@ const BudgetsIndex = () => {
 
                                     <div className="flex items-start gap-6">
                                         {/* Icon */}
-                                        <div className="w-16 h-16 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center flex-shrink-0">
-                                            <Wallet className="text-[#3B82F6] w-8 h-8" />
+                                        <div className={`w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${budgetStatus.status === "danger"
+                                                ? "bg-gradient-to-br from-red-400 to-rose-600"
+                                                : budgetStatus.status === "warning"
+                                                    ? "bg-gradient-to-br from-amber-400 to-orange-600"
+                                                    : budgetStatus.status === "notice"
+                                                        ? "bg-gradient-to-br from-blue-400 to-indigo-600"
+                                                        : "bg-gradient-to-br from-green-400 to-emerald-600"
+                                            }`}>
+                                            <BarChart3 className="text-white w-10 h-10" />
                                         </div>
 
                                         {/* Content */}
@@ -351,15 +376,17 @@ const BudgetsIndex = () => {
                                                 <h3 className="ds-heading-3">
                                                     {budget.name || budget.category?.name || "Ngân sách"}
                                                 </h3>
-                                                <span
-                                                    className="ds-badge"
+                                                <Badge
+                                                    count={budgetStatus.statusLabel}
                                                     style={{
-                                                        backgroundColor: `${budgetStatus.statusColor}20`,
-                                                        color: budgetStatus.statusColor,
+                                                        backgroundColor: budgetStatus.statusColor,
+                                                        color: "white",
+                                                        padding: "4px 12px",
+                                                        borderRadius: "8px",
+                                                        fontSize: "12px",
+                                                        fontWeight: "600",
                                                     }}
-                                                >
-                                                    {budgetStatus.statusLabel}
-                                                </span>
+                                                />
                                             </div>
 
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -379,10 +406,10 @@ const BudgetsIndex = () => {
                                                         {budget.period === "weekly"
                                                             ? "Hàng tuần"
                                                             : budget.period === "monthly"
-                                                            ? "Hàng tháng"
-                                                            : budget.period === "yearly"
-                                                            ? "Hàng năm"
-                                                            : "Tùy chỉnh"}
+                                                                ? "Hàng tháng"
+                                                                : budget.period === "yearly"
+                                                                    ? "Hàng năm"
+                                                                    : "Tùy chỉnh"}
                                                     </p>
                                                 </div>
                                                 <div>
@@ -408,20 +435,19 @@ const BudgetsIndex = () => {
                                                         {percentage.toFixed(0)}%
                                                     </span>
                                                 </div>
-                                                <div className="ds-progress-bar" style={{ height: "12px" }}>
+                                                <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
                                                     <div
-                                                        className="ds-progress-bar-fill"
+                                                        className="h-full rounded-full transition-all duration-500 shadow-md"
                                                         style={{
                                                             width: `${percentage}%`,
-                                                            backgroundColor:
+                                                            background:
                                                                 percentage >= 100
-                                                                    ? "#EF4444"
+                                                                    ? "linear-gradient(90deg, #EF4444, #DC2626)"
                                                                     : percentage >= 80
-                                                                    ? "#F59E0B"
-                                                                    : percentage >= 50
-                                                                    ? "#3B82F6"
-                                                                    : "#10B981",
-                                                            borderRadius: "6px",
+                                                                        ? "linear-gradient(90deg, #F59E0B, #D97706)"
+                                                                        : percentage >= 50
+                                                                            ? "linear-gradient(90deg, #3B82F6, #2563EB)"
+                                                                            : "linear-gradient(90deg, #10B981, #059669)",
                                                         }}
                                                     />
                                                 </div>
@@ -441,9 +467,8 @@ const BudgetsIndex = () => {
                                                     <div>
                                                         <p className="ds-text-small text-[#6B7280] mb-1">Còn lại</p>
                                                         <p
-                                                            className={`font-bold ${
-                                                                remaining < 0 ? "text-[#EF4444]" : "text-[#10B981]"
-                                                            }`}
+                                                            className={`font-bold ${remaining < 0 ? "text-[#EF4444]" : "text-[#10B981]"
+                                                                }`}
                                                         >
                                                             {formatCurrency(remaining)}
                                                         </p>
@@ -457,16 +482,23 @@ const BudgetsIndex = () => {
                         })}
                     </div>
                 ) : (
-                    <div className="ds-empty-state">
-                        <Wallet className="ds-empty-state-icon" size={64} />
-                        <p className="ds-empty-state-text">
+                    <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-300">
+                        <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mb-4">
+                            <Target className="text-indigo-600" size={40} />
+                        </div>
+                        <p className="text-xl font-semibold text-gray-700 mb-2">
                             {activeTab === "expired"
                                 ? "Chưa có ngân sách nào hết hạn"
                                 : activeTab === "active"
-                                ? "Chưa có ngân sách đang hoạt động"
-                                : "Chưa có ngân sách nào"}
+                                    ? "Chưa có ngân sách đang hoạt động"
+                                    : "Chưa có ngân sách nào"}
                         </p>
-                        <button onClick={handleAddBudget} className="ds-button-primary mt-4">
+                        <p className="text-gray-500 mb-6">Bắt đầu tạo ngân sách để quản lý chi tiêu hiệu quả</p>
+                        <button
+                            onClick={handleAddBudget}
+                            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+                        >
+                            <Plus size={20} />
                             Thêm ngân sách đầu tiên
                         </button>
                     </div>
@@ -488,4 +520,6 @@ const BudgetsIndex = () => {
 };
 
 export default BudgetsIndex;
+
+
 

@@ -1,6 +1,21 @@
 /* Import Design System */
 @import './design-system.css';
 
+/* Shimmer animation for progress bars */
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite;
+}
+
 /* Import Inter Font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
@@ -11,63 +26,64 @@
 
 /* Base Styles */
 body {
-  font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* Landing Page 3D Phone Effect */
 .phone-3d {
-  transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
+    transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
 }
 
 @media (max-width: 1024px) {
-  .phone-3d {
-    transform: none;
-  }
+    .phone-3d {
+        transform: none;
+    }
 }
 
 /* Animations */
 @keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+    animation: fade-in 0.3s ease-out;
 }
 
 /* Account Dropdown Styling */
 .account-dropdown .ant-dropdown-menu,
 .account-dropdown-modern .ant-dropdown-menu {
-  border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  padding: 12px;
-  border: 1px solid #E5E7EB;
-  background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    padding: 12px;
+    border: 1px solid #E5E7EB;
+    background: white;
 }
 
 .account-dropdown .ant-dropdown-menu-item,
 .account-dropdown-modern .ant-dropdown-menu-item {
-  border-radius: 12px;
-  margin: 4px 0;
-  padding: 0;
-  height: auto;
-  line-height: normal;
+    border-radius: 12px;
+    margin: 4px 0;
+    padding: 0;
+    height: auto;
+    line-height: normal;
 }
 
 .account-dropdown .ant-dropdown-menu-item:hover,
 .account-dropdown-modern .ant-dropdown-menu-item:hover {
-  background-color: transparent;
+    background-color: transparent;
 }
 
 .account-dropdown-modern .ant-dropdown-menu-item-divider {
-  margin: 8px 0;
-  border-color: #E5E7EB;
+    margin: 8px 0;
+    border-color: #E5E7EB;
 }
 
 .hide-scrollbar {
@@ -122,22 +138,7 @@ body {
     outline: none;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    @apply bg-gray-100 rounded-full;
-}
-
-::-webkit-scrollbar-thumb {
-    @apply bg-gradient-to-b from-blue-400 to-purple-500 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    @apply from-blue-500 to-purple-600;
-}
+/* Scrollbar sử dụng mặc định của trình duyệt */
 
 /* Smooth animations */
 * {
@@ -505,9 +506,12 @@ button:hover {
 
 /* Header gradient animation */
 @keyframes gradient-shift {
-    0%, 100% {
+
+    0%,
+    100% {
         background-position: 0% 50%;
     }
+
     50% {
         background-position: 100% 50%;
     }
@@ -520,9 +524,12 @@ header {
 
 /* Landing Page Enhanced Styles */
 @keyframes gradient-text {
-    0%, 100% {
+
+    0%,
+    100% {
         background-position: 0% 50%;
     }
+
     50% {
         background-position: 100% 50%;
     }
@@ -546,7 +553,8 @@ html {
 }
 
 /* Improved button transitions */
-button, a {
+button,
+a {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -563,6 +571,7 @@ button, a {
 
 /* Smooth animations for landing page */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
