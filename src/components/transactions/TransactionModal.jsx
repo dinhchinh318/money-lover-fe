@@ -25,7 +25,7 @@ const RECURRING_TYPES = [
     { value: "yearly", label: "Hàng năm" },
 ];
 
-const TransactionModal = ({ open, onClose, transaction, onSuccess }) => {
+const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType = "expense" }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [transactionType, setTransactionType] = useState("expense");
@@ -63,16 +63,16 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess }) => {
             } else {
                 form.resetFields();
                 form.setFieldsValue({
-                    type: "expense",
+                    type: initialType,
                     date: dayjs(),
                     isRecurring: false,
                 });
-                setTransactionType("expense");
+                setTransactionType(initialType);
                 setIsRecurring(false);
                 setImageUrl("");
             }
         }
-    }, [open, transaction, form]);
+    }, [open, transaction, form, initialType]);
 
     const loadWallets = async () => {
         try {
@@ -228,11 +228,10 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess }) => {
                                     setTransactionType(type.value);
                                     form.setFieldsValue({ type: type.value });
                                 }}
-                                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                                    transactionType === type.value
-                                        ? "text-white shadow-sm"
-                                        : "bg-[#F9FAFB] text-[#6B7280] hover:bg-[#E5E7EB]"
-                                }`}
+                                className={`px-4 py-2 rounded-lg font-medium transition-all ${transactionType === type.value
+                                    ? "text-white shadow-sm"
+                                    : "bg-[#F9FAFB] text-[#6B7280] hover:bg-[#E5E7EB]"
+                                    }`}
                                 style={{
                                     backgroundColor:
                                         transactionType === type.value ? type.color : undefined,

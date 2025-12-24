@@ -213,81 +213,99 @@ const WalletsIndex = () => {
     return (
         <div className="min-h-screen bg-[#F9FAFB]">
             <div className="max-w-7xl mx-auto px-6 py-8">
-                {/* Header Section */}
-                <div className="flex items-center justify-between mb-6">
-                    <h1 className="ds-heading-1" style={{ fontSize: "24px", fontWeight: 700 }}>
-                        Quản lý Ví
-                    </h1>
+                {/* Header Section - Redesigned */}
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text text-transparent">
+                            Quản lý Ví
+                        </h1>
+                        <p className="text-gray-600 mt-1 text-sm">Theo dõi và quản lý tất cả ví của bạn</p>
+                    </div>
                     <button
                         onClick={handleAddWallet}
-                        className="ds-button-primary"
-                        style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                        className="px-5 py-3 bg-gradient-to-r from-[#10B981] to-emerald-600 text-white font-semibold rounded-xl hover:from-[#059669] hover:to-[#10B981] shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
                     >
-                        <Plus size={18} />
+                        <Plus size={20} />
                         Thêm ví
                     </button>
                 </div>
 
-                {/* Summary Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div className="ds-card">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#3B82F6]/10 rounded-lg flex items-center justify-center">
-                                <Wallet className="text-[#3B82F6] w-6 h-6" />
+                {/* Summary Cards - Redesigned */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    {/* Total Wallets Card */}
+                    <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 rounded-2xl p-6 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                    <Wallet className="text-white w-7 h-7" />
+                                </div>
                             </div>
+                            <p className="text-sm font-medium text-gray-600 mb-2">Tổng số ví</p>
+                            <p className="text-3xl font-bold text-[#3B82F6] mb-1">
+                                {loading ? "..." : summary.totalWallets}
+                            </p>
                         </div>
-                        <p className="ds-text-secondary mb-1">Tổng số ví</p>
-                        <p className="text-2xl font-bold text-[#3B82F6]">
-                            {loading ? "..." : summary.totalWallets}
-                        </p>
                     </div>
 
-                    <div className="ds-card">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#10B981]/10 rounded-lg flex items-center justify-center">
-                                <TrendingUp className="text-[#10B981] w-6 h-6" />
+                    {/* Total Balance Card */}
+                    <div className="relative overflow-hidden bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 rounded-2xl p-6 border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-green-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                    <TrendingUp className="text-white w-7 h-7" />
+                                </div>
                             </div>
+                            <p className="text-sm font-medium text-gray-600 mb-2">Tổng số dư</p>
+                            <p className="text-3xl font-bold text-[#10B981] mb-1">
+                                {loading ? "..." : formatCurrency(summary.totalBalance)}
+                            </p>
                         </div>
-                        <p className="ds-text-secondary mb-1">Tổng số dư</p>
-                        <p className="text-2xl font-bold text-[#10B981]">
-                            {loading ? "..." : formatCurrency(summary.totalBalance)}
-                        </p>
                     </div>
 
-                    <div className="ds-card">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#F59E0B]/10 rounded-lg flex items-center justify-center">
-                                <Wallet className="text-[#F59E0B] w-6 h-6" />
+                    {/* Cash Wallets Card */}
+                    <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 rounded-2xl p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-amber-500 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                    <Wallet className="text-white w-7 h-7" />
+                                </div>
                             </div>
+                            <p className="text-sm font-medium text-gray-600 mb-2">Ví tiền mặt</p>
+                            <p className="text-3xl font-bold text-[#F59E0B] mb-1">
+                                {loading ? "..." : summary.cashWallets}
+                            </p>
                         </div>
-                        <p className="ds-text-secondary mb-1">Ví tiền mặt</p>
-                        <p className="text-2xl font-bold text-[#F59E0B]">
-                            {loading ? "..." : summary.cashWallets}
-                        </p>
                     </div>
 
-                    <div className="ds-card">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#8B5CF6]/10 rounded-lg flex items-center justify-center">
-                                <Building2 className="text-[#8B5CF6] w-6 h-6" />
+                    {/* Bank Wallets Card */}
+                    <div className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-violet-50 to-purple-100 rounded-2xl p-6 border border-purple-100 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-violet-500 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                    <Building2 className="text-white w-7 h-7" />
+                                </div>
                             </div>
+                            <p className="text-sm font-medium text-gray-600 mb-2">Ví ngân hàng</p>
+                            <p className="text-3xl font-bold text-[#8B5CF6] mb-1">
+                                {loading ? "..." : summary.bankWallets}
+                            </p>
                         </div>
-                        <p className="ds-text-secondary mb-1">Ví ngân hàng</p>
-                        <p className="text-2xl font-bold text-[#8B5CF6]">
-                            {loading ? "..." : summary.bankWallets}
-                        </p>
                     </div>
                 </div>
 
-                {/* Filter Tabs */}
-                <div className="flex gap-2 mb-6 bg-white p-1 rounded-lg border border-[#E5E7EB] inline-flex">
+                {/* Filter Tabs - Redesigned */}
+                <div className="flex gap-2 mb-6 bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm inline-flex">
                     {tabs.map((tab) => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`px-4 py-2 rounded-md font-medium transition-all ${activeTab === tab.key
-                                    ? "bg-[#10B981] text-white shadow-sm"
-                                    : "text-[#6B7280] hover:bg-[#F9FAFB]"
+                            className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${activeTab === tab.key
+                                    ? "bg-gradient-to-r from-[#10B981] to-emerald-600 text-white shadow-md"
+                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                                 }`}
                         >
                             {tab.label}
@@ -305,14 +323,19 @@ const WalletsIndex = () => {
                 ) : filteredWallets.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredWallets.map((wallet) => {
+                            const isBank = wallet.type === "bank";
+                            const iconColor = isBank ? "#3B82F6" : "#10B981";
+                            const gradientFrom = isBank ? "from-blue-400 to-indigo-500" : "from-green-400 to-emerald-500";
+                            const bgGradient = isBank ? "from-blue-50 via-indigo-50 to-blue-100" : "from-green-50 via-emerald-50 to-green-100";
+
                             return (
                                 <div
                                     key={wallet._id}
-                                    className="ds-card relative cursor-pointer hover:shadow-lg transition-shadow"
+                                    className={`relative bg-white rounded-2xl p-6 cursor-pointer hover:shadow-xl border-2 transition-all duration-300 group ${wallet.is_default
+                                            ? "border-[#10B981] shadow-lg"
+                                            : "border-gray-200 hover:border-gray-300 shadow-md"
+                                        }`}
                                     onClick={() => navigate(`/wallets/${wallet._id}`)}
-                                    style={{
-                                        border: wallet.is_default ? "2px solid #10B981" : "1px solid #E5E7EB",
-                                    }}
                                 >
                                     {/* Actions Menu */}
                                     <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
@@ -321,9 +344,9 @@ const WalletsIndex = () => {
                                             trigger={["click"]}
                                             placement="bottomRight"
                                         >
-                                            <button className="p-2 hover:bg-[#F9FAFB] rounded-lg transition-colors">
+                                            <button className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100">
                                                 <svg
-                                                    className="w-5 h-5 text-[#6B7280]"
+                                                    className="w-5 h-5 text-gray-600"
                                                     fill="none"
                                                     stroke="currentColor"
                                                     viewBox="0 0 24 24"
@@ -339,68 +362,83 @@ const WalletsIndex = () => {
                                         </Dropdown>
                                     </div>
 
+                                    {/* Default Badge */}
+                                    {wallet.is_default && (
+                                        <div className="absolute top-4 left-4">
+                                            <div className="px-2 py-1 bg-gradient-to-r from-[#10B981] to-emerald-600 rounded-md shadow-md">
+                                                <Star className="text-white w-4 h-4 fill-white" />
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Wallet Icon */}
-                                    <div
-                                        className={`w-16 h-16 rounded-lg flex items-center justify-center mb-4 ${wallet.type === "bank"
-                                                ? "bg-[#3B82F6]/10"
-                                                : "bg-[#10B981]/10"
-                                            }`}
-                                    >
-                                        {wallet.type === "bank" ? (
-                                            <Building2 className="text-[#3B82F6] w-8 h-8" />
+                                    <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${gradientFrom} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                                        {isBank ? (
+                                            <Building2 className="text-white w-10 h-10" />
                                         ) : (
-                                            <Wallet className="text-[#10B981] w-8 h-8" />
+                                            <Wallet className="text-white w-10 h-10" />
                                         )}
                                     </div>
 
                                     {/* Wallet Info */}
-                                    <div className="space-y-2">
+                                    <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <h3 className="ds-heading-3">{wallet.name}</h3>
-                                            {wallet.is_default && (
-                                                <Star className="text-[#10B981] w-5 h-5 fill-[#10B981]" />
-                                            )}
+                                            <h3 className="text-xl font-bold text-gray-900">{wallet.name}</h3>
                                         </div>
 
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
                                             <span
-                                                className={`ds-badge ${wallet.type === "bank"
-                                                        ? "ds-badge-primary"
-                                                        : "ds-badge-success"
+                                                className={`px-3 py-1 rounded-lg text-xs font-semibold ${isBank
+                                                        ? "bg-blue-100 text-blue-700 border border-blue-200"
+                                                        : "bg-green-100 text-green-700 border border-green-200"
                                                     }`}
                                             >
-                                                {wallet.type === "bank" ? "Ngân hàng" : "Tiền mặt"}
+                                                {isBank ? "Ngân hàng" : "Tiền mặt"}
                                             </span>
                                             {wallet.is_archived && (
-                                                <span className="ds-badge ds-badge-warning">Đã lưu trữ</span>
+                                                <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg text-xs font-semibold border border-orange-200">
+                                                    Đã lưu trữ
+                                                </span>
                                             )}
                                         </div>
 
-                                        <p className="text-2xl font-bold text-[#10B981] mt-4">
-                                            {formatCurrency(wallet.balance || 0, wallet.currency)}
-                                        </p>
-
-                                        {wallet.type === "bank" && wallet.bankName && (
-                                            <p className="ds-text-small text-[#6B7280]">
-                                                {wallet.bankName}
+                                        <div className="pt-2">
+                                            <p className="text-3xl font-bold text-[#10B981] mb-1">
+                                                {formatCurrency(wallet.balance || 0, wallet.currency)}
                                             </p>
-                                        )}
+                                            {wallet.type === "bank" && wallet.bankName && (
+                                                <p className="text-sm text-gray-600 font-medium">
+                                                    {wallet.bankName}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
                 ) : (
-                    <div className="ds-empty-state">
-                        <Wallet className="ds-empty-state-icon" size={64} />
-                        <p className="ds-empty-state-text">
+                    <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-gray-200">
+                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                            <Wallet className="text-gray-400" size={40} />
+                        </div>
+                        <p className="text-lg font-semibold text-gray-700 mb-2">
                             {activeTab === "archived"
                                 ? "Chưa có ví nào được lưu trữ"
                                 : activeTab === "active"
                                     ? "Chưa có ví đang hoạt động"
                                     : "Chưa có ví nào"}
                         </p>
-                        <button onClick={handleAddWallet} className="ds-button-primary mt-4">
+                        <p className="text-sm text-gray-500 mb-6">
+                            {activeTab === "archived"
+                                ? "Các ví đã lưu trữ sẽ hiển thị ở đây"
+                                : "Hãy bắt đầu bằng cách thêm ví đầu tiên của bạn"}
+                        </p>
+                        <button
+                            onClick={handleAddWallet}
+                            className="px-6 py-3 bg-gradient-to-r from-[#10B981] to-emerald-600 text-white font-semibold rounded-lg hover:from-[#059669] hover:to-[#10B981] shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+                        >
+                            <Plus size={20} />
                             Thêm ví đầu tiên
                         </button>
                     </div>
@@ -422,4 +460,5 @@ const WalletsIndex = () => {
 };
 
 export default WalletsIndex;
+
 

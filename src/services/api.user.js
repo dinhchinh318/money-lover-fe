@@ -57,4 +57,8 @@ const changePasswordAPI = (currentPassword, newPassword) => {
     const urlBackend = "/v1/api/auth/changePassword";
     return axios.post(urlBackend, { currentPassword, newPassword });
 }
-export { getAUserAPI, loginAPI, registerAPI, fetchAccountAPI, logoutAPI, getUserAPI, deleteUserAPI, createUserAPI, updateUserAPI, forgotPasswordAPI, verifyOTPAPI, resetPasswordAPI, changePasswordAPI }
+const googleLoginAPI = (token) => {
+    const urlBackend = "/v1/api/auth/google";
+    return axios.post(urlBackend, { token });
+}
+export { getAUserAPI, loginAPI, registerAPI, fetchAccountAPI, logoutAPI, getUserAPI, deleteUserAPI, createUserAPI, updateUserAPI, forgotPasswordAPI, verifyOTPAPI, resetPasswordAPI, changePasswordAPI, googleLoginAPI }

@@ -471,118 +471,64 @@ const AnalyticsDiagnostic = () => {
             }
 
             // Xử lý Unusual Time Spending
+            // API trả về { status: true, data: { unusualTimeSpending: [...], hourDistribution: {...} } }
+            let timeSpendingData = [];
+            let hourlyData = [];
+
             if (timeRes?.status === true && timeRes?.data) {
                 const timeSpending = timeRes.data.unusualTimeSpending || [];
                 const hourDistribution = timeRes.data.hourDistribution || {};
 
-                // Kiểm tra xem có dữ liệu thực sự không
-                const hasTimeSpending = Array.isArray(timeSpending) && timeSpending.length > 0;
-                const hasHourlyData = Object.keys(hourDistribution).length > 0;
+                // Set unusual time transactions
+                timeSpendingData = Array.isArray(timeSpending) ? timeSpending : [];
 
-                if (hasTimeSpending || hasHourlyData) {
-                    setUnusualTime(Array.isArray(timeSpending) ? timeSpending : []);
+                // Tạo dữ liệu biểu đồ theo giờ từ hourDistribution
+                // hourDistribution có thể có keys là string hoặc number, nên cần convert
+                if (Object.keys(hourDistribution).length > 0) {
+                    hourlyData = Array.from({ length: 24 }, (_, i) => {
+                        // Thử access bằng cả number và string key
+                        const hourKey = i.toString();
+                        const hourData = hourDistribution[i] || hourDistribution[hourKey] || {};
+                        return {
+                            hour: `${String(i).padStart(2, '0')}:00`,
+                            amount: Number(hourData.totalAmount) || 0,
+                            count: Number(hourData.count) || 0,
+                        };
+                    });
 
-                    // Tạo dữ liệu biểu đồ theo giờ
-                    const hourlyData = Array.from({ length: 24 }, (_, i) => ({
-                        hour: `${i}:00`,
-                        amount: hourDistribution[i]?.totalAmount || 0,
-                        count: hourDistribution[i]?.count || 0,
-                    }));
-
-                    // Kiểm tra xem hourly data có giá trị > 0 không
+                    // Chỉ set nếu có dữ liệu thực sự (totalAmount > 0)
                     const totalHourlyAmount = hourlyData.reduce((sum, item) => sum + item.amount, 0);
-                    if (totalHourlyAmount > 0) {
-                        setHourlySpending(hourlyData);
-                    } else {
-                        // Dữ liệu rỗng, dùng mock
-                        // Dữ liệu rỗng, dùng mock
-                        const mockHourlyData = Array.from({ length: 24 }, (_, i) => ({
-                            hour: `${i}:00`,
-                            amount: i >= 8 && i <= 22 ? 500000 + Math.random() * 1000000 : 100000 + Math.random() * 200000,
-                            count: i >= 8 && i <= 22 ? Math.floor(Math.random() * 10) + 5 : Math.floor(Math.random() * 3),
-                        }));
-                        setHourlySpending(mockHourlyData);
+                    if (totalHourlyAmount === 0) {
+                        hourlyData = [];
                     }
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    // Dữ liệu rỗng, dùng mock
-                    setUnusualTime([
-                        {
-                            transactionId: "mock1",
-                            amount: 200000,
-                            date: new Date(),
-                            hour: 3,
-                            note: "Giao dịch đêm khuya",
-                            category: { name: "Ăn uống" },
-                            categoryName: "Ăn uống",
-                            reason: "Chi tiêu vào giờ bất thường (3:00)",
-                        },
-                    ]);
-                    const mockHourlyData = Array.from({ length: 24 }, (_, i) => ({
-                        hour: `${i}:00`,
-                        amount: i >= 8 && i <= 22 ? 500000 + Math.random() * 1000000 : 100000 + Math.random() * 200000,
-                        count: i >= 8 && i <= 22 ? Math.floor(Math.random() * 10) + 5 : Math.floor(Math.random() * 3),
-                    }));
-                    setHourlySpending(mockHourlyData);
                 }
             } else if (timeRes?.EC === 0 && timeRes?.data) {
                 const timeSpending = timeRes.data.unusualTimeSpending || [];
                 const hourDistribution = timeRes.data.hourDistribution || {};
-                const hasTimeSpending = Array.isArray(timeSpending) && timeSpending.length > 0;
-                const hasHourlyData = Object.keys(hourDistribution).length > 0;
 
-                if (hasTimeSpending || hasHourlyData) {
-                    setUnusualTime(Array.isArray(timeSpending) ? timeSpending : []);
-                    const hourlyData = Array.from({ length: 24 }, (_, i) => ({
-                        hour: `${i}:00`,
-                        amount: hourDistribution[i]?.totalAmount || 0,
-                        count: hourDistribution[i]?.count || 0,
-                    }));
+                timeSpendingData = Array.isArray(timeSpending) ? timeSpending : [];
+
+                if (Object.keys(hourDistribution).length > 0) {
+                    hourlyData = Array.from({ length: 24 }, (_, i) => {
+                        // Thử access bằng cả number và string key
+                        const hourKey = i.toString();
+                        const hourData = hourDistribution[i] || hourDistribution[hourKey] || {};
+                        return {
+                            hour: `${String(i).padStart(2, '0')}:00`,
+                            amount: Number(hourData.totalAmount) || 0,
+                            count: Number(hourData.count) || 0,
+                        };
+                    });
+
                     const totalHourlyAmount = hourlyData.reduce((sum, item) => sum + item.amount, 0);
-                    if (totalHourlyAmount > 0) {
-                        setHourlySpending(hourlyData);
-                    } else {
-                        // Dữ liệu rỗng, dùng mock
-                        const mockHourlyData = Array.from({ length: 24 }, (_, i) => ({
-                            hour: `${i}:00`,
-                            amount: i >= 8 && i <= 22 ? 500000 + Math.random() * 1000000 : 100000,
-                            count: i >= 8 && i <= 22 ? 5 : 1,
-                        }));
-                        setHourlySpending(mockHourlyData);
+                    if (totalHourlyAmount === 0) {
+                        hourlyData = [];
                     }
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    setUnusualTime([]);
-                    const mockHourlyData = Array.from({ length: 24 }, (_, i) => ({
-                        hour: `${i}:00`,
-                        amount: i >= 8 && i <= 22 ? 500000 + Math.random() * 1000000 : 100000,
-                        count: i >= 8 && i <= 22 ? 5 : 1,
-                    }));
-                    setHourlySpending(mockHourlyData);
                 }
-            } else {
-                // Fallback: Tạo dữ liệu mock
-                // Fallback: Tạo dữ liệu mock
-                setUnusualTime([
-                    {
-                        transactionId: "mock1",
-                        amount: 200000,
-                        date: new Date(),
-                        hour: 3,
-                        note: "Giao dịch đêm khuya",
-                        category: { name: "Ăn uống" },
-                        categoryName: "Ăn uống",
-                        reason: "Chi tiêu vào giờ bất thường (3:00)",
-                    },
-                ]);
-                // Tạo dữ liệu biểu đồ theo giờ mock
-                const mockHourlyData = Array.from({ length: 24 }, (_, i) => ({
-                    hour: `${i}:00`,
-                    amount: i >= 8 && i <= 22 ? 500000 + Math.random() * 1000000 : 100000 + Math.random() * 200000,
-                    count: i >= 8 && i <= 22 ? Math.floor(Math.random() * 10) + 5 : Math.floor(Math.random() * 3),
-                }));
-                setHourlySpending(mockHourlyData);
             }
+
+            setUnusualTime(timeSpendingData);
+            setHourlySpending(hourlyData);
 
             // Xử lý 24h Spike
             if (spikeRes?.status === true && spikeRes?.data) {
@@ -601,38 +547,12 @@ const AnalyticsDiagnostic = () => {
             }
         } catch (error) {
             console.error("Error loading anomalies data:", error);
-            // Fallback khi có lỗi
-            const now = new Date();
-            const mockMonthlyData = [];
-            for (let i = 0; i < 5; i++) {
-                const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                mockMonthlyData.push({
-                    month: month.getMonth() + 1,
-                    year: month.getFullYear(),
-                    label: `Tháng ${month.getMonth() + 1}/${month.getFullYear()}`,
-                    totalAmount: 5000000 + Math.random() * 2000000,
-                    deviation: 0,
-                    deviationPercent: 0,
-                });
-            }
-            setMonthlySpikes(mockMonthlyData);
-            setMonthlyStats({ mean: 5000000, threshold: 7000000 });
-            setUnusualLarge([
-                {
-                    transactionId: "mock1",
-                    amount: 5000000,
-                    date: new Date(),
-                    note: "Giao dịch lớn",
-                    category: { name: "Mua sắm" },
-                    categoryName: "Mua sắm",
-                },
-            ]);
-            const mockHourlyData = Array.from({ length: 24 }, (_, i) => ({
-                hour: `${i}:00`,
-                amount: i >= 8 && i <= 22 ? 500000 + Math.random() * 1000000 : 100000,
-                count: i >= 8 && i <= 22 ? 5 : 1,
-            }));
-            setHourlySpending(mockHourlyData);
+            // Khi có lỗi, set về giá trị mặc định (rỗng)
+            setMonthlySpikes([]);
+            setMonthlyStats({ mean: 0, threshold: 0 });
+            setUnusualLarge([]);
+            setUnusualTime([]);
+            setHourlySpending([]);
         }
     };
 
@@ -925,6 +845,21 @@ const AnalyticsDiagnostic = () => {
         navigate("/transactions");
     };
 
+    const handleCategoryClick = (category) => {
+        // Navigate đến trang transactions với filter theo category
+        const categoryId = category.categoryId || category._id || category.id;
+        // Kiểm tra nếu là mock data (categoryId bắt đầu bằng "mock") thì không navigate
+        if (categoryId && !String(categoryId).startsWith("mock")) {
+            const startDate = dateRange[0]?.format("YYYY-MM-DD");
+            const endDate = dateRange[1]?.format("YYYY-MM-DD");
+            // Convert ObjectId thành string nếu cần
+            const categoryIdStr = String(categoryId);
+            navigate(`/transactions?categoryId=${categoryIdStr}&startDate=${startDate}&endDate=${endDate}&type=expense`);
+        } else {
+            message.info("Vui lòng chọn danh mục có dữ liệu thực");
+        }
+    };
+
     // Custom tooltip cho biểu đồ
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -1200,30 +1135,47 @@ const AnalyticsDiagnostic = () => {
                                 )}
 
                                 {/* Phân tích khung giờ chi tiêu */}
-                                {hourlySpending.length > 0 && (
-                                    <div className="mt-6">
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <Clock className="text-indigo-500" size={18} />
-                                            <h3 className="text-sm font-bold text-gray-800">Phân tích khung giờ chi tiêu</h3>
-                                        </div>
+                                <div className="mt-6">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <Clock className="text-indigo-500" size={18} />
+                                        <h3 className="text-sm font-bold text-gray-800">Phân tích khung giờ chi tiêu</h3>
+                                    </div>
+                                    {hourlySpending.length > 0 ? (
                                         <ResponsiveContainer width="100%" height={200}>
-                                            <BarChart data={hourlySpending}>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                                            <BarChart data={hourlySpending} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
                                                 <XAxis
                                                     dataKey="hour"
                                                     stroke="#6B7280"
                                                     fontSize={9}
+                                                    tick={{ fill: "#6B7280" }}
+                                                    interval={1}
+                                                    tickMargin={8}
                                                 />
-                                                <YAxis stroke="#6B7280" />
+                                                <YAxis
+                                                    stroke="#6B7280"
+                                                    tick={{ fill: "#6B7280", fontSize: 10 }}
+                                                    tickFormatter={(value) => {
+                                                        if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                                                        if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                                                        return value.toString();
+                                                    }}
+                                                />
                                                 <Tooltip
                                                     formatter={(value) => formatCurrency(value)}
                                                     labelStyle={{ color: "#374151" }}
+                                                    contentStyle={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px" }}
                                                 />
-                                                <Bar dataKey="amount" fill="#8B5CF6" />
+                                                <Bar dataKey="amount" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
                                             </BarChart>
                                         </ResponsiveContainer>
-                                    </div>
-                                )}
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-[200px] bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                                            <Clock className="text-gray-400 mb-2" size={32} />
+                                            <p className="text-sm text-gray-500">Chưa có dữ liệu</p>
+                                        </div>
+                                    )}
+                                </div>
 
                                 {/* Chi tăng đột biến 24h */}
                                 {spike24h && spike24h.isSpike && (
@@ -1325,8 +1277,9 @@ const AnalyticsDiagnostic = () => {
                                             {frequentCategories.slice(0, 5).map((item, index) => (
                                                 <div
                                                     key={index}
+                                                    onClick={() => handleCategoryClick(item)}
                                                     className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-300 transition-all duration-200 group cursor-pointer"
-                                                    title={`${item.count} giao dịch`}
+                                                    title={`Click để xem ${item.count} giao dịch của ${item.categoryName}`}
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200">

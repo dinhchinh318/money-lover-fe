@@ -265,19 +265,19 @@ const ReportsDashboard = () => {
                 setComparison({
                     current: {
                         income: data.current?.totalIncome || 0,
-                        incomeChange: data.current?.incomeChange || 0,
+                        incomeChange: data.comparison?.incomeChangePercent || 0, // Lấy từ comparison
                         expense: data.current?.totalExpense || 0,
-                        expenseChange: data.current?.expenseChange || 0,
+                        expenseChange: data.comparison?.expenseChangePercent || 0, // Lấy từ comparison
                         balance: data.current?.balance || 0,
-                        balanceChange: data.current?.balanceChange || 0,
+                        balanceChange: data.comparison?.balanceChangePercent || 0, // Lấy từ comparison
                     },
                     previous: {
                         income: data.previous?.totalIncome || 0,
-                        incomeChange: data.previous?.incomeChange || 0,
+                        incomeChange: 0, // Không có phần trăm thay đổi cho kỳ trước
                         expense: data.previous?.totalExpense || 0,
-                        expenseChange: data.previous?.expenseChange || 0,
+                        expenseChange: 0, // Không có phần trăm thay đổi cho kỳ trước
                         balance: data.previous?.balance || 0,
-                        balanceChange: data.previous?.balanceChange || 0,
+                        balanceChange: 0, // Không có phần trăm thay đổi cho kỳ trước
                     },
                 });
             }
@@ -750,7 +750,7 @@ const ReportsDashboard = () => {
                             )}
                             <span className={`text-sm font-semibold ${getChangeColor(overview.incomeChange)}`}>
                                 {overview.incomeChange > 0 ? "+" : ""}
-                                {overview.incomeChange}%
+                                {typeof overview.incomeChange === 'number' ? overview.incomeChange.toFixed(2) : overview.incomeChange}%
                             </span>
                         </div>
                     </Card>
@@ -776,7 +776,7 @@ const ReportsDashboard = () => {
                             )}
                             <span className={`text-sm font-semibold ${getChangeColor(overview.expenseChange)}`}>
                                 {overview.expenseChange > 0 ? "+" : ""}
-                                {overview.expenseChange}%
+                                {typeof overview.expenseChange === 'number' ? overview.expenseChange.toFixed(2) : overview.expenseChange}%
                             </span>
                         </div>
                     </Card>
@@ -820,610 +820,601 @@ const ReportsDashboard = () => {
             </div>
 
             {/* Comparison and Wallet Fluctuations - Side by Side */}
-            <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Comparison Section - Left */}
-                <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg">
-                                <BarChart3 className="text-white" size={18} />
+            <div className="max-w-7xl mx-auto p-6">
+                <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Comparison Section - Left */}
+                    <Card className="shadow-sm border-0 rounded-xl overflow-hidden">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                                <div className="p-1.5 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg">
+                                    <BarChart3 className="text-white" size={16} />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                    So sánh với Kỳ trước
+                                </h3>
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900">
-                                So sánh với Kỳ trước
-                            </h3>
+                            <Tabs
+                                activeKey={comparisonTab}
+                                onChange={setComparisonTab}
+                                items={comparisonTabItems}
+                                size="small"
+                            />
                         </div>
-                        <Tabs
-                            activeKey={comparisonTab}
-                            onChange={setComparisonTab}
-                            items={comparisonTabItems}
-                            size="small"
-                        />
-                    </div>
-                    {loading ? (
-                        <div className="flex justify-center py-8">
-                            <Spin />
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-2 gap-4">
-                            {/* Current Period - Left Column */}
-                            <div>
-                                <div className="mb-4 p-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                                    <h4 className="font-bold text-gray-900 text-sm">
-                                        {getPeriodLabels().current}
-                                    </h4>
-                                </div>
-                                <div className="space-y-3">
-                                    <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 hover:shadow-md transition-all duration-200">
-                                        <span className="text-xs font-semibold text-gray-600 mb-2 block">
-                                            Tổng thu
-                                        </span>
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-bold text-[#10B981] text-lg">
-                                                {formatCurrency(comparison.current.income)}
-                                            </span>
-                                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-lg border border-green-200">
-                                                <TrendingUp size={14} className="text-[#10B981]" />
-                                                <span className="text-xs font-semibold text-[#10B981]">
-                                                    +{comparison.current.incomeChange}%
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                    <Card className="p-4 bg-gradient-to-br from-red-50 to-pink-50 border-2 border-red-200 hover:shadow-md transition-all duration-200">
-                                        <span className="text-xs font-semibold text-gray-600 mb-2 block">
-                                            Tổng chi
-                                        </span>
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-bold text-[#EF4444] text-lg">
-                                                {formatCurrency(comparison.current.expense)}
-                                            </span>
-                                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-lg border border-red-200">
-                                                <TrendingDown size={14} className="text-[#EF4444]" />
-                                                <span className="text-xs font-semibold text-[#EF4444]">
-                                                    {comparison.current.expenseChange}%
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                    <Card className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 hover:shadow-md transition-all duration-200">
-                                        <span className="text-xs font-semibold text-gray-600 mb-2 block">
-                                            Số dư
-                                        </span>
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-bold text-[#3B82F6] text-lg">
-                                                {formatCurrency(comparison.current.balance)}
-                                            </span>
-                                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-lg border border-blue-200">
-                                                <TrendingUp size={14} className="text-[#10B981]" />
-                                                <span className="text-xs font-semibold text-[#10B981]">
-                                                    +{comparison.current.balanceChange}%
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </div>
-                            </div>
-
-                            {/* Previous Period - Right Column */}
-                            <div>
-                                <div className="mb-4 p-2 bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg border border-gray-200">
-                                    <h4 className="font-bold text-gray-900 text-sm">
-                                        {getPeriodLabels().previous}
-                                    </h4>
-                                </div>
-                                <div className="space-y-3">
-                                    <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 hover:shadow-md transition-all duration-200 opacity-75">
-                                        <span className="text-xs font-semibold text-gray-600 mb-2 block">
-                                            Tổng thu
-                                        </span>
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-bold text-[#10B981] text-lg">
-                                                {formatCurrency(comparison.previous.income)}
-                                            </span>
-                                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-lg border border-green-200">
-                                                <TrendingUp size={14} className="text-[#10B981]" />
-                                                <span className="text-xs font-semibold text-[#10B981]">
-                                                    +{comparison.previous.incomeChange}%
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                    <Card className="p-4 bg-gradient-to-br from-red-50 to-pink-50 border-2 border-red-200 hover:shadow-md transition-all duration-200 opacity-75">
-                                        <span className="text-xs font-semibold text-gray-600 mb-2 block">
-                                            Tổng chi
-                                        </span>
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-bold text-[#EF4444] text-lg">
-                                                {formatCurrency(comparison.previous.expense)}
-                                            </span>
-                                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-lg border border-red-200">
-                                                <TrendingDown size={14} className="text-[#EF4444]" />
-                                                <span className="text-xs font-semibold text-[#EF4444]">
-                                                    {comparison.previous.expenseChange}%
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                    <Card className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 hover:shadow-md transition-all duration-200 opacity-75">
-                                        <span className="text-xs font-semibold text-gray-600 mb-2 block">
-                                            Số dư
-                                        </span>
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-bold text-[#3B82F6] text-lg">
-                                                {formatCurrency(comparison.previous.balance)}
-                                            </span>
-                                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-lg border border-blue-200">
-                                                <TrendingDown size={14} className="text-[#EF4444]" />
-                                                <span className="text-xs font-semibold text-[#EF4444]">
-                                                    {comparison.previous.balanceChange}%
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </Card>
-
-                {/* Wallet Fluctuations - Right */}
-                <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg">
-                            <Wallet className="text-white" size={18} />
-                        </div>
-                        <h3 className="text-lg font-bold text-gray-900">
-                            Biến động Ví
-                        </h3>
-                    </div>
-                    <div
-                        className="space-y-4 overflow-y-auto"
-                        style={{
-                            maxHeight: walletFluctuations.length > 2 ? '400px' : 'none',
-                            paddingRight: walletFluctuations.length > 2 ? '8px' : '0'
-                        }}
-                    >
-                        {walletFluctuations.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
-                                Không có dữ liệu biến động ví
+                        {loading ? (
+                            <div className="flex justify-center py-8">
+                                <Spin />
                             </div>
                         ) : (
-                            walletFluctuations.map((wallet, index) => {
-                                // Map walletType thành icon
-                                const getWalletIcon = (type) => {
-                                    switch (type) {
-                                        case "cash": return "💵";
-                                        case "bank": return "🏦";
-                                        case "credit": return "💳";
-                                        case "saving": return "💰";
-                                        default: return "💼";
-                                    }
-                                };
-
-                                return (
-                                    <Card
-                                        key={wallet.walletId || index}
-                                        className="mb-4 border-2 hover:shadow-lg transition-all duration-200 rounded-xl bg-gradient-to-br from-white to-gray-50"
-                                    >
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 flex items-center justify-center">
-                                                    <span className="text-2xl">{wallet.icon || getWalletIcon(wallet.walletType)}</span>
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold text-gray-900">
-                                                        {wallet.walletName || wallet.name || "Ví không tên"}
-                                                    </div>
-                                                    <div className="text-xl font-bold text-gray-900">
-                                                        {formatCurrency(wallet.currentBalance || wallet.balance || 0)}
-                                                    </div>
+                            <div className="flex justify-center gap-6">
+                                {/* Current Period - Left Column */}
+                                <div className="w-full max-w-[280px]">
+                                    <div className="mb-4 p-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                                        <h4 className="font-bold text-gray-900 text-sm text-center">
+                                            {getPeriodLabels().current}
+                                        </h4>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="p-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                                            <span className="text-xs font-semibold text-gray-600 mb-1 block">
+                                                Tổng thu
+                                            </span>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-bold text-[#10B981] text-base">
+                                                    {formatCurrency(comparison.current.income)}
+                                                </span>
+                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded border border-green-200">
+                                                    {comparison.current.incomeChange >= 0 ? (
+                                                        <TrendingUp size={12} className="text-[#10B981]" />
+                                                    ) : (
+                                                        <TrendingDown size={12} className="text-[#EF4444]" />
+                                                    )}
+                                                    <span className={`text-xs font-semibold ${comparison.current.incomeChange >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                                                        {comparison.current.incomeChange > 0 ? '+' : ''}{comparison.current.incomeChange.toFixed(2)}%
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                                <span className="text-sm font-semibold text-gray-600">
-                                                    Thay đổi
+                                        <div className="p-3 bg-gradient-to-br from-red-50 to-pink-50 border border-red-200 rounded-lg">
+                                            <span className="text-xs font-semibold text-gray-600 mb-1 block">
+                                                Tổng chi
+                                            </span>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-bold text-[#EF4444] text-base">
+                                                    {formatCurrency(comparison.current.expense)}
                                                 </span>
-                                                <div className="flex items-center gap-2">
-                                                    {wallet.change >= 0 ? (
-                                                        <ArrowUpRight className="text-[#10B981]" size={16} />
+                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded border border-red-200">
+                                                    {comparison.current.expenseChange >= 0 ? (
+                                                        <TrendingUp size={12} className="text-[#EF4444]" />
                                                     ) : (
-                                                        <ArrowDownRight className="text-[#EF4444]" size={16} />
+                                                        <TrendingDown size={12} className="text-[#10B981]" />
                                                     )}
+                                                    <span className={`text-xs font-semibold ${comparison.current.expenseChange >= 0 ? 'text-[#EF4444]' : 'text-[#10B981]'}`}>
+                                                        {comparison.current.expenseChange > 0 ? '+' : ''}{comparison.current.expenseChange.toFixed(2)}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="p-3 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-lg">
+                                            <span className="text-xs font-semibold text-gray-600 mb-1 block">
+                                                Số dư
+                                            </span>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-bold text-[#3B82F6] text-base">
+                                                    {formatCurrency(comparison.current.balance)}
+                                                </span>
+                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded border border-blue-200">
+                                                    {comparison.current.balanceChange >= 0 ? (
+                                                        <TrendingUp size={12} className="text-[#10B981]" />
+                                                    ) : (
+                                                        <TrendingDown size={12} className="text-[#EF4444]" />
+                                                    )}
+                                                    <span className={`text-xs font-semibold ${comparison.current.balanceChange >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                                                        {comparison.current.balanceChange > 0 ? '+' : ''}{comparison.current.balanceChange.toFixed(2)}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Previous Period - Right Column */}
+                                <div className="w-full max-w-[280px]">
+                                    <div className="mb-4 p-2 bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg border border-gray-200">
+                                        <h4 className="font-bold text-gray-900 text-sm text-center">
+                                            {getPeriodLabels().previous}
+                                        </h4>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="p-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg opacity-75">
+                                            <span className="text-xs font-semibold text-gray-600 mb-1 block">
+                                                Tổng thu
+                                            </span>
+                                            <span className="font-bold text-[#10B981] text-base">
+                                                {formatCurrency(comparison.previous.income)}
+                                            </span>
+                                        </div>
+                                        <div className="p-3 bg-gradient-to-br from-red-50 to-pink-50 border border-red-200 rounded-lg opacity-75">
+                                            <span className="text-xs font-semibold text-gray-600 mb-1 block">
+                                                Tổng chi
+                                            </span>
+                                            <span className="font-bold text-[#EF4444] text-base">
+                                                {formatCurrency(comparison.previous.expense)}
+                                            </span>
+                                        </div>
+                                        <div className="p-3 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-lg opacity-75">
+                                            <span className="text-xs font-semibold text-gray-600 mb-1 block">
+                                                Số dư
+                                            </span>
+                                            <span className="font-bold text-[#3B82F6] text-base">
+                                                {formatCurrency(comparison.previous.balance)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </Card>
+
+                    {/* Wallet Fluctuations - Right */}
+                    <Card className="shadow-sm border-0 rounded-xl overflow-hidden">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="p-1.5 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg">
+                                <Wallet className="text-white" size={16} />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Biến động Ví
+                            </h3>
+                        </div>
+                        <div
+                            className="space-y-4 overflow-y-auto"
+                            style={{
+                                maxHeight: walletFluctuations.length > 2 ? '400px' : 'none',
+                                paddingRight: walletFluctuations.length > 2 ? '8px' : '0'
+                            }}
+                        >
+                            {walletFluctuations.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    Không có dữ liệu biến động ví
+                                </div>
+                            ) : (
+                                walletFluctuations.map((wallet, index) => {
+                                    // Map walletType thành icon
+                                    const getWalletIcon = (type) => {
+                                        switch (type) {
+                                            case "cash": return "💵";
+                                            case "bank": return "🏦";
+                                            case "credit": return "💳";
+                                            case "saving": return "💰";
+                                            default: return "💼";
+                                        }
+                                    };
+
+                                    return (
+                                        <Card
+                                            key={wallet.walletId || index}
+                                            className="mb-4 border-2 hover:shadow-lg transition-all duration-200 rounded-xl bg-gradient-to-br from-white to-gray-50"
+                                        >
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 flex items-center justify-center">
+                                                        <span className="text-2xl">{wallet.icon || getWalletIcon(wallet.walletType)}</span>
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-bold text-gray-900">
+                                                            {wallet.walletName || wallet.name || "Ví không tên"}
+                                                        </div>
+                                                        <div className="text-xl font-bold text-gray-900">
+                                                            {formatCurrency(wallet.currentBalance || wallet.balance || 0)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <span className="text-sm font-semibold text-gray-600">
+                                                        Thay đổi
+                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        {wallet.change >= 0 ? (
+                                                            <ArrowUpRight className="text-[#10B981]" size={16} />
+                                                        ) : (
+                                                            <ArrowDownRight className="text-[#EF4444]" size={16} />
+                                                        )}
+                                                        <span
+                                                            className={`font-bold text-sm ${wallet.change >= 0
+                                                                ? "text-[#10B981]"
+                                                                : "text-[#EF4444]"
+                                                                }`}
+                                                        >
+                                                            {wallet.change >= 0 ? "+" : ""}
+                                                            {formatCurrency(wallet.change)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                                    <div
+                                                        className={`h-full rounded-full transition-all duration-500 ${wallet.changePercent >= 0
+                                                            ? "bg-gradient-to-r from-green-400 to-emerald-500"
+                                                            : wallet.changePercent < -10
+                                                                ? "bg-gradient-to-r from-red-400 to-pink-500"
+                                                                : "bg-gray-400"
+                                                            }`}
+                                                        style={{
+                                                            width: `${Math.min(
+                                                                Math.abs(wallet.changePercent),
+                                                                100
+                                                            )}%`,
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <span className="text-xs font-semibold text-gray-500">
+                                                        Tỷ lệ thay đổi
+                                                    </span>
                                                     <span
-                                                        className={`font-bold text-sm ${wallet.change >= 0
+                                                        className={`font-bold text-sm ${wallet.changePercent >= 0
                                                             ? "text-[#10B981]"
                                                             : "text-[#EF4444]"
                                                             }`}
                                                     >
-                                                        {wallet.change >= 0 ? "+" : ""}
-                                                        {formatCurrency(wallet.change)}
+                                                        {wallet.changePercent >= 0 ? "+" : ""}
+                                                        {wallet.changePercent}%
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                                                <div
-                                                    className={`h-full rounded-full transition-all duration-500 ${wallet.changePercent >= 0
-                                                        ? "bg-gradient-to-r from-green-400 to-emerald-500"
-                                                        : wallet.changePercent < -10
-                                                            ? "bg-gradient-to-r from-red-400 to-pink-500"
-                                                            : "bg-gray-400"
-                                                        }`}
-                                                    style={{
-                                                        width: `${Math.min(
-                                                            Math.abs(wallet.changePercent),
-                                                            100
-                                                        )}%`,
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200">
-                                                <span className="text-xs font-semibold text-gray-500">
-                                                    Tỷ lệ thay đổi
-                                                </span>
-                                                <span
-                                                    className={`font-bold text-sm ${wallet.changePercent >= 0
-                                                        ? "text-[#10B981]"
-                                                        : "text-[#EF4444]"
-                                                        }`}
-                                                >
-                                                    {wallet.changePercent >= 0 ? "+" : ""}
-                                                    {wallet.changePercent}%
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                );
-                            })
-                        )}
-                    </div>
-                </Card>
-            </div>
-
-            {/* Chart Section - Bottom */}
-            <div className="mb-6">
-                <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg">
-                                <BarChart3 className="text-white" size={20} />
-                            </div>
-                            <h2 className="text-2xl font-bold text-gray-900">
-                                Biến động
-                            </h2>
-                            {isUsingTestData && (
-                                <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full border border-yellow-300">
-                                    📊 Dữ liệu TEST
-                                </span>
+                                        </Card>
+                                    );
+                                })
                             )}
                         </div>
-                        <Tabs
-                            activeKey={chartTab}
-                            onChange={setChartTab}
-                            items={chartTabItems}
-                        />
-                    </div>
-                    {chartLoading ? (
-                        <div className="flex items-center justify-center h-[300px]">
-                            <Spin size="large" />
+                    </Card>
+                </div>
+
+                {/* Chart Section - Bottom */}
+                <div className="mb-6">
+                    <Card className="shadow-sm border-0 rounded-xl overflow-hidden">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                                <div className="p-1.5 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg">
+                                    <BarChart3 className="text-white" size={16} />
+                                </div>
+                                <h2 className="text-lg font-semibold text-gray-900">
+                                    Biến động
+                                </h2>
+                                {isUsingTestData && (
+                                    <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full border border-yellow-300">
+                                        📊 Dữ liệu TEST
+                                    </span>
+                                )}
+                            </div>
+                            <Tabs
+                                activeKey={chartTab}
+                                onChange={setChartTab}
+                                items={chartTabItems}
+                                size="small"
+                            />
                         </div>
-                    ) : chartData && chartData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={chartData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                                <XAxis
-                                    dataKey="label"
-                                    stroke="#6B7280"
-                                    tick={{ fontSize: 12 }}
-                                />
-                                <YAxis
-                                    stroke="#6B7280"
-                                    tick={{ fontSize: 12 }}
-                                    tickFormatter={(value) => {
-                                        if (value >= 1000000) {
-                                            return `${(value / 1000000).toFixed(1)}M`;
-                                        }
-                                        if (value >= 1000) {
-                                            return `${(value / 1000).toFixed(0)}K`;
-                                        }
-                                        return value.toString();
-                                    }}
-                                />
-                                <Tooltip
-                                    formatter={(value) => formatCurrency(value)}
-                                    contentStyle={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px" }}
-                                />
-                                <Legend />
-                                <Bar dataKey="expense" fill="#EF4444" name="Chi tiêu" radius={[8, 8, 0, 0]} />
-                                <Bar dataKey="income" fill="#10B981" name="Thu nhập" radius={[8, 8, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    ) : (
-                        <div className="flex items-center justify-center h-[300px] text-gray-400">
-                            <div className="text-center">
-                                <p className="text-lg mb-2">Chưa có dữ liệu</p>
-                                <p className="text-sm">Vui lòng chọn khoảng thời gian khác hoặc thêm giao dịch</p>
+                        {chartLoading ? (
+                            <div className="flex items-center justify-center h-[300px]">
+                                <Spin size="large" />
+                            </div>
+                        ) : chartData && chartData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={chartData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                                    <XAxis
+                                        dataKey="label"
+                                        stroke="#6B7280"
+                                        tick={{ fontSize: 12 }}
+                                    />
+                                    <YAxis
+                                        stroke="#6B7280"
+                                        tick={{ fontSize: 12 }}
+                                        tickFormatter={(value) => {
+                                            if (value >= 1000000) {
+                                                return `${(value / 1000000).toFixed(1)}M`;
+                                            }
+                                            if (value >= 1000) {
+                                                return `${(value / 1000).toFixed(0)}K`;
+                                            }
+                                            return value.toString();
+                                        }}
+                                    />
+                                    <Tooltip
+                                        formatter={(value) => formatCurrency(value)}
+                                        contentStyle={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px" }}
+                                    />
+                                    <Legend />
+                                    <Bar dataKey="expense" fill="#EF4444" name="Chi tiêu" radius={[8, 8, 0, 0]} />
+                                    <Bar dataKey="income" fill="#10B981" name="Thu nhập" radius={[8, 8, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="flex items-center justify-center h-[300px] text-gray-400">
+                                <div className="text-center">
+                                    <p className="text-lg mb-2">Chưa có dữ liệu</p>
+                                    <p className="text-sm">Vui lòng chọn khoảng thời gian khác hoặc thêm giao dịch</p>
+                                </div>
+                            </div>
+                        )}
+                    </Card>
+                </div>
+
+                {/* Phân bổ chi tiêu theo danh mục */}
+                <div className="mb-6">
+                    <Card className="shadow-lg border-0 overflow-hidden">
+                        {/* Header với date selector đẹp hơn */}
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                    <PieChartIcon className="text-blue-600" size={24} />
+                                    Tình hình thu chi
+                                </h3>
+                                <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                                    <Button
+                                        type="text"
+                                        size="small"
+                                        icon={<ChevronLeft size={18} />}
+                                        onClick={handlePreviousPeriod}
+                                        className="hover:bg-blue-50 transition-colors"
+                                    />
+                                    <span className="text-base font-bold text-gray-900 min-w-[100px] text-center">
+                                        {selectedPeriod.format("MM/YYYY")}
+                                    </span>
+                                    <Button
+                                        type="text"
+                                        size="small"
+                                        icon={<ChevronRight size={18} />}
+                                        onClick={handleNextPeriod}
+                                        disabled={selectedPeriod.isSame(dayjs(), "month") || selectedPeriod.isAfter(dayjs(), "month")}
+                                        className="hover:bg-blue-50 transition-colors disabled:opacity-30"
+                                    />
+                                </div>
                             </div>
                         </div>
-                    )}
-                </Card>
-            </div>
 
-            {/* Phân bổ chi tiêu theo danh mục */}
-            <div className="mb-6">
-                <Card className="shadow-lg border-0 overflow-hidden">
-                    {/* Header với date selector đẹp hơn */}
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                <PieChartIcon className="text-blue-600" size={24} />
-                                Tình hình thu chi
-                            </h3>
-                            <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
-                                <Button
-                                    type="text"
-                                    size="small"
-                                    icon={<ChevronLeft size={18} />}
-                                    onClick={handlePreviousPeriod}
-                                    className="hover:bg-blue-50 transition-colors"
-                                />
-                                <span className="text-base font-bold text-gray-900 min-w-[100px] text-center">
-                                    {selectedPeriod.format("MM/YYYY")}
-                                </span>
-                                <Button
-                                    type="text"
-                                    size="small"
-                                    icon={<ChevronRight size={18} />}
-                                    onClick={handleNextPeriod}
-                                    disabled={selectedPeriod.isSame(dayjs(), "month") || selectedPeriod.isAfter(dayjs(), "month")}
-                                    className="hover:bg-blue-50 transition-colors disabled:opacity-30"
-                                />
+                        {categoryExpenseLoading ? (
+                            <div className="flex justify-center py-8">
+                                <Spin />
                             </div>
-                        </div>
-                    </div>
+                        ) : (
+                            <>
+                                {/* Summary Cards - Redesigned */}
+                                {(() => {
+                                    const summary = getCategoryExpenseSummary();
+                                    const pieData = getPieChartData();
+                                    const totalIncome = overview.totalIncome || 0;
 
-                    {categoryExpenseLoading ? (
-                        <div className="flex justify-center py-8">
-                            <Spin />
-                        </div>
-                    ) : (
-                        <>
-                            {/* Summary Cards - Redesigned */}
-                            {(() => {
-                                const summary = getCategoryExpenseSummary();
-                                const pieData = getPieChartData();
-                                const totalIncome = overview.totalIncome || 0;
-
-                                return (
-                                    <div className="p-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                                            {/* Chi tiêu Card */}
-                                            <div className="relative overflow-hidden bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-6 border-2 border-red-100 shadow-md hover:shadow-lg transition-all duration-300 group">
-                                                <div className="absolute top-0 right-0 w-32 h-32 bg-red-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                                                <div className="relative z-10">
-                                                    <div className="flex items-center justify-between mb-3">
-                                                        <span className="text-sm font-semibold text-red-700 uppercase tracking-wide">Chi tiêu</span>
-                                                        <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                            <TrendingUp size={24} className="text-red-600" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-3xl font-bold text-red-600 mb-2">
-                                                        {formatCurrency(summary.totalExpense)}
-                                                    </div>
-                                                    {summary.previousTotal > 0 && (
-                                                        <div className="flex items-center gap-2 text-sm">
-                                                            <span className={`font-semibold ${summary.difference >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                                                {summary.difference >= 0 ? '↑' : '↓'} {Math.abs(parseFloat(summary.changePercent))}%
-                                                            </span>
-                                                            <span className="text-gray-500">so với tháng trước</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* Thu nhập Card */}
-                                            <div className="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-100 shadow-md hover:shadow-lg transition-all duration-300 group">
-                                                <div className="absolute top-0 right-0 w-32 h-32 bg-green-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                                                <div className="relative z-10">
-                                                    <div className="flex items-center justify-between mb-3">
-                                                        <span className="text-sm font-semibold text-green-700 uppercase tracking-wide">Thu nhập</span>
-                                                        <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                            <TrendingDown size={24} className="text-green-600 rotate-180" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-3xl font-bold text-green-600 mb-2">
-                                                        {formatCurrency(totalIncome)}
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <span className="text-gray-500">Tổng thu nhập trong tháng</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        {/* Donut Chart - Redesigned */}
-                                        {pieData.length > 0 ? (
-                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
-                                                {/* Biểu đồ quạt bên trái - Enhanced */}
-                                                <div className="flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 border border-gray-100">
-                                                    <ResponsiveContainer width="100%" height={400}>
-                                                        <PieChart>
-                                                            <Pie
-                                                                data={pieData}
-                                                                cx="50%"
-                                                                cy="50%"
-                                                                labelLine={false}
-                                                                label={false}
-                                                                outerRadius={140}
-                                                                innerRadius={80}
-                                                                fill="#8884d8"
-                                                                dataKey="value"
-                                                                paddingAngle={3}
-                                                                stroke="#fff"
-                                                                strokeWidth={3}
-                                                            >
-                                                                {pieData.map((entry, index) => (
-                                                                    <Cell
-                                                                        key={`cell-${index}`}
-                                                                        fill={entry.color}
-                                                                        stroke="#fff"
-                                                                        strokeWidth={3}
-                                                                        style={{
-                                                                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
-                                                                        }}
-                                                                    />
-                                                                ))}
-                                                            </Pie>
-                                                            <Tooltip
-                                                                formatter={(value, name, props) => [
-                                                                    formatCurrency(value),
-                                                                    `${props.payload.percentage}%`
-                                                                ]}
-                                                                contentStyle={{
-                                                                    backgroundColor: "#fff",
-                                                                    border: "2px solid #E5E7EB",
-                                                                    borderRadius: "12px",
-                                                                    padding: "16px",
-                                                                    boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
-                                                                }}
-                                                            />
-                                                        </PieChart>
-                                                    </ResponsiveContainer>
-                                                </div>
-
-                                                {/* Danh sách danh mục bên phải - Enhanced */}
-                                                <div className="space-y-3 flex flex-col justify-center">
-                                                    {pieData.map((item, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="group relative flex items-center justify-between p-5 bg-white border-2 border-gray-100 rounded-xl hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
-                                                        >
-                                                            {/* Hover gradient overlay */}
-                                                            <div className="absolute inset-0 bg-gradient-to-r from-blue-50/0 to-blue-50/0 group-hover:from-blue-50/50 group-hover:to-transparent transition-all duration-300"></div>
-
-                                                            <div className="relative z-10 flex items-center gap-4 flex-1">
-                                                                {/* Màu sắc danh mục - Larger */}
-                                                                <div
-                                                                    className="w-6 h-6 rounded-full flex-shrink-0 shadow-md group-hover:scale-110 transition-transform"
-                                                                    style={{ backgroundColor: item.color }}
-                                                                />
-                                                                {/* Tên danh mục và phần trăm */}
-                                                                <div className="flex-1">
-                                                                    <div className="font-bold text-gray-900 text-lg mb-1 group-hover:text-blue-600 transition-colors">
-                                                                        {item.name}
-                                                                    </div>
-                                                                    <div className="flex items-center gap-3">
-                                                                        <span className="text-sm font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
-                                                                            {item.percentage}%
-                                                                        </span>
-                                                                        {item.previousAmount > 0 && (
-                                                                            <span className="text-xs text-gray-500">
-                                                                                Kỳ trước: {formatCurrency(item.previousAmount)}
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            {/* Số tiền - Enhanced */}
-                                                            <div className="relative z-10 text-right ml-4">
-                                                                <div className="font-bold text-gray-900 text-xl group-hover:text-blue-600 transition-colors">
-                                                                    {formatCurrency(item.value)}
-                                                                </div>
+                                    return (
+                                        <div className="p-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                                {/* Chi tiêu Card */}
+                                                <div className="relative overflow-hidden bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-6 border-2 border-red-100 shadow-md hover:shadow-lg transition-all duration-300 group">
+                                                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                                                    <div className="relative z-10">
+                                                        <div className="flex items-center justify-between mb-3">
+                                                            <span className="text-sm font-semibold text-red-700 uppercase tracking-wide">Chi tiêu</span>
+                                                            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                                <TrendingUp size={24} className="text-red-600" />
                                                             </div>
                                                         </div>
-                                                    ))}
-
-                                                    {/* Expandable section indicator */}
-                                                    <div
-                                                        onClick={() => setExpandedCategories(expandedCategories.includes("categories") ? [] : ["categories"])}
-                                                        className="mt-6 pt-4 border-t-2 border-gray-200 cursor-pointer group"
-                                                    >
-                                                        <div className="flex items-center justify-between text-sm font-semibold text-gray-700 group-hover:text-blue-600 transition-colors">
-                                                            <span>Chi tiết từng danh mục ({pieData.length})</span>
-                                                            <ChevronDown
-                                                                size={18}
-                                                                className={`transform transition-transform duration-300 ${expandedCategories.includes("categories") ? 'rotate-180' : ''}`}
-                                                            />
+                                                        <div className="text-3xl font-bold text-red-600 mb-2">
+                                                            {formatCurrency(summary.totalExpense)}
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center justify-center h-[300px] text-gray-400">
-                                                <div className="text-center">
-                                                    <p className="text-lg mb-2">Chưa có dữ liệu chi tiêu</p>
-                                                    <p className="text-sm">Vui lòng thêm giao dịch chi tiêu</p>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Chi tiết từng danh mục - Enhanced */}
-                                        {pieData.length > 0 && (
-                                            <div className="mt-6">
-                                                <Collapse
-                                                    activeKey={expandedCategories}
-                                                    onChange={setExpandedCategories}
-                                                    items={[
-                                                        {
-                                                            key: "categories",
-                                                            label: (
-                                                                <span className="font-bold text-lg text-gray-900 flex items-center gap-2">
-                                                                    <Eye size={20} />
-                                                                    Chi tiết từng danh mục ({pieData.length})
+                                                        {summary.previousTotal > 0 && (
+                                                            <div className="flex items-center gap-2 text-sm">
+                                                                <span className={`font-semibold ${summary.difference >= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                                                    {summary.difference >= 0 ? '↑' : '↓'} {Math.abs(parseFloat(summary.changePercent))}%
                                                                 </span>
-                                                            ),
-                                                            children: (
-                                                                <div className="space-y-3 pt-2">
-                                                                    {pieData.map((item, index) => (
-                                                                        <div
-                                                                            key={index}
-                                                                            className="flex items-center justify-between p-5 bg-gradient-to-r from-gray-50 to-white border-2 border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-md transition-all duration-300 group"
-                                                                        >
-                                                                            <div className="flex items-center gap-4">
-                                                                                <div
-                                                                                    className="w-8 h-8 rounded-lg shadow-md flex items-center justify-center group-hover:scale-110 transition-transform"
-                                                                                    style={{ backgroundColor: item.color }}
-                                                                                >
-                                                                                    <span className="text-white font-bold text-sm">{index + 1}</span>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <div className="font-bold text-gray-900 text-lg group-hover:text-blue-600 transition-colors">
-                                                                                        {item.name}
-                                                                                    </div>
-                                                                                    <div className="flex items-center gap-2 mt-1">
-                                                                                        <span className="text-sm font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
-                                                                                            {item.percentage}% tổng chi tiêu
-                                                                                        </span>
-                                                                                        {item.previousAmount > 0 && (
-                                                                                            <span className="text-xs text-gray-500">
-                                                                                                Kỳ trước: {formatCurrency(item.previousAmount)}
-                                                                                            </span>
-                                                                                        )}
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div className="text-right">
-                                                                                <div className="font-bold text-xl text-gray-900 group-hover:text-blue-600 transition-colors">
-                                                                                    {formatCurrency(item.value)}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            ),
-                                                        },
-                                                    ]}
-                                                />
+                                                                <span className="text-gray-500">so với tháng trước</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Thu nhập Card */}
+                                                <div className="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-100 shadow-md hover:shadow-lg transition-all duration-300 group">
+                                                    <div className="absolute top-0 right-0 w-32 h-32 bg-green-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                                                    <div className="relative z-10">
+                                                        <div className="flex items-center justify-between mb-3">
+                                                            <span className="text-sm font-semibold text-green-700 uppercase tracking-wide">Thu nhập</span>
+                                                            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                                <TrendingDown size={24} className="text-green-600 rotate-180" />
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-3xl font-bold text-green-600 mb-2">
+                                                            {formatCurrency(totalIncome)}
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="text-gray-500">Tổng thu nhập trong tháng</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                );
-                            })()}
-                        </>
-                    )}
-                </Card>
+
+
+                                            {/* Donut Chart - Redesigned */}
+                                            {pieData.length > 0 ? (
+                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+                                                    {/* Biểu đồ quạt bên trái - Enhanced */}
+                                                    <div className="flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 border border-gray-100">
+                                                        <ResponsiveContainer width="100%" height={400}>
+                                                            <PieChart>
+                                                                <Pie
+                                                                    data={pieData}
+                                                                    cx="50%"
+                                                                    cy="50%"
+                                                                    labelLine={false}
+                                                                    label={false}
+                                                                    outerRadius={140}
+                                                                    innerRadius={80}
+                                                                    fill="#8884d8"
+                                                                    dataKey="value"
+                                                                    paddingAngle={3}
+                                                                    stroke="#fff"
+                                                                    strokeWidth={3}
+                                                                >
+                                                                    {pieData.map((entry, index) => (
+                                                                        <Cell
+                                                                            key={`cell-${index}`}
+                                                                            fill={entry.color}
+                                                                            stroke="#fff"
+                                                                            strokeWidth={3}
+                                                                            style={{
+                                                                                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+                                                                            }}
+                                                                        />
+                                                                    ))}
+                                                                </Pie>
+                                                                <Tooltip
+                                                                    formatter={(value, name, props) => [
+                                                                        formatCurrency(value),
+                                                                        `${props.payload.percentage}%`
+                                                                    ]}
+                                                                    contentStyle={{
+                                                                        backgroundColor: "#fff",
+                                                                        border: "2px solid #E5E7EB",
+                                                                        borderRadius: "12px",
+                                                                        padding: "16px",
+                                                                        boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+                                                                    }}
+                                                                />
+                                                            </PieChart>
+                                                        </ResponsiveContainer>
+                                                    </div>
+
+                                                    {/* Danh sách danh mục bên phải - Enhanced */}
+                                                    <div className="space-y-3 flex flex-col justify-center">
+                                                        {pieData.map((item, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="group relative flex items-center justify-between p-5 bg-white border-2 border-gray-100 rounded-xl hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
+                                                            >
+                                                                {/* Hover gradient overlay */}
+                                                                <div className="absolute inset-0 bg-gradient-to-r from-blue-50/0 to-blue-50/0 group-hover:from-blue-50/50 group-hover:to-transparent transition-all duration-300"></div>
+
+                                                                <div className="relative z-10 flex items-center gap-4 flex-1">
+                                                                    {/* Màu sắc danh mục - Larger */}
+                                                                    <div
+                                                                        className="w-6 h-6 rounded-full flex-shrink-0 shadow-md group-hover:scale-110 transition-transform"
+                                                                        style={{ backgroundColor: item.color }}
+                                                                    />
+                                                                    {/* Tên danh mục và phần trăm */}
+                                                                    <div className="flex-1">
+                                                                        <div className="font-bold text-gray-900 text-lg mb-1 group-hover:text-blue-600 transition-colors">
+                                                                            {item.name}
+                                                                        </div>
+                                                                        <div className="flex items-center gap-3">
+                                                                            <span className="text-sm font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
+                                                                                {item.percentage}%
+                                                                            </span>
+                                                                            {item.previousAmount > 0 && (
+                                                                                <span className="text-xs text-gray-500">
+                                                                                    Kỳ trước: {formatCurrency(item.previousAmount)}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                {/* Số tiền - Enhanced */}
+                                                                <div className="relative z-10 text-right ml-4">
+                                                                    <div className="font-bold text-gray-900 text-xl group-hover:text-blue-600 transition-colors">
+                                                                        {formatCurrency(item.value)}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+
+                                                        {/* Expandable section indicator */}
+                                                        <div
+                                                            onClick={() => setExpandedCategories(expandedCategories.includes("categories") ? [] : ["categories"])}
+                                                            className="mt-6 pt-4 border-t-2 border-gray-200 cursor-pointer group"
+                                                        >
+                                                            <div className="flex items-center justify-between text-sm font-semibold text-gray-700 group-hover:text-blue-600 transition-colors">
+                                                                <span>Chi tiết từng danh mục ({pieData.length})</span>
+                                                                <ChevronDown
+                                                                    size={18}
+                                                                    className={`transform transition-transform duration-300 ${expandedCategories.includes("categories") ? 'rotate-180' : ''}`}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center justify-center h-[300px] text-gray-400">
+                                                    <div className="text-center">
+                                                        <p className="text-lg mb-2">Chưa có dữ liệu chi tiêu</p>
+                                                        <p className="text-sm">Vui lòng thêm giao dịch chi tiêu</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Chi tiết từng danh mục - Enhanced */}
+                                            {pieData.length > 0 && (
+                                                <div className="mt-6">
+                                                    <Collapse
+                                                        activeKey={expandedCategories}
+                                                        onChange={setExpandedCategories}
+                                                        items={[
+                                                            {
+                                                                key: "categories",
+                                                                label: (
+                                                                    <span className="font-bold text-lg text-gray-900 flex items-center gap-2">
+                                                                        <Eye size={20} />
+                                                                        Chi tiết từng danh mục ({pieData.length})
+                                                                    </span>
+                                                                ),
+                                                                children: (
+                                                                    <div className="space-y-3 pt-2">
+                                                                        {pieData.map((item, index) => (
+                                                                            <div
+                                                                                key={index}
+                                                                                className="flex items-center justify-between p-5 bg-gradient-to-r from-gray-50 to-white border-2 border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-md transition-all duration-300 group"
+                                                                            >
+                                                                                <div className="flex items-center gap-4">
+                                                                                    <div
+                                                                                        className="w-8 h-8 rounded-lg shadow-md flex items-center justify-center group-hover:scale-110 transition-transform"
+                                                                                        style={{ backgroundColor: item.color }}
+                                                                                    >
+                                                                                        <span className="text-white font-bold text-sm">{index + 1}</span>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <div className="font-bold text-gray-900 text-lg group-hover:text-blue-600 transition-colors">
+                                                                                            {item.name}
+                                                                                        </div>
+                                                                                        <div className="flex items-center gap-2 mt-1">
+                                                                                            <span className="text-sm font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
+                                                                                                {item.percentage}% tổng chi tiêu
+                                                                                            </span>
+                                                                                            {item.previousAmount > 0 && (
+                                                                                                <span className="text-xs text-gray-500">
+                                                                                                    Kỳ trước: {formatCurrency(item.previousAmount)}
+                                                                                                </span>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="text-right">
+                                                                                    <div className="font-bold text-xl text-gray-900 group-hover:text-blue-600 transition-colors">
+                                                                                        {formatCurrency(item.value)}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                ),
+                                                            },
+                                                        ]}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
+                            </>
+                        )}
+                    </Card>
+                </div>
             </div>
         </div>
     );

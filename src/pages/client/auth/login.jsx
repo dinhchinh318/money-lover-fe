@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Form, Input, message } from "antd";
 import { Mail, Lock, Eye, EyeOff, Wallet } from "lucide-react";
-import { loginAPI, fetchAccountAPI } from "../../../services/api.user";
+import { loginAPI, fetchAccountAPI, googleLoginAPI } from "../../../services/api.user";
 import { useCurrentApp } from "../../../components/context/app.context";
 
 const Login = () => {
@@ -11,13 +11,120 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { setIsAuthenticated, setUser } = useCurrentApp();
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Load Google Sign-In script
+  useEffect(() => {
+    const loadGoogleScript = () => {
+      if (window.google && window.google.accounts) {
+        initializeGoogleSignIn();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        console.log("Google script loaded");
+        initializeGoogleSignIn();
+      };
+      script.onerror = () => {
+        console.error("Failed to load Google script");
+        message.error("Không thể tải Google Sign-In");
+      };
+      document.body.appendChild(script);
+    };
+
+    const initializeGoogleSignIn = () => {
+      if (!window.google || !window.google.accounts) return;
+
+      const client_id = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+      if (!client_id) {
+        console.error("Google Client ID not found");
+        return;
+      }
+
+      try {
+        window.google.accounts.id.initialize({
+          client_id: client_id,
+          callback: handleGoogleCallback,
+          use_fedcm_for_prompt: false, // Tắt FedCM để tránh lỗi
+        });
+        console.log("Google Sign-In initialized");
+
+        // Render button ngay sau khi initialize
+        setTimeout(() => {
+          const buttonContainer = document.getElementById('google-signin-button');
+          if (buttonContainer && window.google.accounts.id) {
+            try {
+              window.google.accounts.id.renderButton(buttonContainer, {
+                theme: 'outline',
+                size: 'large',
+                width: '100%',
+                text: 'signin_with',
+                type: 'standard',
+              });
+              console.log("Google button rendered");
+            } catch (renderError) {
+              console.error("Error rendering button:", renderError);
+            }
+          }
+        }, 100);
+      } catch (error) {
+        console.error("Error initializing Google:", error);
+      }
+    };
+
+    loadGoogleScript();
+  }, []);
+
+  const handleGoogleCallback = async (response) => {
+    if (!response || !response.credential) {
+      message.error("Không nhận được thông tin từ Google");
+      setGoogleLoading(false);
+      return;
+    }
+
+    setGoogleLoading(true);
+    try {
+      console.log("Sending Google token to backend...");
+      const res = await googleLoginAPI(response.credential);
+      console.log("Backend response:", res);
+
+      if (res?.error === 0 && res?.data && res?.accessToken) {
+        localStorage.setItem("accessToken", res.accessToken);
+        setIsAuthenticated(true);
+        setUser(res.data);
+        message.success("Đăng nhập bằng Google thành công!");
+
+        try {
+          await fetchAccountAPI();
+        } catch (err) {
+          console.error("Fetch account error:", err);
+        }
+
+        navigate("/");
+      } else {
+        console.error("Login failed:", res);
+        message.error(res?.message || "Đăng nhập bằng Google thất bại");
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      const errorMsg = error?.response?.data?.message || error?.message || "Đăng nhập bằng Google thất bại";
+      message.error(errorMsg);
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
       const { email, password } = values;
       const res = await loginAPI(email, password);
-      
+
       console.log("Login response:", res); // Debug log
 
       if (res?.error === 0 && res?.data && res?.accessToken) {
@@ -25,14 +132,14 @@ const Login = () => {
         setIsAuthenticated(true);
         setUser(res.data);
         message.success("Đăng nhập thành công!");
-        
+
         // Fetch account info after setting token
         try {
           await fetchAccountAPI();
         } catch (err) {
           console.error("Fetch account error:", err);
         }
-        
+
         navigate("/");
       } else {
         message.error(res?.message || "Email hoặc mật khẩu không đúng");
@@ -158,6 +265,15 @@ const Login = () => {
               <span className="px-2 bg-white text-[#6B7280]">Hoặc</span>
             </div>
           </div>
+
+          {/* Google Login Button */}
+          <Form.Item>
+            <div
+              id="google-signin-button"
+              className="w-full"
+              style={{ minHeight: '48px', display: 'flex', justifyContent: 'center' }}
+            ></div>
+          </Form.Item>
 
           {/* Register Link */}
           <div className="text-center">

@@ -13,6 +13,8 @@ import {
   Legend,
 } from "recharts";
 import { getFinancialDashboardAPI, getCategoryExpenseReportAPI } from "../../services/api.report";
+import { getOverviewStatsAPI, getAllTransactionsAPI } from "../../services/api.transaction";
+import { getWalletsAPI } from "../../services/api.wallet";
 import dayjs from "dayjs";
 
 function HomePage() {
@@ -47,43 +49,101 @@ function HomePage() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      // TODO: Call API để lấy stats và recent transactions
-      // const statsRes = await getStatsAPI();
-      // const transactionsRes = await getRecentTransactionsAPI();
 
-      setTimeout(() => {
-        setStats({
-          totalBalance: 50000000,
-          monthlyIncome: 15000000,
-          monthlyExpense: 8000000,
-          transactionCount: 45,
-        });
-        const now = new Date();
-        now.setHours(18, 43, 0, 0);
-        now.setDate(12);
-        now.setMonth(11); // December (0-indexed)
-        now.setFullYear(2025);
+      // Lấy tháng hiện tại để tính stats
+      const currentMonthStart = dayjs().startOf("month");
+      const currentMonthEnd = dayjs().endOf("month");
 
-        setRecentTransactions([
-          {
-            id: 1,
-            category: "Ăn uống",
-            amount: -150000,
-            date: now,
-            type: "expense",
-          },
-          {
-            id: 2,
-            category: "Lương",
-            amount: 15000000,
-            date: now,
-            type: "income",
-          },
-        ]);
-        setLoading(false);
-      }, 1000);
+      // Gọi các API song song
+      const [walletsRes, statsRes, transactionsRes] = await Promise.all([
+        getWalletsAPI(), // Lấy tất cả ví để tính total balance
+        getOverviewStatsAPI({
+          startDate: currentMonthStart.format("YYYY-MM-DD"),
+          endDate: currentMonthEnd.format("YYYY-MM-DD"),
+        }), // Lấy stats tháng này
+        getAllTransactionsAPI({
+          limit: 10, // Lấy 10 giao dịch gần nhất
+          sortBy: "-date", // Sắp xếp theo ngày giảm dần
+        }), // Lấy recent transactions
+      ]);
+
+      // Xử lý wallets - tính total balance
+      let totalBalance = 0;
+      if (walletsRes?.status === true && Array.isArray(walletsRes?.data)) {
+        totalBalance = walletsRes.data.reduce((sum, wallet) => {
+          return sum + (Number(wallet.balance) || 0);
+        }, 0);
+      } else if (walletsRes?.EC === 0 && Array.isArray(walletsRes?.data)) {
+        totalBalance = walletsRes.data.reduce((sum, wallet) => {
+          return sum + (Number(wallet.balance) || 0);
+        }, 0);
+      }
+
+      // Xử lý stats
+      let monthlyIncome = 0;
+      let monthlyExpense = 0;
+      let transactionCount = 0;
+
+      if (statsRes?.status === true && statsRes?.data) {
+        const data = statsRes.data;
+        monthlyIncome = Number(data.totalIncome) || 0;
+        monthlyExpense = Number(data.totalExpense) || 0;
+        transactionCount = Number(data.transactionCount) || 0;
+      } else if (statsRes?.EC === 0 && statsRes?.data) {
+        const data = statsRes.data;
+        monthlyIncome = Number(data.totalIncome) || 0;
+        monthlyExpense = Number(data.totalExpense) || 0;
+        transactionCount = Number(data.transactionCount) || 0;
+      }
+
+      // Xử lý recent transactions
+      // API trả về { status: true, data: { transactions: [...], pagination: {...} } }
+      let transactions = [];
+      if (transactionsRes?.status === true && transactionsRes?.data?.transactions) {
+        transactions = Array.isArray(transactionsRes.data.transactions)
+          ? transactionsRes.data.transactions
+          : [];
+      } else if (transactionsRes?.EC === 0 && transactionsRes?.data?.transactions) {
+        transactions = Array.isArray(transactionsRes.data.transactions)
+          ? transactionsRes.data.transactions
+          : [];
+      } else if (transactionsRes?.status === true && Array.isArray(transactionsRes?.data)) {
+        // Fallback nếu data là array trực tiếp
+        transactions = transactionsRes.data;
+      } else if (transactionsRes?.EC === 0 && Array.isArray(transactionsRes?.data)) {
+        // Fallback nếu data là array trực tiếp
+        transactions = transactionsRes.data;
+      }
+
+      // Transform transactions để hiển thị
+      const transformedTransactions = transactions.slice(0, 10).map((transaction) => ({
+        id: transaction._id || transaction.id,
+        category: transaction.category?.name || transaction.categoryName || "Chưa phân loại",
+        amount: transaction.type === "income" ? Number(transaction.amount) : -Number(transaction.amount),
+        date: new Date(transaction.date),
+        type: transaction.type || "expense",
+      }));
+
+      setStats({
+        totalBalance,
+        monthlyIncome,
+        monthlyExpense,
+        transactionCount,
+      });
+
+      setRecentTransactions(transformedTransactions);
     } catch (error) {
+      console.error("Error loading dashboard data:", error);
       message.error("Không thể tải dữ liệu!");
+      // Không set mock data, chỉ set giá trị mặc định
+      setStats({
+        totalBalance: 0,
+        monthlyIncome: 0,
+        monthlyExpense: 0,
+        transactionCount: 0,
+      });
+      setRecentTransactions([]);
+    } finally {
       setLoading(false);
     }
   };
@@ -91,17 +151,17 @@ function HomePage() {
   const loadFinancialOverview = async () => {
     try {
       setLoadingOverview(true);
-      const monthStart = selectedMonth.startOf("month").toDate();
-      const monthEnd = selectedMonth.endOf("month").toDate();
+      const monthStart = selectedMonth.startOf("month");
+      const monthEnd = selectedMonth.endOf("month");
 
       const [overviewRes, categoryRes] = await Promise.all([
         getFinancialDashboardAPI({
-          startDate: monthStart,
-          endDate: monthEnd,
+          startDate: monthStart.format("YYYY-MM-DD"),
+          endDate: monthEnd.format("YYYY-MM-DD"),
         }),
         getCategoryExpenseReportAPI({
-          startDate: monthStart,
-          endDate: monthEnd,
+          startDate: monthStart.format("YYYY-MM-DD"),
+          endDate: monthEnd.format("YYYY-MM-DD"),
         }),
       ]);
 
@@ -120,10 +180,10 @@ function HomePage() {
           totalExpense: Number(data.totalExpense) || 0,
         });
       } else {
-        // Fallback mock data
+        // Không có dữ liệu từ API, set về 0
         setFinancialOverview({
-          totalIncome: 51506952,
-          totalExpense: 33224909,
+          totalIncome: 0,
+          totalExpense: 0,
         });
       }
 
@@ -167,36 +227,17 @@ function HomePage() {
 
         setCategoryExpenses(transformedCategories);
       } else {
-        // Fallback mock data với percentage đã tính - thêm field name
-        const mockData = [
-          { name: "Hóa đơn", categoryName: "Hóa đơn", amount: 22035211, percentage: 66.3 },
-          { name: "Mua sắm", categoryName: "Mua sắm", amount: 4753293, percentage: 14.3 },
-          { name: "Giáo dục", categoryName: "Giáo dục", amount: 2000072, percentage: 6.0 },
-          { name: "Khác", categoryName: "Khác", amount: 1286321, percentage: 3.9 },
-          { name: "Giải trí", categoryName: "Giải trí", amount: 1147327, percentage: 3.5 },
-          { name: "Di chuyển", categoryName: "Di chuyển", amount: 856342, percentage: 2.6 },
-          { name: "Y tế", categoryName: "Y tế", amount: 718346, percentage: 2.2 },
-          { name: "Ăn uống", categoryName: "Ăn uống", amount: 427997, percentage: 1.3 },
-        ];
-        setCategoryExpenses(mockData);
+        // Không có dữ liệu từ API, set mảng rỗng
+        setCategoryExpenses([]);
       }
     } catch (error) {
       console.error("Error loading financial overview:", error);
-      // Fallback mock data khi có lỗi
+      // Khi có lỗi, set về giá trị mặc định (0 hoặc mảng rỗng)
       setFinancialOverview({
-        totalIncome: 51506952,
-        totalExpense: 33224909,
+        totalIncome: 0,
+        totalExpense: 0,
       });
-      setCategoryExpenses([
-        { name: "Hóa đơn", categoryName: "Hóa đơn", amount: 22035211, percentage: 66.3 },
-        { name: "Mua sắm", categoryName: "Mua sắm", amount: 4753293, percentage: 14.3 },
-        { name: "Giáo dục", categoryName: "Giáo dục", amount: 2000072, percentage: 6.0 },
-        { name: "Khác", categoryName: "Khác", amount: 1286321, percentage: 3.9 },
-        { name: "Giải trí", categoryName: "Giải trí", amount: 1147327, percentage: 3.5 },
-        { name: "Di chuyển", categoryName: "Di chuyển", amount: 856342, percentage: 2.6 },
-        { name: "Y tế", categoryName: "Y tế", amount: 718346, percentage: 2.2 },
-        { categoryName: "Ăn uống", amount: 427997, percentage: 1.3 },
-      ]);
+      setCategoryExpenses([]);
     } finally {
       setLoadingOverview(false);
     }
