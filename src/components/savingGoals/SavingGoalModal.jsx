@@ -198,3 +198,6 @@ const SavingGoalModal = ({ open, onClose, goal, onSuccess }) => {
 
 export default SavingGoalModal;
 
+
+
+

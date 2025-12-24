@@ -241,3 +241,6 @@ const CategoryModal = ({ open, onClose, category, onSuccess }) => {
 
 export default CategoryModal;
 
+
+
+

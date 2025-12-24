@@ -32,7 +32,7 @@ const getAUserAPI = (id) => {
     return axios.get(urlBackend)
 }
 const updateUserAPI = (data) => {
-    const urlBackend = "/v1/api/user";
+    const urlBackend = "/v1/api/auth/account";
     return axios.put(urlBackend, data);
 }
 const deleteUserAPI = (id) => {
@@ -53,4 +53,12 @@ const resetPasswordAPI = (email, password) => {
     const urlBackend = "/v1/api/auth/resetPassword";
     return axios.post(urlBackend, { email, password });
 }
-export { getAUserAPI, loginAPI, registerAPI, fetchAccountAPI, logoutAPI, getUserAPI, deleteUserAPI, createUserAPI, updateUserAPI, forgotPasswordAPI, verifyOTPAPI, resetPasswordAPI }
+const changePasswordAPI = (currentPassword, newPassword) => {
+    const urlBackend = "/v1/api/auth/changePassword";
+    return axios.post(urlBackend, { currentPassword, newPassword });
+}
+const googleLoginAPI = (token) => {
+    const urlBackend = "/v1/api/auth/google";
+    return axios.post(urlBackend, { token });
+}
+export { getAUserAPI, loginAPI, registerAPI, fetchAccountAPI, logoutAPI, getUserAPI, deleteUserAPI, createUserAPI, updateUserAPI, forgotPasswordAPI, verifyOTPAPI, resetPasswordAPI, changePasswordAPI, googleLoginAPI }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Edit, Trash2, Pause, Play, Target, Wallet, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
-import { message, Modal, Dropdown, InputNumber } from "antd";
+import { Plus, Edit, Trash2, Pause, Play, Target, Wallet, TrendingUp, AlertCircle, CheckCircle, PiggyBank, Calendar } from "lucide-react";
+import { message, Modal, Dropdown, InputNumber, Badge, Alert } from "antd";
 import { getAllSavingGoalsAPI, deleteSavingGoalAPI, addAmountAPI, withdrawAmountAPI } from "../../../services/api.savingGoal";
 import SavingGoalModal from "../../../components/savingGoals/SavingGoalModal";
 import dayjs from "dayjs";
@@ -72,10 +72,10 @@ const SavingGoalsIndex = () => {
         const averageProgress =
             goals.length > 0
                 ? goals.reduce((sum, g) => {
-                      const current = g.current_amount || 0;
-                      const target = g.target_amount || 1;
-                      return sum + (current / target) * 100;
-                  }, 0) / goals.length
+                    const current = g.current_amount || 0;
+                    const target = g.target_amount || 1;
+                    return sum + (current / target) * 100;
+                }, 0) / goals.length
                 : 0;
 
         setSummary({
@@ -234,81 +234,89 @@ const SavingGoalsIndex = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#F9FAFB]">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
             <div className="max-w-7xl mx-auto px-6 py-8">
                 {/* Header Section */}
-                <div className="flex items-center justify-between mb-6">
-                    <h1 className="ds-heading-1" style={{ fontSize: "24px", fontWeight: 700 }}>
-                        Quản lý Mục tiêu Tiết kiệm
-                    </h1>
+                <div className="mb-8">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg">
+                            <PiggyBank className="text-white" size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-gray-900 bg-clip-text text-transparent">
+                                Quản lý Mục tiêu Tiết kiệm
+                            </h1>
+                            <p className="text-gray-600 mt-1 text-sm">
+                                Tạo và theo dõi mục tiêu tiết kiệm theo thời gian
+                            </p>
+                        </div>
+                    </div>
                     <button
                         onClick={handleAddGoal}
-                        className="ds-button-primary"
-                        style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                        className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
                     >
-                        <Plus size={18} />
+                        <Plus size={20} />
                         Thêm mục tiêu
                     </button>
                 </div>
 
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div className="ds-card">
+                    <div className="bg-gradient-to-br from-emerald-50 to-teal-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-emerald-200">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#3B82F6]/10 rounded-lg flex items-center justify-center">
-                                <Target className="text-[#3B82F6] w-6 h-6" />
+                            <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
+                                <Target className="text-white w-7 h-7" />
                             </div>
                         </div>
-                        <p className="ds-text-secondary mb-1">Tổng mục tiêu</p>
-                        <p className="text-2xl font-bold text-[#3B82F6]">{summary.totalGoals}</p>
+                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng mục tiêu</p>
+                        <p className="text-3xl font-bold text-emerald-600">{summary.totalGoals}</p>
                     </div>
 
-                    <div className="ds-card">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-200">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#10B981]/10 rounded-lg flex items-center justify-center">
-                                <Wallet className="text-[#10B981] w-6 h-6" />
+                            <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
+                                <Wallet className="text-white w-7 h-7" />
                             </div>
                         </div>
-                        <p className="ds-text-secondary mb-1">Tổng số tiền mục tiêu</p>
-                        <p className="text-2xl font-bold text-[#10B981]">
+                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng số tiền mục tiêu</p>
+                        <p className="text-3xl font-bold text-blue-600">
                             {formatCurrency(summary.totalTarget)}
                         </p>
                     </div>
 
-                    <div className="ds-card">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-green-200">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#10B981]/10 rounded-lg flex items-center justify-center">
-                                <TrendingUp className="text-[#10B981] w-6 h-6" />
+                            <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+                                <TrendingUp className="text-white w-7 h-7" />
                             </div>
                         </div>
-                        <p className="ds-text-secondary mb-1">Tổng đã tiết kiệm</p>
-                        <p className="text-2xl font-bold text-[#10B981]">
+                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng đã tiết kiệm</p>
+                        <p className="text-3xl font-bold text-green-600">
                             {formatCurrency(summary.totalSaved)}
                         </p>
                     </div>
 
-                    <div className="ds-card">
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-purple-200">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-[#3B82F6]/10 rounded-lg flex items-center justify-center">
-                                <Target className="text-[#3B82F6] w-6 h-6" />
+                            <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-pink-600 rounded-xl flex items-center justify-center shadow-md">
+                                <PiggyBank className="text-white w-7 h-7" />
                             </div>
                         </div>
-                        <p className="ds-text-secondary mb-1">Tiến độ trung bình</p>
-                        <p className="text-2xl font-bold text-[#3B82F6]">{summary.averageProgress}%</p>
+                        <p className="text-gray-600 mb-1 text-sm font-medium">Tiến độ trung bình</p>
+                        <p className="text-3xl font-bold text-purple-600">{summary.averageProgress}%</p>
                     </div>
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="flex gap-2 mb-6 bg-white p-1 rounded-lg border border-[#E5E7EB] inline-flex">
+                <div className="flex gap-2 mb-6 bg-white p-1.5 rounded-xl border-2 border-gray-200 shadow-sm inline-flex">
                     {tabs.map((tab) => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`px-4 py-2 rounded-md font-medium transition-all ${
-                                activeTab === tab.key
-                                    ? "bg-[#10B981] text-white shadow-sm"
-                                    : "text-[#6B7280] hover:bg-[#F9FAFB]"
-                            }`}
+                            className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 ${activeTab === tab.key
+                                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
+                                    : "text-gray-600 hover:bg-gray-50"
+                                }`}
                         >
                             {tab.label}
                         </button>
@@ -336,16 +344,14 @@ const SavingGoalsIndex = () => {
                             return (
                                 <div
                                     key={goal._id}
-                                    className="ds-card relative group cursor-pointer hover:scale-[1.02] transition-transform"
-                                    style={{
-                                        border: isCompleted
-                                            ? "2px solid #10B981"
+                                    className={`relative group cursor-pointer hover:scale-[1.02] transition-all duration-300 rounded-2xl shadow-lg hover:shadow-xl p-6 ${isCompleted
+                                            ? "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300"
                                             : isOverdue
-                                            ? "2px solid #EF4444"
-                                            : timeRemaining && timeRemaining.color === "#F59E0B"
-                                            ? "2px solid #F59E0B"
-                                            : "1px solid #E5E7EB",
-                                    }}
+                                                ? "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-300"
+                                                : timeRemaining && timeRemaining.color === "#F59E0B"
+                                                    ? "bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300"
+                                                    : "bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200"
+                                        }`}
                                     onClick={() => navigate(`/saving-goals/${goal._id}`)}
                                 >
                                     {/* Actions Menu */}
@@ -379,25 +385,63 @@ const SavingGoalsIndex = () => {
                                     {/* Badges */}
                                     <div className="absolute top-4 left-4 flex flex-col gap-2">
                                         {isCompleted && (
-                                            <span className="ds-badge ds-badge-success">Đã hoàn thành</span>
+                                            <Badge
+                                                count="Đã hoàn thành"
+                                                style={{
+                                                    backgroundColor: "#10B981",
+                                                    color: "white",
+                                                    padding: "4px 12px",
+                                                    borderRadius: "8px",
+                                                    fontSize: "12px",
+                                                    fontWeight: "600",
+                                                }}
+                                            />
                                         )}
                                         {!goal.is_active && (
-                                            <span className="ds-badge ds-badge-warning">Đã tạm dừng</span>
+                                            <Badge
+                                                count="Đã tạm dừng"
+                                                style={{
+                                                    backgroundColor: "#F59E0B",
+                                                    color: "white",
+                                                    padding: "4px 12px",
+                                                    borderRadius: "8px",
+                                                    fontSize: "12px",
+                                                    fontWeight: "600",
+                                                }}
+                                            />
                                         )}
                                         {timeRemaining && timeRemaining.color === "#F59E0B" && (
-                                            <span className="ds-badge" style={{ backgroundColor: "#F59E0B20", color: "#F59E0B" }}>
-                                                Sắp đến hạn
-                                            </span>
+                                            <Badge
+                                                count="Sắp đến hạn"
+                                                style={{
+                                                    backgroundColor: "#F59E0B",
+                                                    color: "white",
+                                                    padding: "4px 12px",
+                                                    borderRadius: "8px",
+                                                    fontSize: "12px",
+                                                    fontWeight: "600",
+                                                }}
+                                            />
                                         )}
                                         {isOverdue && (
-                                            <span className="ds-badge ds-badge-danger">Quá hạn</span>
+                                            <Badge
+                                                count="Quá hạn"
+                                                style={{
+                                                    backgroundColor: "#EF4444",
+                                                    color: "white",
+                                                    padding: "4px 12px",
+                                                    borderRadius: "8px",
+                                                    fontSize: "12px",
+                                                    fontWeight: "600",
+                                                }}
+                                            />
                                         )}
                                     </div>
 
                                     {/* Icon */}
                                     <div className="flex justify-center mb-4 mt-8">
-                                        <div className="w-16 h-16 rounded-full bg-[#10B981]/10 flex items-center justify-center">
-                                            <Target className="text-[#10B981] w-8 h-8" />
+                                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-md">
+                                            <PiggyBank className="text-white w-10 h-10" />
                                         </div>
                                     </div>
 
@@ -426,10 +470,15 @@ const SavingGoalsIndex = () => {
                                                 {progress.toFixed(0)}%
                                             </span>
                                         </div>
-                                        <div className="ds-progress-bar" style={{ height: "12px" }}>
+                                        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
                                             <div
-                                                className="ds-progress-bar-fill ds-progress-bar-fill-success"
-                                                style={{ width: `${progress}%` }}
+                                                className="h-full rounded-full transition-all duration-500 shadow-md"
+                                                style={{
+                                                    width: `${progress}%`,
+                                                    background: isCompleted
+                                                        ? "linear-gradient(90deg, #10B981, #059669)"
+                                                        : "linear-gradient(90deg, #3B82F6, #2563EB)",
+                                                }}
                                             />
                                         </div>
                                     </div>
@@ -457,16 +506,23 @@ const SavingGoalsIndex = () => {
                         })}
                     </div>
                 ) : (
-                    <div className="ds-empty-state">
-                        <Target className="ds-empty-state-icon" size={64} />
-                        <p className="ds-empty-state-text">
+                    <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-300">
+                        <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mb-4">
+                            <PiggyBank className="text-emerald-600" size={40} />
+                        </div>
+                        <p className="text-xl font-semibold text-gray-700 mb-2">
                             {activeTab === "completed"
                                 ? "Chưa có mục tiêu nào hoàn thành"
                                 : activeTab === "active"
-                                ? "Chưa có mục tiêu đang theo dõi"
-                                : "Chưa có mục tiêu nào"}
+                                    ? "Chưa có mục tiêu đang theo dõi"
+                                    : "Chưa có mục tiêu nào"}
                         </p>
-                        <button onClick={handleAddGoal} className="ds-button-primary mt-4">
+                        <p className="text-gray-500 mb-6">Tạo mục tiêu tiết kiệm để đạt được ước mơ của bạn</p>
+                        <button
+                            onClick={handleAddGoal}
+                            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+                        >
+                            <Plus size={20} />
                             Thêm mục tiêu đầu tiên
                         </button>
                     </div>
@@ -532,4 +588,6 @@ const SavingGoalsIndex = () => {
 };
 
 export default SavingGoalsIndex;
+
+
 

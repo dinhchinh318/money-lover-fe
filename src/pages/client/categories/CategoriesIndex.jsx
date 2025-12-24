@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Folder, TrendingUp, TrendingDown } from "lucide-react";
 import { message, Modal } from "antd";
-import { getCategoriesAPI, deleteCategoryAPI } from "../../../services/api.category";
+import { getCategoriesAPI, deleteCategoryAPI, setDefaultCategoryAPI } from "../../../services/api.category";
 import CategoryModal from "../../../components/categories/CategoryModal";
 
 const CategoriesIndex = () => {
@@ -98,6 +98,20 @@ const CategoriesIndex = () => {
         });
     };
 
+    const handleSetDefault = async (category) => {
+        try {
+            const res = await setDefaultCategoryAPI(category._id);
+            if (res.EC === 0) {
+                message.success("Đặt làm danh mục mặc định thành công!");
+                loadCategories();
+            } else {
+                message.error(res.message || "Thất bại!");
+            }
+        } catch (error) {
+            message.error("Có lỗi xảy ra!");
+        }
+    };
+
     const tabs = [
         { key: "all", label: "Tất cả" },
         { key: "income", label: "Thu nhập", color: "#10B981" },
@@ -128,11 +142,10 @@ const CategoriesIndex = () => {
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`px-4 py-2 rounded-md font-medium transition-all ${
-                                activeTab === tab.key
+                            className={`px-4 py-2 rounded-md font-medium transition-all ${activeTab === tab.key
                                     ? "bg-[#10B981] text-white shadow-sm"
                                     : "text-[#6B7280] hover:bg-[#F9FAFB]"
-                            }`}
+                                }`}
                             style={
                                 activeTab === tab.key && tab.color
                                     ? { backgroundColor: tab.color }
@@ -160,12 +173,25 @@ const CategoriesIndex = () => {
                             >
                                 {/* Actions khi hover */}
                                 <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                    {!category.is_default && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleSetDefault(category);
+                                            }}
+                                            className="p-2 bg-white rounded-lg shadow-md hover:bg-green-50 transition-colors"
+                                            title="Đặt làm mặc định"
+                                        >
+                                            <TrendingUp size={16} className="text-[#10B981]" />
+                                        </button>
+                                    )}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleEditCategory(category);
                                         }}
                                         className="p-2 bg-white rounded-lg shadow-md hover:bg-[#F9FAFB] transition-colors"
+                                        title="Chỉnh sửa"
                                     >
                                         <Edit size={16} className="text-[#6B7280]" />
                                     </button>
@@ -175,6 +201,7 @@ const CategoriesIndex = () => {
                                             handleDeleteCategory(category);
                                         }}
                                         className="p-2 bg-white rounded-lg shadow-md hover:bg-red-50 transition-colors"
+                                        title="Xóa"
                                     >
                                         <Trash2 size={16} className="text-[#EF4444]" />
                                     </button>
@@ -183,11 +210,10 @@ const CategoriesIndex = () => {
                                 {/* Badge loại */}
                                 <div className="absolute top-2 left-2">
                                     <span
-                                        className={`ds-badge ${
-                                            category.type === "income"
+                                        className={`ds-badge ${category.type === "income"
                                                 ? "ds-badge-success"
                                                 : "ds-badge-danger"
-                                        }`}
+                                            }`}
                                     >
                                         {category.type === "income" ? "Thu nhập" : "Chi tiêu"}
                                     </span>
@@ -203,11 +229,10 @@ const CategoriesIndex = () => {
                                 {/* Icon */}
                                 <div className="flex justify-center mb-4 mt-8">
                                     <div
-                                        className={`w-16 h-16 rounded-full flex items-center justify-center text-4xl ${
-                                            category.type === "income"
+                                        className={`w-16 h-16 rounded-full flex items-center justify-center text-4xl ${category.type === "income"
                                                 ? "bg-[#10B981]/10"
                                                 : "bg-[#EF4444]/10"
-                                        }`}
+                                            }`}
                                     >
                                         {getIconEmoji(category.icon)}
                                     </div>
@@ -233,8 +258,8 @@ const CategoriesIndex = () => {
                             {activeTab === "income"
                                 ? "Chưa có danh mục thu nhập nào"
                                 : activeTab === "expense"
-                                ? "Chưa có danh mục chi tiêu nào"
-                                : "Chưa có danh mục nào"}
+                                    ? "Chưa có danh mục chi tiêu nào"
+                                    : "Chưa có danh mục nào"}
                         </p>
                         <button
                             onClick={handleAddCategory}
@@ -261,4 +286,5 @@ const CategoriesIndex = () => {
 };
 
 export default CategoriesIndex;
+
 

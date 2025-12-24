@@ -394,3 +394,6 @@ const SavingGoalDetail = () => {
 
 export default SavingGoalDetail;
 
+
+
+

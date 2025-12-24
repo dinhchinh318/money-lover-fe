@@ -26,11 +26,10 @@ const AnalyticsLayout = () => {
                         <Link
                             key={item.path}
                             to={item.path}
-                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-all text-sm ${
-                                isActive(item.path)
+                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-all text-sm ${isActive(item.path)
                                     ? "bg-[#E8F8EF] text-[#0EA25E] border border-[#C4F1DC] shadow-sm"
                                     : "text-gray-600 hover:bg-gray-100"
-                            }`}
+                                }`}
                         >
                             {item.icon && (
                                 <item.icon

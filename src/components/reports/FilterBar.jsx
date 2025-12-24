@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Select, Button, Space } from "antd";
 import { CalendarOutlined, FilterOutlined } from "@ant-design/icons";
+import { Filter, X, Calendar } from "lucide-react";
 import DateRangePicker from "../common/DateRangePicker";
 import dayjs from "dayjs";
 
@@ -70,7 +71,7 @@ const FilterBar = ({
             period: period,
         };
         setFilters(newFilters);
-        
+
         if (autoApply) {
             // Auto apply when selecting from dropdown or quick buttons
             const params = {
@@ -134,11 +135,13 @@ const FilterBar = ({
     };
 
     return (
-        <div className="bg-white border-b border-gray-200 p-4 mb-6 rounded-lg shadow-sm">
+        <div className="bg-gradient-to-r from-white to-gray-50 border-2 border-gray-200 p-5 rounded-xl shadow-sm">
             <div className="flex flex-wrap items-center gap-4">
                 {/* Date Range Picker with Quick Select */}
                 <div className="flex items-center gap-2">
-                    <CalendarOutlined style={{ color: "#6B7280" }} />
+                    <div className="p-2 bg-blue-50 rounded-lg">
+                        <Calendar className="text-blue-600" size={18} />
+                    </div>
                     <DateRangePicker
                         value={filters.dateRange}
                         onChange={(dates) => {
@@ -275,12 +278,18 @@ const FilterBar = ({
                     <Button
                         type="primary"
                         onClick={handleApply}
-                        icon={<FilterOutlined />}
-                        className="bg-[#10B981] hover:bg-[#059669] border-[#10B981]"
+                        icon={<Filter size={16} />}
+                        className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 border-0 shadow-md font-semibold"
                     >
                         Áp dụng
                     </Button>
-                    <Button onClick={handleReset}>Xóa bộ lọc</Button>
+                    <Button
+                        onClick={handleReset}
+                        icon={<X size={16} />}
+                        className="border-gray-300 hover:border-gray-400"
+                    >
+                        Xóa bộ lọc
+                    </Button>
                 </Space>
             </div>
         </div>
