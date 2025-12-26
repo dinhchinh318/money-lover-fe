@@ -1,255 +1,239 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Button, Form, Input, message, Upload } from "antd";
-import { Mail, Lock, Eye, EyeOff, User, Phone, MapPin, Wallet, Upload as UploadIcon } from "lucide-react";
+import { Button, Form, Input, message, ConfigProvider, Checkbox } from "antd";
+import { Mail, Lock, Eye, EyeOff, Wallet, ArrowRight, ShieldCheck, CheckCircle, Sparkles } from "lucide-react";
 import { registerAPI } from "../../../services/api.user";
 
 const Register = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [avatar, setAvatar] = useState(null);
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
       const res = await registerAPI({
-        name: values.name,
         email: values.email,
         password: values.password,
-        phone: values.phone,
-        address: values.address,
-        avatar: avatar,
       });
 
       if (res?.data) {
-        message.success("Đăng ký thành công! Vui lòng đăng nhập.");
+        message.success("Đăng ký thành công! Hãy bắt đầu quản lý tài chính.");
         navigate("/login");
       } else {
         message.error(res?.message || "Đăng ký thất bại!");
       }
     } catch (error) {
-      message.error("Đăng ký thất bại. Vui lòng thử lại!");
+      message.error("Lỗi hệ thống. Vui lòng thử lại!");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAvatarChange = (info) => {
-    if (info.file.status === "done") {
-      setAvatar(info.file.response?.url || info.file.thumbUrl);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 py-8">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 md:p-10">
-        {/* Logo & Header */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-[#16A34A] rounded-full flex items-center justify-center">
-              <Wallet className="text-white w-8 h-8" />
-            </div>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-[#111827] mb-2" style={{ fontSize: '24px' }}>
-            Tạo tài khoản
-          </h1>
-          <p className="text-[#6B7280] text-sm md:text-base" style={{ fontSize: '14px' }}>
-            Bắt đầu quản lý tài chính của bạn
-          </p>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#10b981', // Emerald 500
+          borderRadius: 16,
+          controlHeightLG: 56,
+        },
+      }}
+    >
+      {/* Container chính: Đảm bảo nền xanh xuyên suốt kể cả trên mobile */}
+      <div className="min-h-screen w-full flex items-center justify-center bg-[#F0FDF4] p-4 md:p-10 lg:p-16 relative">
+        
+        {/* Background Decorative Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-5%] right-[-5%] w-[30rem] h-[30rem] bg-emerald-200/30 rounded-full blur-[100px]" />
+          <div className="absolute bottom-[-5%] left-[-5%] w-[30rem] h-[30rem] bg-green-200/30 rounded-full blur-[100px]" />
         </div>
 
-        {/* Register Form */}
-        <Form
-          form={form}
-          name="register"
-          layout="vertical"
-          onFinish={onFinish}
-          autoComplete="off"
-          size="large"
-        >
-          {/* Họ và tên */}
-          <Form.Item
-            label={<span className="font-semibold text-[#111827]">Họ và tên</span>}
-            name="name"
-            rules={[
-              { required: true, message: "Vui lòng nhập họ và tên!" },
-              { min: 2, message: "Họ và tên tối thiểu 2 ký tự!" },
-            ]}
-          >
-            <Input
-              prefix={<User className="text-[#6B7280]" size={18} />}
-              placeholder="Nhập họ và tên"
-              className="h-12"
-              style={{ borderRadius: '8px', padding: '12px' }}
-            />
-          </Form.Item>
+        {/* Main Card */}
+        <div className="w-full max-w-[1100px] bg-white/80 backdrop-blur-md rounded-[2.5rem] shadow-[0_30px_100px_rgba(16,185,129,0.12)] flex flex-col md:flex-row min-h-[680px] border border-white relative z-10 overflow-hidden">
+          
+          {/* CỘT TRÁI: BRANDING (Visible on Tablet/Desktop) */}
+          <div className="hidden md:flex md:w-[42%] bg-gradient-to-br from-[#064E3B] to-[#065F46] p-12 flex-col justify-between relative overflow-hidden">
+            {/* Pattern trang trí chìm */}
+            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-16">
+                <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-xl">
+                  <Wallet className="text-white" size={28} />
+                </div>
+                <span className="text-2xl font-black text-white tracking-tighter">MoneyLover</span>
+              </div>
 
-          {/* Email */}
-          <Form.Item
-            label={<span className="font-semibold text-[#111827]">Email</span>}
-            name="email"
-            rules={[
-              { required: true, message: "Vui lòng nhập email!" },
-              {
-                type: "email",
-                message: "Email không hợp lệ!",
-              },
-            ]}
-          >
-            <Input
-              prefix={<Mail className="text-[#6B7280]" size={18} />}
-              placeholder="Email của bạn"
-              className="h-12"
-              style={{ borderRadius: '8px', padding: '12px' }}
-            />
-          </Form.Item>
+              <div className="space-y-6">
+                <h2 className="text-4xl lg:text-5xl font-black text-white leading-tight">
+                  Quản lý tiền <br />
+                  <span className="text-emerald-400">thật phong cách.</span>
+                </h2>
+                <p className="text-emerald-100/70 text-lg font-medium">
+                  Trải nghiệm nền tảng quản lý tài chính hiện đại nhất hiện nay.
+                </p>
+              </div>
+            </div>
 
-          {/* Mật khẩu */}
-          <Form.Item
-            label={<span className="font-semibold text-[#111827]">Mật khẩu</span>}
-            name="password"
-            rules={[
-              { required: true, message: "Vui lòng nhập mật khẩu!" },
-              { min: 6, message: "Mật khẩu tối thiểu 6 ký tự!" },
-            ]}
-          >
-            <Input.Password
-              prefix={<Lock className="text-[#6B7280]" size={18} />}
-              placeholder="Mật khẩu (tối thiểu 6 ký tự)"
-              className="h-12"
-              style={{ borderRadius: '8px', padding: '12px' }}
-              iconRender={(visible) =>
-                visible ? (
-                  <EyeOff className="text-[#6B7280]" size={18} />
-                ) : (
-                  <Eye className="text-[#6B7280]" size={18} />
-                )
-              }
-            />
-          </Form.Item>
-
-          {/* Xác nhận mật khẩu */}
-          <Form.Item
-            label={<span className="font-semibold text-[#111827]">Xác nhận mật khẩu</span>}
-            name="confirmPassword"
-            dependencies={["password"]}
-            rules={[
-              { required: true, message: "Vui lòng xác nhận mật khẩu!" },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue("password") === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error("Mật khẩu không khớp!"));
-                },
-              }),
-            ]}
-          >
-            <Input.Password
-              prefix={<Lock className="text-[#6B7280]" size={18} />}
-              placeholder="Nhập lại mật khẩu"
-              className="h-12"
-              style={{ borderRadius: '8px', padding: '12px' }}
-              iconRender={(visible) =>
-                visible ? (
-                  <EyeOff className="text-[#6B7280]" size={18} />
-                ) : (
-                  <Eye className="text-[#6B7280]" size={18} />
-                )
-              }
-            />
-          </Form.Item>
-
-          {/* Số điện thoại */}
-          <Form.Item
-            label={<span className="font-semibold text-[#111827]">Số điện thoại</span>}
-            name="phone"
-            rules={[
-              {
-                pattern: /^[0-9]{10,11}$/,
-                message: "Số điện thoại không hợp lệ!",
-              },
-            ]}
-          >
-            <Input
-              prefix={<Phone className="text-[#6B7280]" size={18} />}
-              placeholder="Số điện thoại (tùy chọn)"
-              className="h-12"
-              style={{ borderRadius: '8px', padding: '12px' }}
-            />
-          </Form.Item>
-
-          {/* Địa chỉ */}
-          <Form.Item
-            label={<span className="font-semibold text-[#111827]">Địa chỉ</span>}
-            name="address"
-          >
-            <Input
-              prefix={<MapPin className="text-[#6B7280]" size={18} />}
-              placeholder="Địa chỉ (tùy chọn)"
-              className="h-12"
-              style={{ borderRadius: '8px', padding: '12px' }}
-            />
-          </Form.Item>
-
-          {/* Điều khoản */}
-          <Form.Item
-            name="agreement"
-            valuePropName="checked"
-            rules={[
-              {
-                validator: (_, value) =>
-                  value
-                    ? Promise.resolve()
-                    : Promise.reject(new Error("Bạn phải đồng ý với điều khoản!")),
-              },
-            ]}
-          >
-            <label className="flex items-start cursor-pointer">
-              <input
-                type="checkbox"
-                className="mt-1 mr-2 w-4 h-4 text-[#16A34A] border-[#E5E7EB] rounded focus:ring-[#16A34A]"
-              />
-              <span className="text-sm text-[#6B7280]">
-                Tôi đồng ý với{" "}
-                <Link to="/terms" className="text-[#16A34A] hover:underline">
-                  Điều khoản sử dụng
-                </Link>{" "}
-                và{" "}
-                <Link to="/privacy" className="text-[#16A34A] hover:underline">
-                  Chính sách bảo mật
-                </Link>
-              </span>
-            </label>
-          </Form.Item>
-
-          {/* Submit Button */}
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              className="w-full h-12 text-base font-semibold rounded-lg bg-[#16A34A] hover:bg-[#15803d] border-none"
-              style={{ borderRadius: '8px', height: '48px' }}
-            >
-              Đăng ký
-            </Button>
-          </Form.Item>
-
-          {/* Login Link */}
-          <div className="text-center">
-            <span className="text-[#6B7280] text-sm">Đã có tài khoản? </span>
-            <Link
-              to="/login"
-              className="text-[#16A34A] font-semibold hover:underline text-sm"
-            >
-              Đăng nhập ngay
-            </Link>
+            <div className="relative z-10 pt-10">
+              <div className="space-y-4">
+                {[
+                  { icon: <CheckCircle size={20}/>, text: "Lập ngân sách thông minh" },
+                  { icon: <Sparkles size={20}/>, text: "Đề xuất tiết kiệm tự động" },
+                  { icon: <ShieldCheck size={20}/>, text: "Bảo mật chuẩn Fintech" }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3 text-emerald-50">
+                    <div className="bg-emerald-400/20 p-1 rounded-full">{item.icon}</div>
+                    <span className="font-semibold text-sm">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </Form>
+
+          {/* CỘT PHẢI: FORM ĐĂNG KÝ */}
+          <div className="w-full md:w-[58%] p-8 sm:p-12 lg:p-20 flex flex-col justify-center bg-white">
+            <div className="w-full max-w-sm mx-auto">
+              {/* Header cho Mobile (Hiển thị logo khi cột trái bị ẩn) */}
+              <div className="md:hidden flex flex-col items-center mb-10">
+                 <div className="w-16 h-16 bg-emerald-600 rounded-3xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-100">
+                    <Wallet className="text-white" size={32} />
+                 </div>
+                 <h1 className="text-2xl font-black text-slate-800">Tạo tài khoản</h1>
+                 <p className="text-slate-500 font-medium">MoneyWise - Fintech Smart</p>
+              </div>
+
+              {/* Header cho Desktop */}
+              <div className="hidden md:block mb-10">
+                <h1 className="text-3xl font-black text-slate-900 mb-2">Đăng ký</h1>
+                <p className="text-slate-500 font-medium italic">Chào mừng bạn đến với sự thịnh vượng!</p>
+              </div>
+
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={onFinish}
+                requiredMark={false}
+                autoComplete="off"
+              >
+                <Form.Item
+                  name="email"
+                  label={<span className="text-xs font-bold uppercase tracking-widest text-emerald-700 ml-1">Địa chỉ Email</span>}
+                  rules={[
+                    { required: true, message: "Email là bắt buộc!" },
+                    { type: "email", message: "Định dạng email không hợp lệ!" }
+                  ]}
+                  className="mb-5"
+                >
+                  <Input 
+                    prefix={<Mail size={18} className="text-slate-400 mr-2" />} 
+                    placeholder="name@email.com"
+                    className="rounded-2xl border-2 border-slate-100 bg-slate-50/50 hover:bg-white focus:bg-white transition-all h-14"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="password"
+                  label={<span className="text-xs font-bold uppercase tracking-widest text-emerald-700 ml-1">Mật khẩu</span>}
+                  rules={[
+                    { required: true, message: "Vui lòng nhập mật khẩu!" },
+                    { min: 6, message: "Mật khẩu tối thiểu 6 ký tự!" }
+                  ]}
+                  className="mb-5"
+                >
+                  <Input.Password 
+                    prefix={<Lock size={18} className="text-slate-400 mr-2" />}
+                    placeholder="••••••••"
+                    className="rounded-2xl border-2 border-slate-100 bg-slate-50/50 hover:bg-white focus:bg-white transition-all h-14"
+                    iconRender={visible => (visible ? <EyeOff size={18} className="text-slate-400"/> : <Eye size={18} className="text-slate-400"/>)}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="confirm"
+                  label={<span className="text-xs font-bold uppercase tracking-widest text-emerald-700 ml-1">Xác nhận mật khẩu</span>}
+                  dependencies={['password']}
+                  rules={[
+                    { required: true, message: "Vui lòng xác nhận mật khẩu!" },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue('password') === value) return Promise.resolve();
+                        return Promise.reject(new Error('Mật khẩu không trùng khớp!'));
+                      },
+                    }),
+                  ]}
+                  className="mb-6"
+                >
+                  <Input.Password 
+                    prefix={<Lock size={18} className="text-slate-400 mr-2" />}
+                    placeholder="Nhập lại mật khẩu"
+                    className="rounded-2xl border-2 border-slate-100 bg-slate-50/50 hover:bg-white focus:bg-white transition-all h-14"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="agreement"
+                  valuePropName="checked"
+                  rules={[
+                    { validator: (_, value) => value ? Promise.resolve() : Promise.reject(new Error("Vui lòng đồng ý với điều khoản!")) },
+                  ]}
+                  className="mb-8"
+                >
+                  <Checkbox className="text-slate-500 text-sm leading-tight">
+                    Tôi đồng ý với <Link to="#" className="text-emerald-600 font-bold hover:underline">Điều khoản</Link> & <Link to="#" className="text-emerald-600 font-bold hover:underline">Chính sách bảo mật</Link> của MoneyWise.
+                  </Checkbox>
+                </Form.Item>
+
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  block
+                  className="h-14 bg-emerald-600 hover:bg-emerald-700 border-none shadow-xl shadow-emerald-200 font-black text-base rounded-2xl group transition-all"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <span>ĐĂNG KÝ NGAY</span>
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Button>
+
+                <p className="text-center mt-8 text-slate-500 font-semibold">
+                  Đã là thành viên?{' '}
+                  <Link to="/login" className="text-emerald-600 hover:text-emerald-700 underline underline-offset-4 decoration-2">
+                    Đăng nhập
+                  </Link>
+                </p>
+              </Form>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .ant-input-affix-wrapper {
+          border-width: 2px !important;
+          padding-left: 1.25rem !important;
+        }
+        .ant-input-affix-wrapper-focused {
+          box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.1) !important;
+          border-color: #10b981 !important;
+        }
+        .ant-checkbox-checked .ant-checkbox-inner {
+          background-color: #10b981 !important;
+          border-color: #10b981 !important;
+        }
+        .ant-form-item-label label {
+          height: auto !important;
+          padding-bottom: 4px !important;
+        }
+        .ant-form-item-explain-error {
+          font-size: 12px !important;
+          font-weight: 600 !important;
+          margin-top: 4px !important;
+        }
+      `}} />
+    </ConfigProvider>
   );
 };
 
