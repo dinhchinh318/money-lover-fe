@@ -9,6 +9,8 @@ import HomePage from "./pages/client/home.jsx";
 import LandingPage from "./pages/client/landing.jsx";
 import Login from "./pages/client/auth/login.jsx";
 import Register from "./pages/client/auth/register.jsx";
+import ForgotPassword from "./pages/client/forgotPassword.jsx";
+import ResetPassword from "./pages/client/resetPassword.jsx";
 import ReportsLayout from "./components/reports/ReportsLayout.jsx";
 import ReportsDashboard from "./pages/client/reports/ReportsDashboard.jsx";
 import ReportsTime from "./pages/client/reports/ReportsTime.jsx";
@@ -47,6 +49,8 @@ const router = createBrowserRouter([
       { index: true, element: <HomeRoute /> },
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
+      { path: "/reset-password", element: <ResetPassword /> },
+      { path: "/forgot-password", element: <ForgotPassword /> },
       // Reports Routes with Layout
       {
         path: "/reports",
