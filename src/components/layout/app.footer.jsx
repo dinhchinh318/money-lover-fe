@@ -6,6 +6,14 @@ import { Wallet, Mail, Phone, MapPin, Clock, HelpCircle, Heart, ArrowRight } fro
 import { Link } from "react-router-dom";
 
 const AppFooter = () => {
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <footer className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
       {/* Decorative Background Elements */}
@@ -155,25 +163,25 @@ const AppFooter = () => {
               </h3>
               <ul className="flex flex-col gap-3">
                 <li>
-                  <Link to="/" className="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+                  <Link to="/" onClick={scrollToTop} className="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                     <div className="w-1.5 h-1.5 bg-blue-400 rounded-full group-hover:scale-150 transition-transform"></div>
                     <span>Trang chủ</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="/transactions" className="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+                  <Link to="/transactions" onClick={scrollToTop} className="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                     <div className="w-1.5 h-1.5 bg-purple-400 rounded-full group-hover:scale-150 transition-transform"></div>
                     <span>Giao dịch</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="/reports" className="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+                  <Link to="/reports" onClick={scrollToTop} className="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                     <div className="w-1.5 h-1.5 bg-pink-400 rounded-full group-hover:scale-150 transition-transform"></div>
                     <span>Báo cáo</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="/analytics" className="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+                  <Link to="/analytics" onClick={scrollToTop} className="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                     <div className="w-1.5 h-1.5 bg-green-400 rounded-full group-hover:scale-150 transition-transform"></div>
                     <span>Phân tích</span>
                   </Link>

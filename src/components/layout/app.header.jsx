@@ -1,311 +1,432 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { User, LogOut, Wallet, Menu as MenuIcon, X, Home, TrendingUp, BarChart3, FileText, Settings, UserCircle, Bell, Folder, PiggyBank, CalendarClock, PieChart } from "lucide-react";
+import {
+  LogOut,
+  Wallet,
+  Menu as MenuIcon,
+  X,
+  Home,
+  TrendingUp,
+  FileText,
+  Settings,
+  UserCircle,
+  Bell,
+  Folder,
+  PiggyBank,
+  CalendarClock,
+  PieChart,
+  ChevronDown,
+  MoreHorizontal,
+  LayoutGrid,
+  Plus,
+} from "lucide-react";
 import { useState } from "react";
 import { Dropdown, message, Avatar, Badge } from "antd";
 import { useCurrentApp } from "../context/app.context";
-import { fetchAccountAPI, logoutAPI } from "../../services/api.user";
+import { logoutAPI } from "../../services/api.user";
 
 const AppHeader = () => {
   const { setIsAuthenticated, isAuthenticated, user, setUser } = useCurrentApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
+  // ===== Helpers =====
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  };
+
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
+  const closeMenuAndScrollTop = () => {
+    closeMobileMenu();
+    scrollToTop();
+  };
+
+  const goAndScroll = (path) => {
+    navigate(path);
+    scrollToTop();
+  };
+
+  // ===== Logout =====
   const handleLogout = async () => {
     try {
       const res = await logoutAPI();
-      if (res.error === 0) {
-        message.success("Đăng xuất thành công!");
+      if (res?.error === 0) {
+        message.success("Đăng xuất thành công");
         setUser(null);
         setIsAuthenticated(false);
         localStorage.removeItem("accessToken");
         navigate("/login");
+        scrollToTop();
       }
     } catch (error) {
-      message.error("Đăng xuất thất bại!");
+      message.error("Lỗi hệ thống");
     }
   };
 
-  const navLinks = [
-    { key: "home", label: "Home", path: "/", icon: Home },
-    { key: "transactions", label: "Transactions", path: "/transactions", icon: Wallet },
-    { key: "wallets", label: "Wallets", path: "/wallets", icon: Wallet },
-    { key: "categories", label: "Categories", path: "/categories", icon: Folder },
-    { key: "budgets", label: "Budgets", path: "/budgets", icon: PieChart },
-    { key: "recurring-bills", label: "Recurring Bills", path: "/recurring-bills", icon: CalendarClock },
-    { key: "saving-goals", label: "Saving Goals", path: "/saving-goals", icon: PiggyBank },
-    { key: "reports", label: "Reports", path: "/reports", icon: FileText },
-    { key: "analytics", label: "Analytics", path: "/analytics", icon: TrendingUp },
+  // ===== Nav Data =====
+  const mainNav = [
+    { key: "home", label: "Tổng quan", path: "/", icon: Home },
+    { key: "transactions", label: "Giao dịch", path: "/transactions", icon: Wallet },
+    { key: "wallets", label: "Ví của tôi", path: "/wallets", icon: Folder },
+    { key: "budgets", label: "Ngân sách", path: "/budgets", icon: PieChart },
+    { key: "reports", label: "Báo cáo", path: "/reports", icon: FileText },
   ];
 
-  const accountMenuItems = [
-    ...(!isAuthenticated
-      ? [
-        {
-          key: "signin",
-          label: (
-            <Link to="/login" className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 rounded-xl transition-all group">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <User size={18} className="text-white" />
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900">Đăng nhập</p>
-                <p className="text-xs text-gray-500">Truy cập tài khoản của bạn</p>
-              </div>
-            </Link>
-          ),
-        },
-        {
-          key: "signup",
-          label: (
-            <Link to="/register" className="flex items-center gap-3 px-4 py-3 hover:bg-purple-50 rounded-xl transition-all group">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <UserCircle size={18} className="text-white" />
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900">Đăng ký</p>
-                <p className="text-xs text-gray-500">Tạo tài khoản mới</p>
-              </div>
-            </Link>
-          ),
-        },
-      ]
-      : [
-        {
-          key: "profile-header",
-          label: (
-            <div className="px-4 py-3 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <Avatar
-                  size={48}
-                  className="border-2 border-green-500 shadow-lg"
-                  src={user?.avatar}
-                  style={{
-                    background: user?.avatar ? 'transparent' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    color: "#fff",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {!user?.avatar && (user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U")}
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 text-sm truncate">
-                    {user?.name || "Người dùng"}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-                </div>
-              </div>
-            </div>
-          ),
-        },
-        {
-          key: "profile",
-          label: (
-            <Link to="/profile" className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 rounded-xl transition-all group">
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center group-hover:bg-green-500 group-hover:scale-110 transition-all">
-                <UserCircle size={18} className="text-green-600 group-hover:text-white transition-colors" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Hồ sơ của tôi</p>
-                <p className="text-xs text-gray-500">Xem và chỉnh sửa thông tin</p>
-              </div>
-            </Link>
-          ),
-        },
-        {
-          key: "settings",
-          label: (
-            <Link to="/settings" className="flex items-center gap-3 px-4 py-3 hover:bg-purple-50 rounded-xl transition-all group">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center group-hover:bg-purple-500 group-hover:scale-110 transition-all">
-                <Settings size={18} className="text-purple-600 group-hover:text-white transition-colors" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Cài đặt</p>
-                <p className="text-xs text-gray-500">Tùy chỉnh ứng dụng</p>
-              </div>
-            </Link>
-          ),
-        },
-        {
-          key: "divider",
-          type: "divider",
-        },
-        {
-          key: "logout",
-          label: (
-            <div
-              onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 rounded-xl transition-all group cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center group-hover:bg-red-500 group-hover:scale-110 transition-all">
-                <LogOut size={18} className="text-red-600 group-hover:text-white transition-colors" />
-              </div>
-              <div>
-                <p className="font-medium text-red-600 group-hover:text-red-700">Đăng xuất</p>
-                <p className="text-xs text-gray-500">Thoát khỏi tài khoản</p>
-              </div>
-            </div>
-          ),
-        },
-      ]),
+  const toolNav = [
+    { key: "categories", label: "Danh mục", path: "/categories", icon: LayoutGrid },
+    { key: "recurring-bills", label: "Hóa đơn định kỳ", path: "/recurring-bills", icon: CalendarClock },
+    { key: "saving-goals", label: "Tiết kiệm", path: "/saving-goals", icon: PiggyBank },
+    { key: "analytics", label: "Phân tích", path: "/analytics", icon: TrendingUp },
   ];
 
-  return (
-    <header className="sticky top-0 z-[1000] bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200/60 dark:border-gray-700/60 shadow-lg shadow-gray-100/50 dark:shadow-gray-900/50">
-      <div className="mx-auto w-full max-w-[1360px] px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4 w-full">
-          {/* Logo với animation - luôn bám trái */}
-          <div className="flex-shrink-0">
-            <Link
-              to="/"
-              className="flex items-center gap-2.5 group transition-all duration-300 hover:scale-105"
-            >
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative w-9 h-9 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
-                  <Wallet className="text-white w-[18px] h-[18px]" />
-                </div>
-              </div>
-              <div>
-                <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent tracking-tight">
-                  MoneyLover
-                </span>
-                <p className="text-[10px] md:text-xs text-gray-500 hidden sm:block leading-tight">Quản lý tài chính thông minh</p>
-              </div>
-            </Link>
+  // ===== Dropdown Menus =====
+  const moreMenu = {
+    items: toolNav.map((item) => ({
+      key: item.key,
+      label: (
+        <Link
+          to={item.path}
+          onClick={scrollToTop}
+          className="flex items-center gap-3 px-1 py-1 font-semibold text-slate-600 hover:text-emerald-600 transition-colors"
+        >
+          <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+            <item.icon size={16} strokeWidth={2.5} />
           </div>
+          <span className="text-sm">{item.label}</span>
+        </Link>
+      ),
+    })),
+  };
 
-          {/* Desktop Navigation - bám giữa nhờ flex-1 */}
-          <nav className="hidden lg:flex items-center gap-1.5 flex-1 justify-center mx-6">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              const isActive =
-                location.pathname === link.path ||
-                (link.path === "/" && location.pathname === "/") ||
-                (link.path === "/reports" && location.pathname.startsWith("/reports")) ||
-                (link.path === "/analytics" && location.pathname.startsWith("/analytics"));
+  const userDropdownItems = [
+    {
+      key: "header",
+      label: (
+        <div className="px-2 py-3 min-w-[200px]">
+          <div className="flex items-center gap-3">
+            <Avatar
+              size={44}
+              src={user?.avatar}
+              className="border-2 border-emerald-500 bg-emerald-50 text-emerald-600 font-bold"
+            >
+              {user?.name?.[0]?.toUpperCase()}
+            </Avatar>
+            <div className="flex flex-col overflow-hidden">
+              <p className="text-sm font-black text-slate-900 truncate leading-tight">
+                {user?.name || "Người dùng"}
+              </p>
+              <p className="text-[10px] text-slate-400 truncate mt-0.5 uppercase tracking-wider font-bold">
+                {user?.email}
+              </p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    { type: "divider" },
+    {
+      key: "profile",
+      label: (
+        <Link
+          to="/profile"
+          onClick={scrollToTop}
+          className="flex items-center gap-3 px-1 py-1.5 font-bold text-slate-600"
+        >
+          <UserCircle size={18} className="text-slate-400" /> Hồ sơ
+        </Link>
+      ),
+    },
+    {
+      key: "settings",
+      label: (
+        <Link
+          to="/settings"
+          onClick={scrollToTop}
+          className="flex items-center gap-3 px-1 py-1.5 font-bold text-slate-600"
+        >
+          <Settings size={18} className="text-slate-400" /> Cài đặt
+        </Link>
+      ),
+    },
+    { type: "divider" },
+    {
+      key: "logout",
+      label: (
+        <div
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-1 py-1.5 font-bold text-red-500 transition-colors cursor-pointer"
+        >
+          <LogOut size={18} /> Đăng xuất
+        </div>
+      ),
+    },
+  ];
+
+  // ===== UI =====
+  return (
+    <>
+      <header className="sticky top-0 z-[1000] w-full border-b border-slate-200/60 bg-white/70 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-20 lg:px-8">
+          {/* LEFT: LOGO */}
+          <Link
+            to="/"
+            onClick={scrollToTop}
+            className="flex items-center gap-2.5 transition-transform active:scale-95"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-200">
+              <Wallet className="text-white" size={24} strokeWidth={2.5} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-black leading-none tracking-tighter text-slate-900 uppercase">
+                Money<span className="text-emerald-600">Lover</span>
+              </span>
+              <span className="text-[10px] font-bold text-emerald-600/70 tracking-[0.2em] uppercase leading-none mt-1">
+                Smart Finance
+              </span>
+            </div>
+          </Link>
+
+          {/* CENTER: DESKTOP NAV */}
+          <nav className="hidden lg:flex items-center gap-1 rounded-2xl bg-slate-100/60 p-1.5 border border-slate-200/40">
+            {mainNav.map((item) => {
+              const isActive = location.pathname === item.path;
+              const Icon = item.icon;
+
               return (
                 <Link
-                  key={link.key}
-                  to={link.path}
-                  className={`relative flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all duration-300 font-medium text-sm group ${isActive
-                    ? 'text-green-600 bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm'
-                    : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
-                    }`}
+                  key={item.key}
+                  to={item.path}
+                  onClick={scrollToTop}
+                  className={[
+                    "flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-black transition-all duration-200",
+                    isActive
+                      ? "bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200/50"
+                      : "text-slate-500 hover:text-emerald-600 hover:bg-white/40",
+                  ].join(" ")}
                 >
-                  {isActive && (
-                    <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"></span>
-                  )}
-                  <Icon size={16} className={isActive ? 'text-green-600' : 'text-gray-500 group-hover:text-green-600'} />
-                  <span className={isActive ? 'font-semibold' : ''}>{link.label}</span>
+                  <Icon size={16} strokeWidth={isActive ? 3 : 2} />
+                  {item.label}
                 </Link>
               );
             })}
+
+            <div className="mx-1 h-5 w-px bg-slate-300/50" />
+
+            <Dropdown
+              menu={moreMenu}
+              trigger={["hover"]}
+              placement="bottomRight"
+              overlayClassName="custom-nav-dropdown"
+            >
+              <button className="flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-black text-slate-500 hover:text-emerald-600 transition-colors outline-none">
+                <MoreHorizontal size={18} />
+                Thêm
+              </button>
+            </Dropdown>
           </nav>
 
-          {/* Account Section - Góc trên bên phải */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Account Dropdown */}
-            <Dropdown
-              menu={{ items: accountMenuItems }}
-              placement="bottomRight"
-              trigger={["click"]}
-              overlayClassName="account-dropdown-modern"
-              overlayStyle={{
-                borderRadius: '16px',
-                padding: '12px',
-                minWidth: '280px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-              }}
-            >
-              <div className="cursor-pointer">
-                {isAuthenticated && user ? (
-                  <div className="relative group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
-                    <div className="relative flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 transition-all duration-300 border border-green-200/50 shadow-sm hover:shadow-md">
-                      <Avatar
-                        size={32}
-                        className="border-2 border-green-500 shadow-md"
-                        src={user?.avatar}
-                        style={{
-                          background: user?.avatar ? 'transparent' : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                          color: "#fff",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {!user?.avatar && (user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U")}
-                      </Avatar>
-                      <div className="hidden md:block">
-                        <p className="text-xs font-semibold text-gray-900 leading-tight">
-                          {user.name || "Người dùng"}
-                        </p>
-                        <p className="text-[10px] text-gray-500 leading-tight">
-                          {user.email?.split('@')[0] || "Tài khoản"}
-                        </p>
-                      </div>
-                      <div className="hidden md:block">
-                        <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 transition-all duration-300 shadow-md hover:shadow-lg">
-                    <User className="text-white" size={16} />
-                    <span className="text-white font-medium text-xs hidden sm:inline">Đăng nhập</span>
-                  </div>
-                )}
-              </div>
-            </Dropdown>
-
-            {/* Notification Bell (nếu đã đăng nhập) */}
+          {/* RIGHT: ACTIONS */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Quick Add Button */}
             {isAuthenticated && (
-              <button className="relative p-2 rounded-lg text-gray-600 hover:text-green-600 hover:bg-gray-100 transition-all duration-300">
-                <Badge count={3} size="small" offset={[-2, 2]}>
-                  <Bell size={18} />
+              <button
+                onClick={() => goAndScroll("/transactions")}
+                className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all active:scale-90 border border-emerald-100 group"
+                title="Thêm giao dịch"
+              >
+                <Plus size={20} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-300" />
+              </button>
+            )}
+
+            {/* Notification */}
+            {isAuthenticated && (
+              <button
+                onClick={scrollToTop}
+                className="relative p-2 text-slate-400 hover:text-emerald-600 transition-colors"
+                title="Thông báo"
+              >
+                <Badge dot color="#10b981" offset={[-2, 2]}>
+                  <Bell size={22} />
                 </Badge>
               </button>
             )}
 
-            {/* Mobile Menu Button */}
+            {/* User Dropdown */}
+            {isAuthenticated ? (
+              <Dropdown
+                menu={{ items: userDropdownItems }}
+                trigger={["click"]}
+                placement="bottomRight"
+                overlayClassName="custom-user-dropdown"
+              >
+                <button className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-3 transition-all hover:border-emerald-200 hover:shadow-md outline-none">
+                  <Avatar src={user?.avatar} className="bg-emerald-500 shadow-sm border border-white" size={32}>
+                    {user?.name?.[0]}
+                  </Avatar>
+                  <ChevronDown size={14} className="text-slate-400" />
+                </button>
+              </Dropdown>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/login"
+                  onClick={scrollToTop}
+                  className="hidden sm:block text-sm font-bold text-slate-600 px-4 py-2"
+                >
+                  Đăng nhập
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={scrollToTop}
+                  className="text-sm font-bold bg-emerald-600 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all"
+                >
+                  Bắt đầu
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile Toggle */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-green-600 transition-all duration-300"
-              aria-label="Toggle menu"
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden p-2 rounded-xl bg-slate-50 text-slate-600 active:scale-95 transition-transform"
+              aria-label="Open menu"
             >
-              {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
+              <MenuIcon size={26} />
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden pb-4 pt-4 border-t border-gray-200 animate-fade-in">
-            <nav className="flex flex-col gap-2">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = location.pathname === link.path || (link.path === "/" && location.pathname === "/");
-                return (
-                  <Link
-                    key={link.key}
-                    to={link.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-medium ${isActive
-                      ? 'text-green-600 bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm'
-                      : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
-                      }`}
-                  >
-                    <Icon size={20} className={isActive ? 'text-green-600' : 'text-gray-500'} />
-                    <span className={isActive ? 'font-semibold' : ''}>{link.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+      {/* MOBILE DRAWER */}
+      <div className={`fixed inset-0 z-[1100] transition-all duration-300 ${mobileMenuOpen ? "visible" : "invisible"}`}>
+        <div
+          className={`absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 ${
+            mobileMenuOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={closeMobileMenu}
+        />
+
+        <div
+          className={[
+            "absolute right-0 top-0 h-full w-full max-w-[20rem] bg-white shadow-2xl",
+            "transition-transform duration-500 ease-out flex flex-col",
+            mobileMenuOpen ? "translate-x-0" : "translate-x-full",
+          ].join(" ")}
+        >
+          <div className="flex items-center justify-between p-6 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-emerald-500 flex items-center justify-center">
+                <Wallet size={16} className="text-white" strokeWidth={3} />
+              </div>
+              <span className="font-black text-slate-900 uppercase tracking-tighter">MoneyLover</span>
+            </div>
+
+            <button onClick={closeMobileMenu} className="p-2 rounded-full bg-slate-100 text-slate-400" aria-label="Close menu">
+              <X size={20} />
+            </button>
           </div>
-        )}
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            <div>
+              <p className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Menu chính</p>
+              <div className="grid gap-1">
+                {mainNav.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.key}
+                      to={item.path}
+                      onClick={closeMenuAndScrollTop}   // ✅ đóng menu + scroll top
+                      className={[
+                        "flex items-center gap-4 px-4 py-3.5 rounded-2xl font-bold transition-all",
+                        isActive ? "bg-emerald-50 text-emerald-600" : "text-slate-600 hover:bg-slate-50",
+                      ].join(" ")}
+                    >
+                      <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                      <span className="text-[15px]">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <p className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Công cụ bổ sung</p>
+              <div className="grid gap-1">
+                {toolNav.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  const Icon = item.icon;
+
+                  return (
+                    <Link
+                      key={item.key}
+                      to={item.path}
+                      onClick={closeMenuAndScrollTop} // ✅ đóng menu + scroll top
+                      className={[
+                        "flex items-center gap-4 px-4 py-3.5 rounded-2xl font-bold transition-all",
+                        isActive ? "bg-emerald-50 text-emerald-600" : "text-slate-600 hover:bg-slate-50",
+                      ].join(" ")}
+                    >
+                      <Icon size={20} />
+                      <span className="text-[15px]">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 bg-slate-50">
+            {isAuthenticated ? (
+              <button
+                onClick={() => {
+                  closeMobileMenu();
+                  handleLogout();
+                }}
+                className="flex w-full items-center justify-center gap-2 py-4 rounded-2xl bg-white border border-red-100 text-red-500 font-bold shadow-sm active:scale-[0.98] transition-all"
+              >
+                <LogOut size={18} /> Thoát ứng dụng
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                onClick={closeMenuAndScrollTop}
+                className="flex w-full items-center justify-center py-4 rounded-2xl bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-100"
+              >
+                Đăng nhập ngay
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
-    </header>
+
+      {/* Antd dropdown style */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            .custom-nav-dropdown .ant-dropdown-menu,
+            .custom-user-dropdown .ant-dropdown-menu {
+              padding: 8px !important;
+              border-radius: 20px !important;
+              border: 1px solid rgba(241, 245, 249, 0.8) !important;
+              box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1) !important;
+              background: rgba(255, 255, 255, 0.98) !important;
+              backdrop-filter: blur(8px);
+            }
+            .ant-dropdown-menu-item {
+              border-radius: 12px !important;
+              padding: 8px 12px !important;
+            }
+            .ant-dropdown-menu-item:hover {
+              background-color: #f0fdf4 !important;
+            }
+          `,
+        }}
+      />
+    </>
   );
 };
 
