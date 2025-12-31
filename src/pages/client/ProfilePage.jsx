@@ -36,7 +36,7 @@ import {
   HomeOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getMyProfileAPI, updateMyProfileAPI } from "../../services/api.profile";
+import { getMyProfileAPI, updateMyProfileAPI,uploadMyAvatarAPI } from "../../services/api.profile";
 import { useCurrentApp } from "../../components/context/app.context";
 
 const { Title, Text } = Typography;
@@ -177,27 +177,64 @@ const ProfilePage = () => {
     message.info("Đã hủy chỉnh sửa");
   };
 
-  const handleUploadAvatar = async ({ file }) => {
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error("Ảnh phải nhỏ hơn 2MB để tối ưu tốc độ");
+  const handleUploadAvatar = async ({ file, onSuccess, onError }) => {
+    const realFile = file?.originFileObj ?? file;
+
+    // validate size
+    if (realFile.size / 1024 / 1024 >= 2) {
+      message.error("Ảnh phải nhỏ hơn 2MB");
+      onError?.();
       return;
     }
-    setAvatarLoading(true);
-    try {
-      const formData = new FormData();
-      // ✅ Nếu BE nhận field avatarUrl thì dùng "avatarUrl", nếu nhận "avatar" thì đổi lại
-      formData.append("avatar", file);
-      await updateMyProfileAPI(formData);
 
-      message.success("Cập nhật ảnh đại diện thành công");
-      await fetchProfile();
+    // preview ngay
+    const previewUrl = URL.createObjectURL(realFile);
+    form.setFieldsValue({ avatarUrl: previewUrl });
+    setAvatarLoading(true);
+
+    try {
+      const res = await uploadMyAvatarAPI(realFile);
+
+      const avatarUrl =
+        res?.data?.data?.avatarUrl ||
+        res?.data?.avatarUrl ||
+        res?.data?.data?.secure_url ||
+        res?.data?.secure_url ||
+        null;
+
+      if (avatarUrl) {
+        form.setFieldsValue({
+          avatarUrl: `${avatarUrl}?t=${Date.now()}`,
+        });
+
+        setProfile((prev) => ({ ...prev, avatarUrl }));
+        message.success("Cập nhật ảnh đại diện thành công");
+        onSuccess?.("ok");
+      } else {
+        // ❗ CHỈ log, KHÔNG message.error
+        console.warn("Upload OK but avatarUrl missing:", res?.data);
+        onSuccess?.("ok"); // vẫn coi là thành công
+      }
+
     } catch (err) {
-      message.error("Không thể tải ảnh lên");
+      // ❌ KHÔNG throw nữa
+      console.error("Upload avatar error:", err);
+
+      message.error(
+        err?.response?.data?.message || "Không thể tải ảnh lên"
+      );
+
+      // revert preview
+      if (initialFormValues?.avatarUrl) {
+        form.setFieldsValue({ avatarUrl: initialFormValues.avatarUrl });
+      }
+
+      onError?.();
     } finally {
       setAvatarLoading(false);
     }
   };
+
 
   const onSave = async () => {
     try {
@@ -345,7 +382,7 @@ const ProfilePage = () => {
   const uiValues = form.getFieldsValue();
   const displayName = uiValues.displayName || rawProfile?.displayName || "Người Dùng";
   const email = uiValues.email || rawProfile?.email || rawProfile?.user?.email || "";
-  const avatarSrc = uiValues.avatarUrl || rawProfile?.avatarUrl || "";
+  const avatarSrc = uiValues.avatarUrl || rawProfile?.avatarUrl || rawProfile?.avatar || null;
 
   return (
     <div style={{ background: COLORS.bgGradient, minHeight: "100vh", padding: "44px 20px" }}>
@@ -376,7 +413,7 @@ const ProfilePage = () => {
                     <div className="avatar-wrapper">
                       <Avatar
                         size={132}
-                        src={avatarSrc}
+                        src={avatarSrc || undefined}
                         icon={<UserOutlined />}
                         style={{
                           border: "4px solid #fff",

@@ -20,6 +20,14 @@ const updateMyProfileAPI = (data) => {
     return axios.put(urlBackend, data);
 };
 
+const uploadMyAvatarAPI = (file) => {
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  return axios.put("/v1/api/profile/me/avatar", formData);
+};
+
+
 const deleteMyProfileAPI = () => {
     const urlBackend = "/v1/api/profile/me";
     return axios.delete(urlBackend);
@@ -33,6 +41,7 @@ const restoreMyProfileAPI = () => {
 export {
     getMyProfileAPI,
     updateMyProfileAPI,
+    uploadMyAvatarAPI,
     deleteMyProfileAPI,
     restoreMyProfileAPI,
 };

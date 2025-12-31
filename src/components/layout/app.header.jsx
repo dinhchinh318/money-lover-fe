@@ -108,7 +108,7 @@ const AppHeader = () => {
           <div className="flex items-center gap-3">
             <Avatar
               size={44}
-              src={profile?.avatar}
+              src={profile?.avatarUrl}
               className="border-2 border-emerald-500 bg-emerald-50 text-emerald-600 font-bold"
             >
               {profile?.displayName?.[0]?.toUpperCase()}
@@ -263,7 +263,11 @@ const AppHeader = () => {
                 overlayClassName="custom-user-dropdown"
               >
                 <button className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-3 transition-all hover:border-emerald-200 hover:shadow-md outline-none">
-                  <Avatar src={profile?.avatar} className="bg-emerald-500 shadow-sm border border-white" size={32}>
+                  <Avatar
+                    src={profile?.avatarUrl}
+                    className="bg-emerald-500 shadow-sm border border-white"
+                    size={32}
+                  >
                     {profile?.displayName?.[0]}
                   </Avatar>
                   <ChevronDown size={14} className="text-slate-400" />
