@@ -13,6 +13,7 @@ export const AppContextProvider = ({ children }) => {
   // Authentication
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   // Theme
   const [theme, setTheme] = useState(() => {
@@ -62,6 +63,7 @@ export const AppContextProvider = ({ children }) => {
         const res = await fetchAccountAPI();
         if (res.data) {
           setUser(res.data.user);
+          setProfile(res.data.profile);
           setIsAuthenticated(true);
         }
       } catch (err) {
@@ -81,6 +83,7 @@ export const AppContextProvider = ({ children }) => {
             const res = await fetchAccountAPI();
             if (res.data) {
               setUser(res.data.user);
+              setProfile(res.data.profile);
             }
           } catch (err) {
             console.error("Fetch account failed:", err);
@@ -104,6 +107,8 @@ export const AppContextProvider = ({ children }) => {
         setIsAuthenticated,
         user,
         setUser,
+        profile,
+        setProfile,
       }}
     >
       {children}

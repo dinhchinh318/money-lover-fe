@@ -25,7 +25,7 @@ import { useCurrentApp } from "../context/app.context";
 import { logoutAPI } from "../../services/api.user";
 
 const AppHeader = () => {
-  const { setIsAuthenticated, isAuthenticated, user, setUser } = useCurrentApp();
+  const { setIsAuthenticated, isAuthenticated, user, setUser, profile, setProfile } = useCurrentApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -108,14 +108,14 @@ const AppHeader = () => {
           <div className="flex items-center gap-3">
             <Avatar
               size={44}
-              src={user?.avatar}
+              src={profile?.avatar}
               className="border-2 border-emerald-500 bg-emerald-50 text-emerald-600 font-bold"
             >
-              {user?.name?.[0]?.toUpperCase()}
+              {profile?.displayName?.[0]?.toUpperCase()}
             </Avatar>
             <div className="flex flex-col overflow-hidden">
               <p className="text-sm font-black text-slate-900 truncate leading-tight">
-                {user?.name || "Người dùng"}
+                {profile?.displayName || "Người dùng"}
               </p>
               <p className="text-[10px] text-slate-400 truncate mt-0.5 uppercase tracking-wider font-bold">
                 {user?.email}
@@ -142,7 +142,7 @@ const AppHeader = () => {
       key: "settings",
       label: (
         <Link
-          to="/settings"
+          to="/setting"
           onClick={scrollToTop}
           className="flex items-center gap-3 px-1 py-1.5 font-bold text-slate-600"
         >
@@ -243,7 +243,8 @@ const AppHeader = () => {
             {/* Notification */}
             {isAuthenticated && (
               <button
-                onClick={scrollToTop}
+                // onClick={scrollToTop}
+                onClick={() => goAndScroll("/notification")}
                 className="relative p-2 text-slate-400 hover:text-emerald-600 transition-colors"
                 title="Thông báo"
               >
@@ -262,8 +263,8 @@ const AppHeader = () => {
                 overlayClassName="custom-user-dropdown"
               >
                 <button className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-3 transition-all hover:border-emerald-200 hover:shadow-md outline-none">
-                  <Avatar src={user?.avatar} className="bg-emerald-500 shadow-sm border border-white" size={32}>
-                    {user?.name?.[0]}
+                  <Avatar src={profile?.avatar} className="bg-emerald-500 shadow-sm border border-white" size={32}>
+                    {profile?.displayName?.[0]}
                   </Avatar>
                   <ChevronDown size={14} className="text-slate-400" />
                 </button>
