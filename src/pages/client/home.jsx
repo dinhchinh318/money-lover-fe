@@ -827,7 +827,7 @@ import { getWalletsAPI } from "../../services/api.wallet";
 import dayjs from "dayjs";
 
 function HomePage() {
-  const { user, isAuthenticated } = useCurrentApp();
+  const { user, profile, isAuthenticated } = useCurrentApp();
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -1059,7 +1059,7 @@ function HomePage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">
-                {user?.name ? `Xin chào, ${user.name}` : "Xin chào"}
+                {profile?.displayName ? `Xin chào, ${profile?.displayName}` : "Xin chào"}
               </h1>
               <p className="mt-1 text-sm sm:text-base text-slate-600">
                 Chào mừng bạn trở lại với <span className="font-semibold text-emerald-700">MoneyLover</span>
