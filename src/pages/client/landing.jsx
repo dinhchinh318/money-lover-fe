@@ -11,24 +11,24 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0d4d2e] via-[#1a5f3f] to-[#2d1b4e] relative overflow-hidden">
-      {/* Animated Background decorative elements */}
+      {/* Animated Background decorative elements - Responsive sizes */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-green-400/20 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-400/20 rounded-full blur-3xl animate-pulse-delayed"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-400/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-[25rem] h-[25rem] sm:w-[37.5rem] sm:h-[37.5rem] bg-green-400/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute top-0 left-0 w-[20rem] h-[20rem] sm:w-[31.25rem] sm:h-[31.25rem] bg-purple-400/20 rounded-full blur-3xl animate-pulse-delayed"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[16rem] h-[16rem] sm:w-[25rem] sm:h-[25rem] bg-blue-400/10 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Floating Dollar Sign ($) - Bên trái */}
-      <div className="absolute top-1/4 left-10 z-20 animate-float" style={{ animationDelay: '0s' }}>
-        <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-[0_0_30px_rgba(34,197,94,0.8)] transform rotate-12 border-2 border-green-400/80 hover:scale-110 transition-transform duration-300 cursor-pointer">
-          <span className="text-white font-bold text-3xl">$</span>
+      {/* Floating Dollar Sign ($) - Bên trái - Hidden on small screens */}
+      <div className="hidden sm:block absolute top-1/4 left-4 sm:left-10 z-20 animate-float" style={{ animationDelay: '0s' }}>
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-[0_0_30px_rgba(34,197,94,0.8)] transform rotate-12 border-2 border-green-400/80 hover:scale-110 transition-transform duration-300 cursor-pointer">
+          <span className="text-white font-bold text-2xl sm:text-3xl">$</span>
         </div>
       </div>
 
-      {/* Floating Coin (₫) - Bên phải */}
-      <div className="absolute top-1/3 right-10 z-20 animate-float-delayed" style={{ animationDelay: '0.5s' }}>
-        <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(250,204,21,0.8)] transform -rotate-12 border-2 border-yellow-300/80 hover:scale-110 transition-transform duration-300 cursor-pointer">
-          <span className="text-yellow-900 font-bold text-2xl">₫</span>
+      {/* Floating Coin (₫) - Bên phải - Hidden on small screens */}
+      <div className="hidden sm:block absolute top-1/3 right-4 sm:right-10 z-20 animate-float-delayed" style={{ animationDelay: '0.5s' }}>
+        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(250,204,21,0.8)] transform -rotate-12 border-2 border-yellow-300/80 hover:scale-110 transition-transform duration-300 cursor-pointer">
+          <span className="text-yellow-900 font-bold text-xl sm:text-2xl">₫</span>
         </div>
       </div>
 
