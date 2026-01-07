@@ -401,7 +401,7 @@ const AnalyticsPrescriptive = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
+        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header Section */}
                 <div className="mb-10">

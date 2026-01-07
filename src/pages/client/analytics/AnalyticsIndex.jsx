@@ -31,20 +31,20 @@ const AnalyticsIndex = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white p-4 sm:p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <div className="mb-6 sm:mb-8">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                         Phân tích Thông minh
                     </h1>
-                    <p className="text-gray-600 text-lg">
+                    <p className="text-gray-600 text-base sm:text-lg">
                         Chọn loại phân tích bạn muốn xem
                     </p>
                 </div>
 
                 {/* Analytics Types Grid */}
-                <Row gutter={[24, 24]}>
+                <Row gutter={[16, 16]} className="sm:gutter-[24px]">
                     {analyticsTypes.map((analytics) => {
                         const Icon = analytics.icon;
                         return (
@@ -57,23 +57,24 @@ const AnalyticsIndex = () => {
                                     >
                                         <div className="flex flex-col h-full">
                                             <div
-                                                className="w-16 h-16 rounded-xl flex items-center justify-center mb-4"
+                                                className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center mb-3 sm:mb-4"
                                                 style={{ backgroundColor: `${analytics.color}20` }}
                                             >
                                                 <Icon
-                                                    size={32}
+                                                    size={24}
+                                                    className="sm:w-8 sm:h-8"
                                                     style={{ color: analytics.color }}
                                                 />
                                             </div>
-                                            <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
                                                 {analytics.title}
                                             </h3>
-                                            <p className="text-gray-600 mb-4 flex-grow">
+                                            <p className="text-sm sm:text-base text-gray-600 mb-4 flex-grow">
                                                 {analytics.description}
                                             </p>
-                                            <div className="flex items-center text-[#10B981] font-semibold">
+                                            <div className="flex items-center text-[#10B981] font-semibold text-sm sm:text-base">
                                                 Xem chi tiết
-                                                <ArrowRight size={18} className="ml-2" />
+                                                <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px] ml-2" />
                                             </div>
                                         </div>
                                     </Card>

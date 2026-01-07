@@ -86,30 +86,24 @@ const AnalyticsPredictive = () => {
                 predictMonthEndExpenseTrendAPI(),
             ]);
 
-            // Xử lý response 7 ngày
+            // Xử lý response 7 ngày - chỉ dùng dữ liệu từ API
             if (res7?.status === true && res7?.data) {
                 const data = res7.data;
                 const predictedMonthEnd = data.prediction?.predictedMonthEnd || 0;
                 const avgPerDay = data.last7Days?.avgPerDay || data.currentMonth?.avgPerDay || 0;
 
-                // Kiểm tra xem có dữ liệu thực sự không
+                // Chỉ set nếu có dữ liệu thực sự
                 if (predictedMonthEnd > 0 || avgPerDay > 0) {
                     setPrediction7Days(data);
                     if (avgPerDay > 0) {
                         const sparkData = generateSparklineFromData(avgPerDay, 5);
                         setSparkline7Days(sparkData);
                     } else {
-                        setSparkline7Days(generateSparklineFromData(100000, 5));
+                        setSparkline7Days([]);
                     }
                 } else {
-                    // Dữ liệu = 0, dùng mock
-                    const mock7 = {
-                        last7Days: { avgPerDay: 200000 },
-                        currentMonth: { avgPerDay: 200000, daysPassed: 7, total: 1400000 },
-                        prediction: { predictedMonthEnd: 4500000 },
-                    };
-                    setPrediction7Days(mock7);
-                    setSparkline7Days(generateSparklineFromData(200000, 5));
+                    setPrediction7Days(null);
+                    setSparkline7Days([]);
                 }
             } else if (res7?.EC === 0 && res7?.data) {
                 const data = res7.data;
@@ -121,29 +115,19 @@ const AnalyticsPredictive = () => {
                     if (avgPerDay > 0) {
                         setSparkline7Days(generateSparklineFromData(avgPerDay, 5));
                     } else {
-                        setSparkline7Days(generateSparklineFromData(100000, 5));
+                        setSparkline7Days([]);
                     }
                 } else {
-                    const mock7 = {
-                        last7Days: { avgPerDay: 200000 },
-                        currentMonth: { avgPerDay: 200000, daysPassed: 7, total: 1400000 },
-                        prediction: { predictedMonthEnd: 4500000 },
-                    };
-                    setPrediction7Days(mock7);
-                    setSparkline7Days(generateSparklineFromData(200000, 5));
+                    setPrediction7Days(null);
+                    setSparkline7Days([]);
                 }
             } else {
-                // Fallback mock data
-                const mock7 = {
-                    last7Days: { avgPerDay: 200000 },
-                    currentMonth: { avgPerDay: 200000, daysPassed: 7, total: 1400000 },
-                    prediction: { predictedMonthEnd: 4500000 },
-                };
-                setPrediction7Days(mock7);
-                setSparkline7Days(generateSparklineFromData(200000, 5));
+                // Không có dữ liệu từ API
+                setPrediction7Days(null);
+                setSparkline7Days([]);
             }
 
-            // Xử lý response 30 ngày
+            // Xử lý response 30 ngày - chỉ dùng dữ liệu từ API
             if (res30?.status === true && res30?.data) {
                 const data = res30.data;
                 const predictedMonthEnd = data.prediction?.predictedMonthEnd || 0;
@@ -155,16 +139,11 @@ const AnalyticsPredictive = () => {
                         const sparkData = generateSparklineFromData(avgPerDay, 5);
                         setSparkline30Days(sparkData);
                     } else {
-                        setSparkline30Days(generateSparklineFromData(100000, 5));
+                        setSparkline30Days([]);
                     }
                 } else {
-                    const mock30 = {
-                        last30Days: { avgPerDay: 180000 },
-                        currentMonth: { avgPerDay: 180000, daysPassed: 15, total: 2700000 },
-                        prediction: { predictedMonthEnd: 5400000 },
-                    };
-                    setPrediction30Days(mock30);
-                    setSparkline30Days(generateSparklineFromData(180000, 5));
+                    setPrediction30Days(null);
+                    setSparkline30Days([]);
                 }
             } else if (res30?.EC === 0 && res30?.data) {
                 const data = res30.data;
@@ -176,25 +155,16 @@ const AnalyticsPredictive = () => {
                     if (avgPerDay > 0) {
                         setSparkline30Days(generateSparklineFromData(avgPerDay, 5));
                     } else {
-                        setSparkline30Days(generateSparklineFromData(100000, 5));
+                        setSparkline30Days([]);
                     }
                 } else {
-                    const mock30 = {
-                        last30Days: { avgPerDay: 180000 },
-                        currentMonth: { avgPerDay: 180000, daysPassed: 15, total: 2700000 },
-                        prediction: { predictedMonthEnd: 5400000 },
-                    };
-                    setPrediction30Days(mock30);
-                    setSparkline30Days(generateSparklineFromData(180000, 5));
+                    setPrediction30Days(null);
+                    setSparkline30Days([]);
                 }
             } else {
-                const mock30 = {
-                    last30Days: { avgPerDay: 180000 },
-                    currentMonth: { avgPerDay: 180000, daysPassed: 15, total: 2700000 },
-                    prediction: { predictedMonthEnd: 5400000 },
-                };
-                setPrediction30Days(mock30);
-                setSparkline30Days(generateSparklineFromData(180000, 5));
+                // Không có dữ liệu từ API
+                setPrediction30Days(null);
+                setSparkline30Days([]);
             }
 
             // Xử lý response xu hướng
@@ -251,42 +221,10 @@ const AnalyticsPredictive = () => {
                     }
                     setMonthlyChartData(chartData);
                 } else {
-                    // Dữ liệu = 0, dùng mock
-                    const mockTrend = {
-                        trend: { dailyTrend: 15000 },
-                        currentMonth: { avgPerDay: 180000, daysPassed: 15, total: 2700000 },
-                        prediction: { predictedMonthEnd: 5400000 },
-                    };
-                    setPredictionTrend(mockTrend);
-                    setSparklineTrend(generateTrendSparkline(180000, 15000, 5));
-
-                    // mock chart
-                    const now = new Date();
-                    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-                    const daysPassed = 15;
-                    const currentTotal = 2700000;
-                    const predictedMonthEnd = 5400000;
-                    const chartData = [];
-                    const avgDaily = daysPassed > 0 ? currentTotal / daysPassed : 0;
-                    const daysRemaining = Math.max(1, daysInMonth - daysPassed);
-                    const predictedDaily = daysRemaining > 0 ? (predictedMonthEnd - currentTotal) / daysRemaining : 0;
-                    for (let day = 1; day <= daysInMonth; day++) {
-                        if (day <= daysPassed) {
-                            chartData.push({
-                                day,
-                                actual: avgDaily * day,
-                                predicted: null,
-                                today: day === now.getDate(),
-                            });
-                        } else {
-                            chartData.push({
-                                day,
-                                actual: day === daysPassed ? currentTotal : null,
-                                predicted: currentTotal + (day - daysPassed) * predictedDaily,
-                            });
-                        }
-                    }
-                    setMonthlyChartData(chartData);
+                    // Không có dữ liệu từ API
+                    setPredictionTrend(null);
+                    setSparklineTrend([]);
+                    setMonthlyChartData([]);
                 }
             } else if (resTrend?.EC === 0 && resTrend?.data) {
                 const data = resTrend.data;
@@ -300,7 +238,7 @@ const AnalyticsPredictive = () => {
                     if (baseValue > 0) {
                         setSparklineTrend(generateTrendSparkline(baseValue, trendValue, 5));
                     } else {
-                        setSparklineTrend(generateSparklineFromData(100000, 5));
+                        setSparklineTrend([]);
                     }
 
                     const now = new Date();
@@ -328,62 +266,16 @@ const AnalyticsPredictive = () => {
                     }
                     setMonthlyChartData(chartData);
                 } else {
-                    const mockTrend = {
-                        trend: { dailyTrend: 15000 },
-                        currentMonth: { avgPerDay: 180000, daysPassed: 15, total: 2700000 },
-                        prediction: { predictedMonthEnd: 5400000 },
-                    };
-                    setPredictionTrend(mockTrend);
-                    setSparklineTrend(generateTrendSparkline(180000, 15000, 5));
-                    const now = new Date();
-                    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-                    const chartData = [];
-                    for (let day = 1; day <= daysInMonth; day++) {
-                        chartData.push({
-                            day,
-                            actual: day <= 15 ? 180000 * day : null,
-                            predicted: day > 15 ? 2700000 + (day - 15) * 180000 : null,
-                        });
-                    }
-                    setMonthlyChartData(chartData);
+                    // Không có dữ liệu từ API
+                    setPredictionTrend(null);
+                    setSparklineTrend([]);
+                    setMonthlyChartData([]);
                 }
             } else {
-                const mockTrend = {
-                    trend: { dailyTrend: 15000 },
-                    currentMonth: { avgPerDay: 180000, daysPassed: 15, total: 2700000 },
-                    prediction: { predictedMonthEnd: 5400000 },
-                };
-                setPredictionTrend(mockTrend);
-                setSparklineTrend(generateTrendSparkline(180000, 15000, 5));
-
-                // mock chart
-                const now = new Date();
-                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-                const daysPassed = 15;
-                const currentTotal = 2700000;
-                const predictedMonthEnd = 5400000;
-                const chartData = [];
-                const avgDaily = daysPassed > 0 ? currentTotal / daysPassed : 0;
-                const daysRemaining = Math.max(1, daysInMonth - daysPassed);
-                const predictedDaily = daysRemaining > 0 ? (predictedMonthEnd - currentTotal) / daysRemaining : 0;
-                for (let day = 1; day <= daysInMonth; day++) {
-                    if (day <= daysPassed) {
-                        chartData.push({
-                            day,
-                            actual: avgDaily * day,
-                            predicted: null,
-                            today: day === now.getDate(),
-                        });
-                    } else {
-                        chartData.push({
-                            day,
-                            actual: null,
-                            predicted: currentTotal + predictedDaily * (day - daysPassed),
-                            today: day === now.getDate(),
-                        });
-                    }
-                }
-                setMonthlyChartData(chartData);
+                // Không có dữ liệu từ API
+                setPredictionTrend(null);
+                setSparklineTrend([]);
+                setMonthlyChartData([]);
             }
         } catch (error) {
             message.error("Lỗi khi tải dữ liệu dự đoán chi tiêu");
@@ -434,10 +326,7 @@ const AnalyticsPredictive = () => {
                     return limit > 0; // Chỉ cần có limit > 0 là đủ
                 });
 
-            if (!hasValidData) {
-                console.warn("⚠️ Không có dữ liệu hợp lệ, sử dụng mock data");
-                predictions = createMockBudgetData();
-            } else {
+            if (hasValidData) {
                 console.log("✅ Sử dụng dữ liệu thật từ API");
                 // Đảm bảo dữ liệu có đầy đủ các trường cần thiết
                 predictions = predictions.map((b, index) => {
@@ -487,64 +376,29 @@ const AnalyticsPredictive = () => {
             console.log("📋 Processed Predictions (sau khi xử lý):", predictions.length, "items");
             console.log("=".repeat(60));
 
-            // Set budget overruns
-            setBudgetOverruns(predictions);
-
-            // Tạo dữ liệu cho biểu đồ budget - Group theo ngày, không phải theo budget
-            const chartData = createBudgetChartData(predictions);
-            setBudgetChartData(chartData);
+            // Set budget overruns - chỉ khi có dữ liệu hợp lệ
+            if (hasValidData) {
+                setBudgetOverruns(predictions);
+                // Tạo dữ liệu cho biểu đồ budget - Group theo ngày, không phải theo budget
+                const chartData = createBudgetChartData(predictions);
+                setBudgetChartData(chartData);
+            } else {
+                // Không có dữ liệu từ API
+                setBudgetOverruns([]);
+                setBudgetChartData([]);
+            }
 
         } catch (error) {
             console.error("❌ [DỰ ĐOÁN VƯỢT NGÂN SÁCH] Lỗi:", error);
             console.error("Error response:", error.response?.data);
             console.error("Error message:", error.message);
-            // Fallback mock data khi có lỗi
-            const mockBudgets = createMockBudgetData();
-            setBudgetOverruns(mockBudgets);
-            setBudgetChartData(createBudgetChartData(mockBudgets));
+            // Khi có lỗi, set về giá trị mặc định (rỗng)
+            setBudgetOverruns([]);
+            setBudgetChartData([]);
         }
     };
 
-    // Helper function để tạo mock budget data
-    const createMockBudgetData = () => {
-        return [
-            {
-                budgetName: "Ăn uống",
-                categoryName: "Ăn uống",
-                limit: 3000000,
-                spent: 1200000,
-                spentAmount: 1200000,
-                category: { name: "Ăn uống" },
-                prediction: { predictedOverrun: 500000 },
-                usagePercent: 40,
-                isAtRisk: false
-            },
-            {
-                budgetName: "Hóa đơn",
-                categoryName: "Hóa đơn",
-                limit: 2000000,
-                spent: 1500000,
-                spentAmount: 1500000,
-                category: { name: "Hóa đơn" },
-                prediction: { predictedOverrun: 0 },
-                usagePercent: 75,
-                isAtRisk: true
-            },
-            {
-                budgetName: "Mua sắm",
-                categoryName: "Mua sắm",
-                limit: 2500000,
-                spent: 1900000,
-                spentAmount: 1900000,
-                category: { name: "Mua sắm" },
-                prediction: { predictedOverrun: 800000 },
-                usagePercent: 76,
-                isAtRisk: true
-            },
-        ];
-    };
-
-    // Helper function để tạo budget chart data (cho cả real và mock data)
+    // Helper function để tạo budget chart data
     const createBudgetChartData = (budgets) => {
         if (!Array.isArray(budgets) || budgets.length === 0) {
             console.warn("⚠️ [CHART] Không có budgets để tạo chart");
@@ -664,129 +518,49 @@ const AnalyticsPredictive = () => {
                     });
                 });
 
-                // Kiểm tra xem có dữ liệu thực sự không
+                // Kiểm tra xem có dữ liệu thực sự không - chỉ dùng dữ liệu từ API
                 if (Array.isArray(predictions) && predictions.length > 0) {
                     setCategoryPredictions(predictions);
                 } else {
-                    // Dữ liệu rỗng, dùng mock
-                    const mockCategories = [
-                        {
-                            category: { name: "Ăn uống" },
-                            categoryName: "Ăn uống",
-                            predicted: 2500000,
-                            last30Days: 1800000,
-                            trend: "increasing"
-                        },
-                        {
-                            category: { name: "Mua sắm" },
-                            categoryName: "Mua sắm",
-                            predicted: 1500000,
-                            last30Days: 900000,
-                            trend: "stable"
-                        },
-                        {
-                            category: { name: "Di chuyển" },
-                            categoryName: "Di chuyển",
-                            predicted: 800000,
-                            last30Days: 500000,
-                            trend: "decreasing"
-                        },
-                    ];
-                    setCategoryPredictions(mockCategories);
+                    // Không có dữ liệu từ API
+                    setCategoryPredictions([]);
                 }
             } else if (res?.EC === 0 && res?.data) {
                 const predictions = res.data.predictions || res.data || [];
                 if (Array.isArray(predictions) && predictions.length > 0) {
                     setCategoryPredictions(predictions);
                 } else {
-                    // Dữ liệu rỗng, dùng mock
-                    const mockCategories = [
-                        {
-                            category: { name: "Ăn uống" },
-                            categoryName: "Ăn uống",
-                            predicted: 2500000,
-                            last30Days: 1800000,
-                            trend: "increasing"
-                        },
-                        {
-                            category: { name: "Mua sắm" },
-                            categoryName: "Mua sắm",
-                            predicted: 1500000,
-                            last30Days: 900000,
-                            trend: "stable"
-                        },
-                    ];
-                    setCategoryPredictions(mockCategories);
+                    // Không có dữ liệu từ API
+                    setCategoryPredictions([]);
                 }
             } else {
-                // Fallback mock data khi API lỗi
-                const mockCategories = [
-                    {
-                        category: { name: "Ăn uống" },
-                        categoryName: "Ăn uống",
-                        predicted: 2500000,
-                        last30Days: 1800000,
-                        trend: "increasing"
-                    },
-                    {
-                        category: { name: "Mua sắm" },
-                        categoryName: "Mua sắm",
-                        predicted: 1500000,
-                        last30Days: 900000,
-                        trend: "stable"
-                    },
-                    {
-                        category: { name: "Di chuyển" },
-                        categoryName: "Di chuyển",
-                        predicted: 800000,
-                        last30Days: 500000,
-                        trend: "decreasing"
-                    },
-                ];
-                setCategoryPredictions(mockCategories);
+                // Không có dữ liệu từ API
+                setCategoryPredictions([]);
             }
         } catch (error) {
-            // Fallback mock data khi có lỗi
-            const mockCategories = [
-                {
-                    category: { name: "Ăn uống" },
-                    categoryName: "Ăn uống",
-                    predicted: 2500000,
-                    last30Days: 1800000,
-                    trend: "increasing"
-                },
-                {
-                    category: { name: "Mua sắm" },
-                    categoryName: "Mua sắm",
-                    predicted: 1500000,
-                    last30Days: 900000,
-                    trend: "stable"
-                },
-                {
-                    category: { name: "Di chuyển" },
-                    categoryName: "Di chuyển",
-                    predicted: 800000,
-                    last30Days: 500000,
-                    trend: "decreasing"
-                },
-            ];
-            setCategoryPredictions(mockCategories);
+            console.error("Error loading category predictions:", error);
+            // Khi có lỗi, set về giá trị mặc định (rỗng)
+            setCategoryPredictions([]);
         }
     };
 
-    // Tạo sparkline data từ giá trị trung bình
+    // Tạo sparkline data từ giá trị trung bình - chỉ dùng dữ liệu thực từ API
     const generateSparklineFromData = (avgValue, points) => {
+        if (!avgValue || avgValue <= 0) return [];
+        // Tạo dữ liệu đơn giản từ giá trị trung bình (không dùng random, chỉ dùng giá trị thực)
         return Array.from({ length: points }, (_, i) => ({
             week: i + 1,
-            value: avgValue * (0.8 + Math.random() * 0.4), // Biến thiên ±20%
+            value: avgValue, // Dùng giá trị trung bình thực từ API
         }));
     };
 
-    // Tạo sparkline data từ xu hướng
+    // Tạo sparkline data từ xu hướng - chỉ dùng dữ liệu thực từ API
     const generateTrendSparkline = (baseValue, trendValue, points) => {
+        if (!baseValue || baseValue <= 0) return [];
+        // Tạo dữ liệu từ xu hướng thực từ API (không dùng random)
         return Array.from({ length: points }, (_, i) => ({
             week: i + 1,
-            value: baseValue + (trendValue * i) + (Math.random() * baseValue * 0.1),
+            value: baseValue + (trendValue * i), // Dùng giá trị và xu hướng thực từ API
         }));
     };
 
@@ -884,7 +658,7 @@ const AnalyticsPredictive = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
             <div className="max-w-7xl mx-auto p-6">
                 {/* Header Section */}
                 <div className="mb-8">
@@ -960,17 +734,23 @@ const AnalyticsPredictive = () => {
                                                 <span>{getDaysRemaining()} ngày còn lại</span>
                                             </div>
                                         </div>
-                                        <ResponsiveContainer width="100%" height={50}>
-                                            <LineChart data={sparkline7Days.length > 0 ? sparkline7Days : generateSparklineFromData(500000, 5)}>
-                                                <Line
-                                                    type="monotone"
-                                                    dataKey="value"
-                                                    stroke="#3B82F6"
-                                                    strokeWidth={2.5}
-                                                    dot={{ r: 3, fill: "#3B82F6" }}
-                                                />
-                                            </LineChart>
-                                        </ResponsiveContainer>
+                                        {sparkline7Days.length > 0 ? (
+                                            <ResponsiveContainer width="100%" height={50}>
+                                                <LineChart data={sparkline7Days}>
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="value"
+                                                        stroke="#3B82F6"
+                                                        strokeWidth={2.5}
+                                                        dot={{ r: 3, fill: "#3B82F6" }}
+                                                    />
+                                                </LineChart>
+                                            </ResponsiveContainer>
+                                        ) : (
+                                            <div className="h-[50px] flex items-center justify-center text-xs text-gray-400">
+                                                Chưa có dữ liệu
+                                            </div>
+                                        )}
                                     </Card>
 
                                     {/* Card 30 ngày */}
@@ -994,17 +774,23 @@ const AnalyticsPredictive = () => {
                                                 <span>{getDaysRemaining()} ngày còn lại</span>
                                             </div>
                                         </div>
-                                        <ResponsiveContainer width="100%" height={50}>
-                                            <LineChart data={sparkline30Days.length > 0 ? sparkline30Days : generateSparklineFromData(500000, 5)}>
-                                                <Line
-                                                    type="monotone"
-                                                    dataKey="value"
-                                                    stroke="#10B981"
-                                                    strokeWidth={2.5}
-                                                    dot={{ r: 3, fill: "#10B981" }}
-                                                />
-                                            </LineChart>
-                                        </ResponsiveContainer>
+                                        {sparkline30Days.length > 0 ? (
+                                            <ResponsiveContainer width="100%" height={50}>
+                                                <LineChart data={sparkline30Days}>
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="value"
+                                                        stroke="#10B981"
+                                                        strokeWidth={2.5}
+                                                        dot={{ r: 3, fill: "#10B981" }}
+                                                    />
+                                                </LineChart>
+                                            </ResponsiveContainer>
+                                        ) : (
+                                            <div className="h-[50px] flex items-center justify-center text-xs text-gray-400">
+                                                Chưa có dữ liệu
+                                            </div>
+                                        )}
                                     </Card>
 
                                     {/* Card Xu hướng */}
@@ -1042,18 +828,24 @@ const AnalyticsPredictive = () => {
                                                 <span>{getDaysRemaining()} ngày còn lại</span>
                                             </div>
                                         </div>
-                                        <ResponsiveContainer width="100%" height={50}>
-                                            <LineChart data={sparklineTrend.length > 0 ? sparklineTrend : generateSparklineFromData(500000, 5)}>
-                                                <Line
-                                                    type="monotone"
-                                                    dataKey="value"
-                                                    stroke="#8B5CF6"
-                                                    strokeWidth={2.5}
-                                                    strokeDasharray="5 5"
-                                                    dot={{ r: 3, fill: "#8B5CF6" }}
-                                                />
-                                            </LineChart>
-                                        </ResponsiveContainer>
+                                        {sparklineTrend.length > 0 ? (
+                                            <ResponsiveContainer width="100%" height={50}>
+                                                <LineChart data={sparklineTrend}>
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="value"
+                                                        stroke="#8B5CF6"
+                                                        strokeWidth={2.5}
+                                                        strokeDasharray="5 5"
+                                                        dot={{ r: 3, fill: "#8B5CF6" }}
+                                                    />
+                                                </LineChart>
+                                            </ResponsiveContainer>
+                                        ) : (
+                                            <div className="h-[50px] flex items-center justify-center text-xs text-gray-400">
+                                                Chưa có dữ liệu
+                                            </div>
+                                        )}
                                     </Card>
                                 </div>
 
@@ -1361,66 +1153,12 @@ const AnalyticsPredictive = () => {
                                             const sparklineData = [];
                                             const timelineLabels = [];
 
-                                            // Lấy 3 tuần gần nhất từ dữ liệu thực tế
+                                            // Lấy 3 tuần gần nhất từ dữ liệu thực tế - chỉ dùng dữ liệu từ API
                                             let recentWeeks = weeklyAmounts.slice(-3);
-                                            // Nếu không có weeklyAmounts nhưng có avgPerWeek hoặc totalAmount, tạo dữ liệu
                                             let hasData = recentWeeks.length > 0;
 
-                                            // Nếu không có weeklyAmounts nhưng có dữ liệu khác, tạo sparkline từ đó
-                                            if (!hasData) {
-                                                if (avgPerWeek > 0 && weeks > 0) {
-                                                    // Tạo dữ liệu từ avgPerWeek với biến thiên nhỏ để có xu hướng
-                                                    const variation = 0.15; // Biến thiên 15%
-                                                    recentWeeks = [];
-                                                    for (let i = 0; i < 3; i++) {
-                                                        // Tạo xu hướng tăng dần hoặc giảm dần dựa trên trend
-                                                        let trendFactor = 1;
-                                                        if (trend === "increasing") {
-                                                            trendFactor = 0.85 + (i * 0.1); // Tăng dần
-                                                        } else if (trend === "decreasing") {
-                                                            trendFactor = 1.15 - (i * 0.1); // Giảm dần
-                                                        }
-                                                        const randomVariation = 1 + (Math.random() - 0.5) * variation;
-                                                        recentWeeks.push(avgPerWeek * trendFactor * randomVariation);
-                                                    }
-                                                    hasData = true;
-                                                } else if (totalAmount > 0 && weeks > 0) {
-                                                    // Nếu không có avgPerWeek nhưng có totalAmount, tính từ đó
-                                                    const calculatedAvgPerWeek = totalAmount / weeks;
-                                                    const variation = 0.15;
-                                                    recentWeeks = [];
-                                                    for (let i = 0; i < 3; i++) {
-                                                        let trendFactor = 1;
-                                                        if (trend === "increasing") {
-                                                            trendFactor = 0.85 + (i * 0.1);
-                                                        } else if (trend === "decreasing") {
-                                                            trendFactor = 1.15 - (i * 0.1);
-                                                        }
-                                                        const randomVariation = 1 + (Math.random() - 0.5) * variation;
-                                                        recentWeeks.push(calculatedAvgPerWeek * trendFactor * randomVariation);
-                                                    }
-                                                    hasData = true;
-                                                } else if (predictedNextWeek > 0) {
-                                                    // Nếu chỉ có dự đoán, tạo dữ liệu từ dự đoán
-                                                    recentWeeks = [];
-                                                    for (let i = 0; i < 3; i++) {
-                                                        // Tạo xu hướng dựa trên trend
-                                                        let factor = 1;
-                                                        if (trend === "increasing") {
-                                                            factor = 0.7 + (i * 0.1); // Tăng dần từ 70% đến 90%
-                                                        } else if (trend === "decreasing") {
-                                                            factor = 1.1 - (i * 0.1); // Giảm dần từ 110% đến 90%
-                                                        } else {
-                                                            factor = 0.9 + (i * 0.05); // Ổn định quanh 90-100%
-                                                        }
-                                                        recentWeeks.push(predictedNextWeek * factor);
-                                                    }
-                                                    hasData = true;
-                                                }
-                                            }
-
                                             if (hasData) {
-                                                // Điền 3 tuần thực tế
+                                                // Điền 3 tuần thực tế từ API
                                                 for (let i = 0; i < 3; i++) {
                                                     if (i < recentWeeks.length) {
                                                         sparklineData.push({
@@ -1430,41 +1168,18 @@ const AnalyticsPredictive = () => {
                                                         });
                                                         // Label: "3 tuần trước", "2 tuần trước", "1 tuần trước"
                                                         timelineLabels.push(`${3 - i} tuần trước`);
-                                                    } else {
-                                                        // Không có đủ dữ liệu, dùng giá trị trung bình
-                                                        const avgValue = recentWeeks.reduce((a, b) => a + b, 0) / recentWeeks.length;
-                                                        sparklineData.push({
-                                                            period: i + 1,
-                                                            actual: avgValue,
-                                                            predicted: null,
-                                                        });
-                                                        timelineLabels.push(`${3 - i} tuần trước`);
                                                     }
                                                 }
 
-                                                // Điểm cuối cùng: Tuần tới (dự đoán)
-                                                sparklineData.push({
-                                                    period: 4,
-                                                    actual: recentWeeks[recentWeeks.length - 1],
-                                                    predicted: predictedNextWeek > 0 ? predictedNextWeek : null,
-                                                });
-                                                timelineLabels.push("Tuần tới");
-                                            } else {
-                                                // Không có dữ liệu, tạo dữ liệu mẫu để hiển thị
-                                                for (let i = 0; i < 3; i++) {
+                                                // Điểm cuối cùng: Tuần tới (dự đoán từ API)
+                                                if (recentWeeks.length > 0) {
                                                     sparklineData.push({
-                                                        period: i + 1,
-                                                        actual: null,
-                                                        predicted: null,
+                                                        period: 4,
+                                                        actual: recentWeeks[recentWeeks.length - 1],
+                                                        predicted: predictedNextWeek > 0 ? predictedNextWeek : null,
                                                     });
-                                                    timelineLabels.push(`${3 - i} tuần trước`);
+                                                    timelineLabels.push("Tuần tới");
                                                 }
-                                                sparklineData.push({
-                                                    period: 4,
-                                                    actual: null,
-                                                    predicted: predictedNextWeek > 0 ? predictedNextWeek : null,
-                                                });
-                                                timelineLabels.push("Tuần tới");
                                             }
 
                                             return (

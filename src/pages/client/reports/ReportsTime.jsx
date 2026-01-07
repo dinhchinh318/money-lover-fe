@@ -177,19 +177,19 @@ const ReportsTime = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
+            <div className="max-w-[98%] mx-auto p-4 sm:p-6">
                 {/* Header Section */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
-                            <Calendar className="text-white" size={24} />
+                <div className="mb-6 sm:mb-8">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-4">
+                        <div className="p-2 sm:p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
+                            <Calendar className="text-white w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
-                        <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-gray-900 bg-clip-text text-transparent">
+                        <div className="min-w-0 flex-1">
+                            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-gray-900 bg-clip-text text-transparent">
                                 Báo cáo theo Thời gian
                             </h1>
-                            <p className="text-gray-600 mt-1 text-sm">
+                            <p className="text-gray-600 mt-1 text-xs sm:text-sm">
                                 Phân tích thu chi theo thời gian với biểu đồ và bảng chi tiết
                             </p>
                         </div>
@@ -197,7 +197,7 @@ const ReportsTime = () => {
                 </div>
 
                 {/* Filter Bar */}
-                <Card className="mb-6 shadow-lg border-0 rounded-2xl bg-gradient-to-br from-white to-gray-50">
+                <Card className="mb-4 sm:mb-6 shadow-lg border-0 rounded-2xl bg-gradient-to-br from-white to-gray-50">
                     <div className="flex items-center gap-2 mb-4">
                         <Filter className="text-indigo-500" size={18} />
                         <h3 className="text-sm font-bold text-gray-800">Bộ lọc</h3>
@@ -225,7 +225,7 @@ const ReportsTime = () => {
                 ) : (
                     <>
                         {/* Charts Section */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                             {/* Line Chart */}
                             <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50">
                                 <div className="flex items-center gap-3 mb-6">
@@ -301,7 +301,7 @@ const ReportsTime = () => {
                                         </LineChart>
                                     </ResponsiveContainer>
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center h-[350px] bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                                    <div className="flex flex-col items-center justify-center h-[250px] sm:h-[350px] bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                                         <BarChart3 className="text-gray-400 mb-2" size={32} />
                                         <p className="text-sm text-gray-500">Chưa có dữ liệu để hiển thị</p>
                                     </div>
@@ -377,7 +377,7 @@ const ReportsTime = () => {
                                         </BarChart>
                                     </ResponsiveContainer>
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center h-[350px] bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                                    <div className="flex flex-col items-center justify-center h-[250px] sm:h-[350px] bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                                         <BarChart3 className="text-gray-400 mb-2" size={32} />
                                         <p className="text-sm text-gray-500">Chưa có dữ liệu để hiển thị</p>
                                     </div>

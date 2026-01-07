@@ -104,172 +104,31 @@ const AnalyticsDiagnostic = () => {
             ]);
 
 
-            // Xử lý Category Spikes
+            // Xử lý Category Spikes - chỉ dùng dữ liệu từ API
             if (catRes?.status === true && catRes?.data) {
                 const spikes = catRes.data?.spikes || [];
-                if (Array.isArray(spikes) && spikes.length > 0) {
-                    setCategorySpikes(spikes);
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    // Dữ liệu rỗng, dùng mock
-                    setCategorySpikes([
-                        {
-                            categoryId: "mock1",
-                            categoryName: "Ăn uống",
-                            categoryIcon: "🍔",
-                            totalAmount: 2500000,
-                            previousAmount: 1500000,
-                            growthPercent: 66.7,
-                            isSpike: true,
-                        },
-                        {
-                            categoryId: "mock2",
-                            categoryName: "Mua sắm",
-                            categoryIcon: "🛍️",
-                            totalAmount: 1800000,
-                            previousAmount: 800000,
-                            growthPercent: 125.0,
-                            isSpike: true,
-                        },
-                    ]);
-                }
+                setCategorySpikes(Array.isArray(spikes) ? spikes : []);
             } else if (catRes?.EC === 0 && catRes?.data) {
                 const spikes = catRes.data?.spikes || catRes.data || [];
-                if (Array.isArray(spikes) && spikes.length > 0) {
-                    setCategorySpikes(spikes);
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    setCategorySpikes([
-                        {
-                            categoryId: "mock1",
-                            categoryName: "Ăn uống",
-                            categoryIcon: "🍔",
-                            totalAmount: 2500000,
-                            previousAmount: 1500000,
-                            growthPercent: 66.7,
-                            isSpike: true,
-                        },
-                    ]);
-                }
+                setCategorySpikes(Array.isArray(spikes) ? spikes : []);
             } else {
-                // Fallback: Tạo dữ liệu mock
-                // Fallback: Tạo dữ liệu mock
-                setCategorySpikes([
-                    {
-                        categoryId: "mock1",
-                        categoryName: "Ăn uống",
-                        categoryIcon: "🍔",
-                        totalAmount: 2500000,
-                        previousAmount: 1500000,
-                        growthPercent: 66.7,
-                        isSpike: true,
-                    },
-                    {
-                        categoryId: "mock2",
-                        categoryName: "Mua sắm",
-                        categoryIcon: "🛍️",
-                        totalAmount: 1800000,
-                        previousAmount: 800000,
-                        growthPercent: 125.0,
-                        isSpike: true,
-                    },
-                ]);
+                setCategorySpikes([]);
             }
 
-            // Xử lý Wallet Variations
+            // Xử lý Wallet Variations - chỉ dùng dữ liệu từ API
             if (walletRes?.status === true && walletRes?.data) {
                 const variations = Array.isArray(walletRes.data) ? walletRes.data : [];
-                // Kiểm tra xem có dữ liệu thực sự không (có ít nhất 1 item có changePercent/variation khác 0)
-                const hasValidData = variations.length > 0 && variations.some(
-                    (v) => (v.changePercent !== undefined && v.changePercent !== 0) ||
-                        (v.variation !== undefined && v.variation !== 0)
-                );
-
-                if (hasValidData) {
-                    setWalletVariations(variations);
-                } else {
-                    // Dữ liệu rỗng hoặc tất cả đều 0, dùng mock
-                    setWalletVariations([
-                        {
-                            walletId: "mock1",
-                            walletName: "Ví tiền mặt",
-                            changePercent: 15.5,
-                            variation: 15.5,
-                        },
-                        {
-                            walletId: "mock2",
-                            walletName: "Tài khoản ngân hàng",
-                            changePercent: -8.2,
-                            variation: -8.2,
-                        },
-                    ]);
-                }
+                setWalletVariations(variations);
             } else if (walletRes?.EC === 0 && walletRes?.data) {
                 const variations = Array.isArray(walletRes.data) ? walletRes.data : [];
-                const hasValidData = variations.length > 0 && variations.some(
-                    (v) => (v.changePercent !== undefined && v.changePercent !== 0) ||
-                        (v.variation !== undefined && v.variation !== 0)
-                );
-
-                if (hasValidData) {
-                    setWalletVariations(variations);
-                } else {
-                    // Dữ liệu rỗng hoặc tất cả đều 0, dùng mock
-                    setWalletVariations([
-                        {
-                            walletId: "mock1",
-                            walletName: "Ví tiền mặt",
-                            changePercent: 15.5,
-                            variation: 15.5,
-                        },
-                        {
-                            walletId: "mock2",
-                            walletName: "Tài khoản ngân hàng",
-                            changePercent: -8.2,
-                            variation: -8.2,
-                        },
-                    ]);
-                }
+                setWalletVariations(variations);
             } else {
-                // Fallback: Tạo dữ liệu mock
-                // Fallback: Tạo dữ liệu mock
-                setWalletVariations([
-                    {
-                        walletId: "mock1",
-                        walletName: "Ví tiền mặt",
-                        changePercent: 15.5,
-                        variation: 15.5,
-                    },
-                    {
-                        walletId: "mock2",
-                        walletName: "Tài khoản ngân hàng",
-                        changePercent: -8.2,
-                        variation: -8.2,
-                    },
-                ]);
+                setWalletVariations([]);
             }
         } catch (error) {
             console.error("Error loading variations data:", error);
-            // Fallback khi có lỗi
-            setCategorySpikes([
-                {
-                    categoryId: "mock1",
-                    categoryName: "Ăn uống",
-                    categoryIcon: "🍔",
-                    totalAmount: 2500000,
-                    previousAmount: 1500000,
-                    growthPercent: 66.7,
-                    isSpike: true,
-                },
-            ]);
-            setWalletVariations([
-                {
-                    walletId: "mock1",
-                    walletName: "Ví tiền mặt",
-                    changePercent: 15.5,
-                    variation: 15.5,
-                },
-            ]);
+            setCategorySpikes([]);
+            setWalletVariations([]);
         }
     };
 
@@ -283,191 +142,56 @@ const AnalyticsDiagnostic = () => {
             ]);
 
 
-            // Xử lý Monthly Spikes
+            // Xử lý Monthly Spikes - chỉ dùng dữ liệu từ API
             if (monthRes?.status === true && monthRes?.data) {
                 const data = monthRes.data.allMonths || monthRes.data.spikes || [];
-                // Kiểm tra xem có dữ liệu thực sự không (có totalAmount > 0)
-                const hasValidData = Array.isArray(data) && data.length > 0 &&
-                    data.some(item => (item.totalAmount || 0) > 0);
+                setMonthlySpikes(Array.isArray(data) ? data : []);
 
-                if (hasValidData) {
-                    setMonthlySpikes(data);
-
-                    // Lưu thống kê để tính threshold
-                    if (monthRes.data.statistics) {
-                        setMonthlyStats({
-                            mean: monthRes.data.statistics.mean || 0,
-                            threshold: monthRes.data.statistics.threshold || 0,
-                        });
-                    } else {
-                        // Tạo stats từ dữ liệu
-                        const amounts = data.map(d => d.totalAmount || 0).filter(a => a > 0);
-                        const mean = amounts.length > 0 ? amounts.reduce((a, b) => a + b, 0) / amounts.length : 0;
-                        setMonthlyStats({
-                            mean: mean,
-                            threshold: mean * 1.4, // 40% trên trung bình
-                        });
-                    }
-                } else {
-                    // Dữ liệu rỗng hoặc tất cả = 0, dùng mock
-                    console.log("Monthly spikes is empty or all zeros, using mock data");
-                    const now = new Date();
-                    const mockMonthlyData = [];
-                    for (let i = 0; i < 5; i++) {
-                        const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                        const baseAmount = 5000000;
-                        const amount = baseAmount + (Math.random() * 3000000) - (i === 0 ? 0 : 2000000);
-                        mockMonthlyData.push({
-                            month: month.getMonth() + 1,
-                            year: month.getFullYear(),
-                            label: `Tháng ${month.getMonth() + 1}/${month.getFullYear()}`,
-                            totalAmount: amount,
-                            deviation: i === 0 ? amount - baseAmount : 0,
-                            deviationPercent: i === 0 ? 25.5 : 0,
-                        });
-                    }
-                    setMonthlySpikes(mockMonthlyData);
+                // Lưu thống kê để tính threshold
+                if (monthRes.data.statistics) {
                     setMonthlyStats({
-                        mean: 5000000,
-                        threshold: 7000000,
+                        mean: monthRes.data.statistics.mean || 0,
+                        threshold: monthRes.data.statistics.threshold || 0,
+                    });
+                } else {
+                    // Tạo stats từ dữ liệu
+                    const amounts = data.map(d => d.totalAmount || 0).filter(a => a > 0);
+                    const mean = amounts.length > 0 ? amounts.reduce((a, b) => a + b, 0) / amounts.length : 0;
+                    setMonthlyStats({
+                        mean: mean,
+                        threshold: mean * 1.4, // 40% trên trung bình
                     });
                 }
             } else if (monthRes?.EC === 0 && monthRes?.data) {
                 const data = monthRes.data.allMonths || monthRes.data.spikes || [];
-                const hasValidData = Array.isArray(data) && data.length > 0 &&
-                    data.some(item => (item.totalAmount || 0) > 0);
-
-                if (hasValidData) {
-                    setMonthlySpikes(data);
-                    if (monthRes.data.statistics) {
-                        setMonthlyStats({
-                            mean: monthRes.data.statistics.mean || 0,
-                            threshold: monthRes.data.statistics.threshold || 0,
-                        });
-                    } else {
-                        const amounts = data.map(d => d.totalAmount || 0).filter(a => a > 0);
-                        const mean = amounts.length > 0 ? amounts.reduce((a, b) => a + b, 0) / amounts.length : 0;
-                        setMonthlyStats({
-                            mean: mean,
-                            threshold: mean * 1.4,
-                        });
-                    }
+                setMonthlySpikes(Array.isArray(data) ? data : []);
+                if (monthRes.data.statistics) {
+                    setMonthlyStats({
+                        mean: monthRes.data.statistics.mean || 0,
+                        threshold: monthRes.data.statistics.threshold || 0,
+                    });
                 } else {
-                    console.log("Monthly spikes is empty or all zeros, using mock data");
-                    const now = new Date();
-                    const mockMonthlyData = [];
-                    for (let i = 0; i < 5; i++) {
-                        const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                        mockMonthlyData.push({
-                            month: month.getMonth() + 1,
-                            year: month.getFullYear(),
-                            label: `Tháng ${month.getMonth() + 1}/${month.getFullYear()}`,
-                            totalAmount: 5000000 + Math.random() * 2000000,
-                            deviation: 0,
-                            deviationPercent: 0,
-                        });
-                    }
-                    setMonthlySpikes(mockMonthlyData);
-                    setMonthlyStats({ mean: 5000000, threshold: 7000000 });
-                }
-            } else {
-                // Fallback: Tạo dữ liệu mock cho monthly spikes
-                // Fallback: Tạo dữ liệu mock
-                const now = new Date();
-                const mockMonthlyData = [];
-                for (let i = 0; i < 5; i++) {
-                    const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                    const baseAmount = 5000000;
-                    const amount = baseAmount + (Math.random() * 3000000) - (i === 0 ? 0 : 2000000);
-                    mockMonthlyData.push({
-                        month: month.getMonth() + 1,
-                        year: month.getFullYear(),
-                        label: `Tháng ${month.getMonth() + 1}/${month.getFullYear()}`,
-                        totalAmount: amount,
-                        deviation: i === 0 ? amount - baseAmount : 0,
-                        deviationPercent: i === 0 ? 25.5 : 0,
+                    const amounts = data.map(d => d.totalAmount || 0).filter(a => a > 0);
+                    const mean = amounts.length > 0 ? amounts.reduce((a, b) => a + b, 0) / amounts.length : 0;
+                    setMonthlyStats({
+                        mean: mean,
+                        threshold: mean * 1.4,
                     });
                 }
-                setMonthlySpikes(mockMonthlyData);
-                setMonthlyStats({
-                    mean: 5000000,
-                    threshold: 7000000,
-                });
+            } else {
+                setMonthlySpikes([]);
+                setMonthlyStats({ mean: 0, threshold: 0 });
             }
 
-            // Xử lý Unusual Large Expenses
+            // Xử lý Unusual Large Expenses - chỉ dùng dữ liệu từ API
             if (largeRes?.status === true && largeRes?.data) {
                 const expenses = largeRes.data.unusualExpenses || [];
-                if (Array.isArray(expenses) && expenses.length > 0) {
-                    setUnusualLarge(expenses);
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    // Dữ liệu rỗng, dùng mock
-                    setUnusualLarge([
-                        {
-                            transactionId: "mock1",
-                            amount: 5000000,
-                            date: new Date(),
-                            note: "Mua laptop mới",
-                            category: { name: "Mua sắm" },
-                            categoryName: "Mua sắm",
-                            wallet: { name: "Tài khoản ngân hàng" },
-                            walletName: "Tài khoản ngân hàng",
-                        },
-                        {
-                            transactionId: "mock2",
-                            amount: 3500000,
-                            date: new Date(),
-                            note: "Sửa chữa xe",
-                            category: { name: "Di chuyển" },
-                            categoryName: "Di chuyển",
-                            wallet: { name: "Ví tiền mặt" },
-                            walletName: "Ví tiền mặt",
-                        },
-                    ]);
-                }
+                setUnusualLarge(Array.isArray(expenses) ? expenses : []);
             } else if (largeRes?.EC === 0 && largeRes?.data) {
                 const expenses = largeRes.data.unusualExpenses || [];
-                if (Array.isArray(expenses) && expenses.length > 0) {
-                    setUnusualLarge(expenses);
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    setUnusualLarge([
-                        {
-                            transactionId: "mock1",
-                            amount: 5000000,
-                            date: new Date(),
-                            note: "Giao dịch lớn",
-                            category: { name: "Mua sắm" },
-                            categoryName: "Mua sắm",
-                        },
-                    ]);
-                }
+                setUnusualLarge(Array.isArray(expenses) ? expenses : []);
             } else {
-                // Fallback: Tạo dữ liệu mock
-                // Fallback: Tạo dữ liệu mock
-                setUnusualLarge([
-                    {
-                        transactionId: "mock1",
-                        amount: 5000000,
-                        date: new Date(),
-                        note: "Mua laptop mới",
-                        category: { name: "Mua sắm" },
-                        categoryName: "Mua sắm",
-                        wallet: { name: "Tài khoản ngân hàng" },
-                        walletName: "Tài khoản ngân hàng",
-                    },
-                    {
-                        transactionId: "mock2",
-                        amount: 3500000,
-                        date: new Date(),
-                        note: "Sửa chữa xe",
-                        category: { name: "Di chuyển" },
-                        categoryName: "Di chuyển",
-                        wallet: { name: "Ví tiền mặt" },
-                        walletName: "Ví tiền mặt",
-                    },
-                ]);
+                setUnusualLarge([]);
             }
 
             // Xử lý Unusual Time Spending
@@ -530,20 +254,13 @@ const AnalyticsDiagnostic = () => {
             setUnusualTime(timeSpendingData);
             setHourlySpending(hourlyData);
 
-            // Xử lý 24h Spike
+            // Xử lý 24h Spike - chỉ dùng dữ liệu từ API
             if (spikeRes?.status === true && spikeRes?.data) {
                 setSpike24h(spikeRes.data);
             } else if (spikeRes?.EC === 0 && spikeRes?.data) {
                 setSpike24h(spikeRes.data);
             } else {
-                // Fallback: Tạo dữ liệu mock
-                // Fallback: Tạo dữ liệu mock
-                setSpike24h({
-                    isSpike: true,
-                    changePercent: 35.2,
-                    currentAmount: 2500000,
-                    previousAmount: 1850000,
-                });
+                setSpike24h(null);
             }
         } catch (error) {
             console.error("Error loading anomalies data:", error);
@@ -558,14 +275,17 @@ const AnalyticsDiagnostic = () => {
 
     const loadHabitsData = async (weeks, days) => {
         try {
+            const startDate = dateRange[0]?.format("YYYY-MM-DD");
+            const endDate = dateRange[1]?.format("YYYY-MM-DD");
+            
             const [dayRes, catRes, freqRes] = await Promise.all([
                 getMostSpendingDayOfWeekAPI({ weeks }),
-                getMostFrequentCategoriesAPI({ days }),
-                getTransactionFrequencyAPI({ days }),
+                getMostFrequentCategoriesAPI({ days, startDate, endDate }),
+                getTransactionFrequencyAPI({ days, startDate, endDate }),
             ]);
 
 
-            // Xử lý Spending Days
+            // Xử lý Spending Days - chỉ dùng dữ liệu từ API
             if (dayRes?.status === true && dayRes?.data) {
                 const daysData = dayRes.data.days || [];
 
@@ -590,22 +310,7 @@ const AnalyticsDiagnostic = () => {
                     };
                 });
 
-                // Kiểm tra xem có dữ liệu thực sự không (tổng > 0)
-                const totalAmount = chartData.reduce((sum, item) => sum + item.amount, 0);
-                if (totalAmount > 0) {
-                    setSpendingDays(chartData);
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    setSpendingDays([
-                        { day: "Mon", amount: 1200000 },
-                        { day: "Tue", amount: 1500000 },
-                        { day: "Wed", amount: 1800000 },
-                        { day: "Thu", amount: 2000000 },
-                        { day: "Fri", amount: 2500000 },
-                        { day: "Sat", amount: 3000000 },
-                        { day: "Sun", amount: 2800000 },
-                    ]);
-                }
+                setSpendingDays(chartData);
             } else if (dayRes?.EC === 0 && dayRes?.data) {
                 const daysData = dayRes.data.days || [];
                 const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -627,119 +332,42 @@ const AnalyticsDiagnostic = () => {
                         amount: dayData?.totalAmount || 0,
                     };
                 });
-                const totalAmount = chartData.reduce((sum, item) => sum + item.amount, 0);
-                if (totalAmount > 0) {
-                    setSpendingDays(chartData);
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    setSpendingDays([
-                        { day: "Mon", amount: 1200000 },
-                        { day: "Tue", amount: 1500000 },
-                        { day: "Wed", amount: 1800000 },
-                        { day: "Thu", amount: 2000000 },
-                        { day: "Fri", amount: 2500000 },
-                        { day: "Sat", amount: 3000000 },
-                        { day: "Sun", amount: 2800000 },
-                    ]);
-                }
+                setSpendingDays(chartData);
             } else {
-                // Fallback: Tạo dữ liệu mock
-                // Fallback: Tạo dữ liệu mock
-                setSpendingDays([
-                    { day: "Mon", amount: 1200000 },
-                    { day: "Tue", amount: 1500000 },
-                    { day: "Wed", amount: 1800000 },
-                    { day: "Thu", amount: 2000000 },
-                    { day: "Fri", amount: 2500000 },
-                    { day: "Sat", amount: 3000000 },
-                    { day: "Sun", amount: 2800000 },
-                ]);
+                setSpendingDays([]);
             }
 
-            // Xử lý Frequent Categories
+            // Xử lý Frequent Categories - chỉ dùng dữ liệu từ API
+            console.log("🔍 [DANH MỤC PHÁT SINH NHIỀU NHẤT] API Response:", catRes);
             if (catRes?.status === true && catRes?.data) {
                 const categories = Array.isArray(catRes.data) ? catRes.data : [];
-                if (categories.length > 0) {
-                    setFrequentCategories(categories);
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    // Dữ liệu rỗng, dùng mock
-                    setFrequentCategories([
-                        { categoryId: "mock1", categoryName: "Ăn uống", count: 45 },
-                        { categoryId: "mock2", categoryName: "Mua sắm", count: 32 },
-                        { categoryId: "mock3", categoryName: "Di chuyển", count: 28 },
-                        { categoryId: "mock4", categoryName: "Giải trí", count: 15 },
-                        { categoryId: "mock5", categoryName: "Y tế", count: 8 },
-                    ]);
-                }
+                console.log("✅ [DANH MỤC PHÁT SINH NHIỀU NHẤT] Categories từ API:", categories);
+                categories.forEach((cat, idx) => {
+                    console.log(`  ${idx + 1}. ${cat.categoryName}: ${cat.count} giao dịch, ${cat.totalAmount?.toLocaleString('vi-VN')} VND`);
+                });
+                setFrequentCategories(categories);
             } else if (catRes?.EC === 0 && catRes?.data) {
                 const categories = Array.isArray(catRes.data) ? catRes.data : [];
-                if (categories.length > 0) {
-                    setFrequentCategories(categories);
-                } else {
-                    // Dữ liệu rỗng, dùng mock
-                    setFrequentCategories([
-                        { categoryId: "mock1", categoryName: "Ăn uống", count: 45 },
-                        { categoryId: "mock2", categoryName: "Mua sắm", count: 32 },
-                        { categoryId: "mock3", categoryName: "Di chuyển", count: 28 },
-                    ]);
-                }
+                console.log("✅ [DANH MỤC PHÁT SINH NHIỀU NHẤT] Categories từ API (EC=0):", categories);
+                setFrequentCategories(categories);
             } else {
-                // Fallback: Tạo dữ liệu mock
-                // Fallback: Tạo dữ liệu mock
-                setFrequentCategories([
-                    { categoryId: "mock1", categoryName: "Ăn uống", count: 45 },
-                    { categoryId: "mock2", categoryName: "Mua sắm", count: 32 },
-                    { categoryId: "mock3", categoryName: "Di chuyển", count: 28 },
-                    { categoryId: "mock4", categoryName: "Giải trí", count: 15 },
-                    { categoryId: "mock5", categoryName: "Y tế", count: 8 },
-                ]);
+                console.warn("⚠️ [DANH MỤC PHÁT SINH NHIỀU NHẤT] Không có dữ liệu từ API");
+                setFrequentCategories([]);
             }
 
-            // Xử lý Transaction Frequency
-            console.log("🔍 [TẦN SUẤT GIAO DỊCH] API Response:", freqRes);
+            // Xử lý Transaction Frequency - chỉ dùng dữ liệu từ API
             if (freqRes?.status === true && freqRes?.data) {
-                console.log("✅ [TẦN SUẤT GIAO DỊCH] Data từ API:", freqRes.data);
-                console.log("📊 [TẦN SUẤT GIAO DỊCH] Frequency:", freqRes.data.frequency);
-                console.log("📊 [TẦN SUẤT GIAO DỊCH] Total transactions:", freqRes.data.totalTransactions);
                 setTransactionFreq(freqRes.data);
             } else if (freqRes?.EC === 0 && freqRes?.data) {
-                console.log("✅ [TẦN SUẤT GIAO DỊCH] Data từ API (EC=0):", freqRes.data);
                 setTransactionFreq(freqRes.data);
             } else {
-                console.log("⚠️ [TẦN SUẤT GIAO DỊCH] Không có dữ liệu, dùng mock");
-                // Fallback: Tạo dữ liệu mock
-                setTransactionFreq({
-                    frequency: {
-                        perDay: 3.5,
-                        perWeek: 24.5,
-                        perMonth: 105.0,
-                    },
-                });
+                setTransactionFreq(null);
             }
         } catch (error) {
             console.error("Error loading habits data:", error);
-            // Fallback khi có lỗi
-            setSpendingDays([
-                { day: "Mon", amount: 1200000 },
-                { day: "Tue", amount: 1500000 },
-                { day: "Wed", amount: 1800000 },
-                { day: "Thu", amount: 2000000 },
-                { day: "Fri", amount: 2500000 },
-                { day: "Sat", amount: 3000000 },
-                { day: "Sun", amount: 2800000 },
-            ]);
-            setFrequentCategories([
-                { categoryId: "mock1", categoryName: "Ăn uống", count: 45 },
-                { categoryId: "mock2", categoryName: "Mua sắm", count: 32 },
-            ]);
-            setTransactionFreq({
-                frequency: {
-                    perDay: 3.5,
-                    perWeek: 24.5,
-                    perMonth: 105.0,
-                },
-            });
+            setSpendingDays([]);
+            setFrequentCategories([]);
+            setTransactionFreq(null);
         }
     };
 
@@ -760,26 +388,61 @@ const AnalyticsDiagnostic = () => {
             if (/[\u{1F300}-\u{1F9FF}]/u.test(icon)) {
                 return icon;
             }
-            // Nếu là string icon name, có thể map sang emoji
-            return icon;
+            // Map icon string sang emoji
+            const iconStringMap = {
+                "food": "🍔",
+                "shopping": "🛒",
+                "shopping-bag": "🛍️",
+                "transport": "🚗",
+                "car": "🚗",
+                "entertainment": "🎬",
+                "game": "🎮",
+                "health": "🏥",
+                "medical": "🏥",
+                "bills": "💳",
+                "invoice": "📄",
+                "education": "📚",
+                "travel": "✈️",
+                "flight": "✈️",
+                "gift": "🎁",
+                "present": "🎁",
+                "salary": "💰",
+                "income": "💰",
+                "investment": "📈",
+                "savings": "💵",
+                "other": "📦",
+                "default": "📁",
+            };
+            return iconStringMap[icon.toLowerCase()] || icon;
         }
 
         // Fallback: map category name sang emoji
         const categoryName = (item.categoryName || item.category?.name || "").toLowerCase();
         const iconMap = {
             "ăn uống": "🍔",
-            "mua sắm": "🛍️",
+            "food": "🍔",
+            "mua sắm": "🛒",
+            "shopping": "🛒",
             "di chuyển": "🚗",
-            "giải trí": "🎮",
+            "transport": "🚗",
+            "giải trí": "🎬",
+            "entertainment": "🎬",
             "y tế": "🏥",
-            "hóa đơn": "📄",
+            "health": "🏥",
+            "hóa đơn": "💳",
+            "bills": "💳",
             "giáo dục": "📚",
+            "education": "📚",
             "du lịch": "✈️",
+            "travel": "✈️",
             "quà tặng": "🎁",
-            "khác": "💰",
+            "gift": "🎁",
+            "đầu tư": "📈",
+            "investment": "📈",
+            "khác": "📦",
+            "other": "📦",
         };
-
-        return iconMap[categoryName] || "💰";
+        return iconMap[categoryName] || "📦";
     };
 
     // Format dữ liệu cho biểu đồ tháng với đánh dấu đột biến
@@ -846,17 +509,16 @@ const AnalyticsDiagnostic = () => {
     };
 
     const handleCategoryClick = (category) => {
-        // Navigate đến trang transactions với filter theo category
+        // Navigate đến trang transactions với filter theo category và thời gian
         const categoryId = category.categoryId || category._id || category.id;
-        // Kiểm tra nếu là mock data (categoryId bắt đầu bằng "mock") thì không navigate
-        if (categoryId && !String(categoryId).startsWith("mock")) {
+        if (categoryId) {
             const startDate = dateRange[0]?.format("YYYY-MM-DD");
             const endDate = dateRange[1]?.format("YYYY-MM-DD");
             // Convert ObjectId thành string nếu cần
             const categoryIdStr = String(categoryId);
             navigate(`/transactions?categoryId=${categoryIdStr}&startDate=${startDate}&endDate=${endDate}&type=expense`);
         } else {
-            message.info("Vui lòng chọn danh mục có dữ liệu thực");
+            message.warning("Không tìm thấy ID danh mục");
         }
     };
 
@@ -885,7 +547,7 @@ const AnalyticsDiagnostic = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
             <div className="max-w-7xl mx-auto p-6">
                 {/* Header Section */}
                 <div className="mb-8">
@@ -988,22 +650,43 @@ const AnalyticsDiagnostic = () => {
                                         <div className="space-y-3">
                                             {walletVariations.map((wallet, index) => {
                                                 const changePercent = wallet.changePercent || wallet.variation || 0;
-                                                const isPositive = changePercent > 0;
+                                                const change = wallet.change || 0;
+                                                const isIncrease = changePercent > 0; // Chi tiêu tăng = xấu (màu đỏ)
+                                                const isDecrease = changePercent < 0; // Chi tiêu giảm = tốt (màu xanh)
+                                                const isStable = changePercent === 0;
+                                                
                                                 return (
                                                     <div
                                                         key={index}
                                                         className="group p-4 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all duration-200 cursor-pointer"
+                                                        title={`Chi tiêu tháng ${wallet.latestMonth?.month}/${wallet.latestMonth?.year}: ${formatCurrency(wallet.latestMonth?.totalAmount || 0)} | Tháng trước: ${formatCurrency(wallet.previousMonth?.totalAmount || 0)}`}
                                                     >
                                                         <div className="flex items-center justify-between">
-                                                            <div className="flex items-center gap-3">
+                                                            <div className="flex items-center gap-3 flex-1">
                                                                 <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
                                                                     <Wallet className="text-blue-600" size={16} />
                                                                 </div>
-                                                                <span className="font-semibold text-gray-900">{wallet.walletName}</span>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <span className="font-semibold text-gray-900 block truncate">{wallet.walletName}</span>
+                                                                    <span className="text-xs text-gray-500">
+                                                                        {isIncrease ? "Chi tiêu tăng" : isDecrease ? "Chi tiêu giảm" : "Không đổi"}
+                                                                    </span>
+                                                                </div>
                                                             </div>
-                                                            <div className={`flex items-center gap-1 font-bold ${isPositive ? 'text-red-500' : 'text-green-500'}`}>
-                                                                {isPositive ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                                                                <span>{Math.abs(changePercent).toFixed(1)}%</span>
+                                                            <div className={`flex items-center gap-1 font-bold ${isIncrease ? 'text-red-500' : isDecrease ? 'text-green-500' : 'text-gray-500'}`}>
+                                                                {isIncrease ? (
+                                                                    <>
+                                                                        <TrendingUp size={16} />
+                                                                        <span>+{Math.abs(changePercent).toFixed(1)}%</span>
+                                                                    </>
+                                                                ) : isDecrease ? (
+                                                                    <>
+                                                                        <TrendingDown size={16} />
+                                                                        <span>{changePercent.toFixed(1)}%</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <span>0%</span>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1282,14 +965,14 @@ const AnalyticsDiagnostic = () => {
                                                     title={`Click để xem ${item.count} giao dịch của ${item.categoryName}`}
                                                 >
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200">
-                                                            <span className="text-2xl">{getCategoryIcon(item)}</span>
+                                                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 border-2 border-indigo-300 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 group-hover:border-indigo-400 transition-all duration-300">
+                                                            <span className="text-3xl leading-none">{getCategoryIcon(item)}</span>
                                                         </div>
                                                         <div className="flex items-center gap-3 flex-1">
-                                                            <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                                            <span className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
                                                                 {item.categoryName}
                                                             </span>
-                                                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md">
                                                                 {index + 1}
                                                             </div>
                                                         </div>

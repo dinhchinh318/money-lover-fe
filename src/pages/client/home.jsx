@@ -896,15 +896,17 @@ function HomePage() {
         }),
       ]);
 
-      // wallets
+      console.log("API Responses:", { walletsRes, statsRes, transactionsRes });
+
+      // wallets - Wallet API trả về format { EC: 0, data: [...] }
       let totalBalance = 0;
-      if (walletsRes?.status === true && Array.isArray(walletsRes?.data)) {
+      if (walletsRes?.EC === 0 && Array.isArray(walletsRes?.data)) {
         totalBalance = walletsRes.data.reduce((sum, wallet) => sum + (Number(wallet.balance) || 0), 0);
-      } else if (walletsRes?.EC === 0 && Array.isArray(walletsRes?.data)) {
+      } else if (walletsRes?.status === true && Array.isArray(walletsRes?.data)) {
         totalBalance = walletsRes.data.reduce((sum, wallet) => sum + (Number(wallet.balance) || 0), 0);
       }
 
-      // stats
+      // stats - Transaction API trả về format { status: true, data: {...} }
       let monthlyIncome = 0;
       let monthlyExpense = 0;
       let transactionCount = 0;
@@ -921,14 +923,14 @@ function HomePage() {
         transactionCount = Number(data.transactionCount) || 0;
       }
 
-      // recent transactions
+      // recent transactions - Transaction API trả về format { status: true, data: { transactions: [...] } }
       let transactions = [];
       if (transactionsRes?.status === true && transactionsRes?.data?.transactions) {
         transactions = Array.isArray(transactionsRes.data.transactions) ? transactionsRes.data.transactions : [];
-      } else if (transactionsRes?.EC === 0 && transactionsRes?.data?.transactions) {
-        transactions = Array.isArray(transactionsRes.data.transactions) ? transactionsRes.data.transactions : [];
       } else if (transactionsRes?.status === true && Array.isArray(transactionsRes?.data)) {
         transactions = transactionsRes.data;
+      } else if (transactionsRes?.EC === 0 && transactionsRes?.data?.transactions) {
+        transactions = Array.isArray(transactionsRes.data.transactions) ? transactionsRes.data.transactions : [];
       } else if (transactionsRes?.EC === 0 && Array.isArray(transactionsRes?.data)) {
         transactions = transactionsRes.data;
       }
@@ -969,6 +971,8 @@ function HomePage() {
           endDate: monthEnd.format("YYYY-MM-DD"),
         }),
       ]);
+
+      console.log("Financial Overview Responses:", { overviewRes, categoryRes });
 
       if (overviewRes?.status === true && overviewRes?.data) {
         const data = overviewRes.data;
