@@ -33,6 +33,16 @@ import SavingGoalsIndex from "./pages/client/savingGoals/SavingGoalsIndex.jsx";
 import ProfilePage from "./pages/client/profile/Profile.jsx";
 import SavingGoalDetail from "./pages/client/savingGoals/SavingGoalDetail.jsx";
 import { AppContextProvider, useCurrentApp } from "./components/context/app.context.jsx";
+import GroupsPage from "./pages/client/group/GroupsPage";
+import MyInvitesPage from "./pages/client/group/MyInvitesPage";
+import GroupDetailLayout from "./pages/client/group/GroupDetailLayout"
+import GroupOverviewPage from "./pages/client/group/GroupOverviewPage"
+import GroupWalletsPage from "./pages/client/group/GroupWalletsPage"
+import GroupCategoriesPage from "./pages/client/group/GroupCategoriesPage"
+import GroupTransactionsPage from "./pages/client/group/GroupTransactionsPage.jsx"
+import GroupBudgetsPage from "./pages/client/group/GroupBudgetsPage"
+import GroupReportsPage from "./pages/client/group/GroupReportsPage"
+import GroupsProviders from './pages/client/group/context/GroupsProviders.jsx';
 // import "antd/dist/reset.css"; // nếu dùng Ant Design
 
 // Component để chọn hiển thị LandingPage hoặc HomePage dựa trên authentication
@@ -121,6 +131,27 @@ const router = createBrowserRouter([
         path: "/profile",
         element: <ProfilePage />,
       },
+      // Group
+      {
+        path: "/groups",
+         element: <GroupsProviders />,
+        children: [
+          { index: true, element: <GroupsPage /> },
+          { path: "invites", element: <MyInvitesPage /> },
+          {
+            path: ":groupId",
+            element: <GroupDetailLayout />,
+            children: [
+              { index: true, element: <GroupOverviewPage /> },
+              { path: "wallets", element: <GroupWalletsPage /> },
+              { path: "categories", element: <GroupCategoriesPage /> },
+              { path: "transactions", element: <GroupTransactionsPage /> },
+              { path: "budgets", element: <GroupBudgetsPage /> },
+              { path: "reports", element: <GroupReportsPage /> },
+            ],
+          },
+        ],
+      }
     ],
   },
 ]);

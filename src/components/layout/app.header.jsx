@@ -18,6 +18,7 @@ import {
   MoreHorizontal,
   LayoutGrid,
   Plus,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { Dropdown, message, Avatar, Badge } from "antd";
@@ -79,6 +80,7 @@ const AppHeader = () => {
     { key: "recurring-bills", label: "Hóa đơn định kỳ", path: "/recurring-bills", icon: CalendarClock },
     { key: "saving-goals", label: "Tiết kiệm", path: "/saving-goals", icon: PiggyBank },
     { key: "analytics", label: "Phân tích", path: "/analytics", icon: TrendingUp },
+    { key: "groups", label: "Nhóm", path: "/groups", icon: Users },
   ];
 
   // ===== Dropdown Menus =====

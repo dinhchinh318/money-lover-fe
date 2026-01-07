@@ -197,6 +197,67 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
         }).format(amount);
     };
 
+    const hasMeaningfulData = () => {
+        if (!open) return false;
+        const v = form.getFieldsValue(true);
+
+        const ignoreKeys = new Set([
+            "type",
+            "date",
+            "recurringType",
+            "isRecurring",
+        ]);
+
+        if (imageUrl) return true;
+        if (v.isRecurring) return true;
+
+        return Object.entries(v).some(([k, val]) => {
+            if (ignoreKeys.has(k)) return false;
+            if (val === undefined || val === null) return false;
+            if (typeof val === "string" && val.trim() === "") return false;
+            if (typeof val === "number" && val === 0) return false;
+            if (Array.isArray(val) && val.length === 0) return false;
+            return true;
+        });
+    };
+
+    const switchTypeWithConfirm = (nextType) => {
+        if (!open) return;
+        if (nextType === transactionType) return;
+
+        const doSwitch = () => {
+            form.resetFields();
+            setImageUrl("");
+            setIsRecurring(false);
+            setTransactionType(nextType);
+
+            setTimeout(() => {
+            form.setFieldsValue({
+                type: nextType,
+                date: dayjs(),
+                isRecurring: false,
+                recurringType: "monthly",
+                endDate: null,
+            });
+            }, 0);
+        };
+
+        if (!hasMeaningfulData()) {
+            doSwitch();
+            return;
+        }
+
+        Modal.confirm({
+            title: "Đổi loại giao dịch?",
+            content: "Nếu chuyển sang loại giao dịch khác, dữ liệu hiện tại sẽ mất.",
+            okText: "Đồng ý",
+            cancelText: "Hủy",
+            centered: true,
+            onOk: doSwitch,
+        });
+    };
+
+
     return (
         <Modal
             title={transaction ? "Sửa giao dịch" : "Thêm giao dịch"}
@@ -224,10 +285,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
                             <button
                                 key={type.value}
                                 type="button"
-                                onClick={() => {
-                                    setTransactionType(type.value);
-                                    form.setFieldsValue({ type: type.value });
-                                }}
+                                onClick={() => switchTypeWithConfirm(type.value)}
                                 className={`px-4 py-2 rounded-lg font-medium transition-all ${transactionType === type.value
                                     ? "text-white shadow-sm"
                                     : "bg-[#F9FAFB] text-[#6B7280] hover:bg-[#E5E7EB]"
