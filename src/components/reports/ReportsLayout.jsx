@@ -1,10 +1,13 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link, useLocation, Outlet } from "react-router-dom";
-import { Home, Clock3, List, Wallet, Menu, X, BarChart3 } from "lucide-react";
+import { Home, Clock3, List, Wallet, Menu as MenuIcon, X } from "lucide-react";
+import { useState } from "react";
 
-export default function ReportsLayout() {
-  const location = useLocation();
-  const [mobileOpen, setMobileOpen] = useState(false);
+const ReportsLayout = () => {
+    const location = useLocation();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const isActive = (path) => {
     if (path === "/reports") return location.pathname === "/reports";
@@ -92,30 +95,107 @@ export default function ReportsLayout() {
         onClick={() => setMobileOpen(false)}
       />
 
-      {/* Drawer */}
-      <aside
-        className={[
-          "md:hidden fixed top-0 left-0 z-50 h-full w-72 bg-white",
-          "border-r border-gray-200 shadow-xl transform transition-transform",
-          mobileOpen ? "translate-x-0" : "-translate-x-full",
-        ].join(" ")}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Menu báo cáo"
-      >
-        <div className="h-14 px-3 flex items-center justify-between border-b border-gray-200">
-          <div className="flex items-center gap-2 font-semibold text-gray-800">
-            <BarChart3 size={18} className="text-gray-700" />
-            <span>Báo cáo</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setMobileOpen(false)}
-            className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 active:bg-gray-200"
-            aria-label="Đóng menu"
-          >
-            <X size={20} className="text-gray-700" />
-          </button>
+    const navItems = [
+        { path: "/reports", label: "Tổng quan", icon: Home },
+        { path: "/reports/time", label: "Báo cáo theo thời gian", icon: Clock3 },
+        { path: "/reports/category", label: "Báo cáo theo danh mục", icon: List },
+        { path: "/reports/wallet", label: "Báo cáo theo ví", icon: Wallet },
+    ];
+
+    return (
+        <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
+            {/* Sidebar Navigation - Hidden on mobile, shown on desktop */}
+            <aside className="hidden lg:block lg:w-64 bg-white border-r border-gray-200 shadow-sm flex-shrink-0">
+                <div className="p-4 space-y-2">
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-all text-sm ${isActive(item.path)
+                                    ? "bg-[#E8F8EF] text-[#0EA25E] border border-[#C4F1DC] shadow-sm"
+                                    : "text-gray-600 hover:bg-gray-100"
+                                }`}
+                        >
+                            {item.icon && (
+                                <item.icon
+                                    size={18}
+                                    className={isActive(item.path) ? "text-[#0EA25E]" : "text-gray-500"}
+                                />
+                            )}
+                            <span>{item.label}</span>
+                        </Link>
+                    ))}
+                </div>
+            </aside>
+
+            {/* Main Content */}
+            <div className="flex-1 overflow-auto w-full flex flex-col">
+                {/* Mobile Menu Button */}
+                <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+                    <h2 className="text-lg font-bold text-gray-800">Báo cáo</h2>
+                    <button
+                        onClick={() => setMobileMenuOpen(true)}
+                        className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 active:scale-95 transition-transform"
+                        aria-label="Mở menu"
+                    >
+                        <MenuIcon size={24} />
+                    </button>
+                </div>
+
+                <Outlet />
+            </div>
+
+            {/* Mobile Drawer Menu */}
+            <div className={`fixed inset-0 z-[1100] transition-all duration-300 ${mobileMenuOpen ? "visible" : "invisible"} lg:hidden`}>
+                <div
+                    className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+                        mobileMenuOpen ? "opacity-100" : "opacity-0"
+                    }`}
+                    onClick={closeMobileMenu}
+                />
+
+                <div
+                    className={[
+                        "absolute right-0 top-0 h-full w-full max-w-[18rem] bg-white shadow-2xl",
+                        "transition-transform duration-500 ease-out flex flex-col",
+                        mobileMenuOpen ? "translate-x-0" : "translate-x-full",
+                    ].join(" ")}
+                >
+                    <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                        <h3 className="font-bold text-gray-900">Menu Báo cáo</h3>
+                        <button
+                            onClick={closeMobileMenu}
+                            className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                            aria-label="Đóng menu"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                onClick={closeMobileMenu}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
+                                    isActive(item.path)
+                                        ? "bg-[#E8F8EF] text-[#0EA25E] border border-[#C4F1DC]"
+                                        : "text-gray-600 hover:bg-gray-100"
+                                }`}
+                            >
+                                {item.icon && (
+                                    <item.icon
+                                        size={20}
+                                        className={isActive(item.path) ? "text-[#0EA25E]" : "text-gray-500"}
+                                    />
+                                )}
+                                <span>{item.label}</span>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </div>
         </div>
 
         <SidebarContent onNavigate={() => setMobileOpen(false)} />

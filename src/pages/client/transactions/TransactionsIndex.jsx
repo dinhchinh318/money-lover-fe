@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Plus, Edit, Trash2, TrendingUp, TrendingDown, ArrowRight, Wallet, BarChart3 } from "lucide-react";
 import { message, Dropdown, Modal, Pagination, Select } from "antd";
 import { getAllTransactionsAPI, deleteTransactionAPI, getOverviewStatsAPI } from "../../../services/api.transaction";
@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 
 const TransactionsIndex = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [transactions, setTransactions] = useState([]);
     const [groupedTransactions, setGroupedTransactions] = useState({});
     const [loading, setLoading] = useState(true);
@@ -39,16 +40,51 @@ const TransactionsIndex = () => {
         pageSize: 10,
         total: 0,
     });
+    const [urlParamsLoaded, setUrlParamsLoaded] = useState(false);
 
     useEffect(() => {
         loadWallets();
         loadCategories();
     }, []);
 
+    // Đọc filter từ URL params (từ analytics) và áp dụng ngay
     useEffect(() => {
-        loadTransactions();
-        loadStats();
-    }, [filters, pagination.current, pagination.pageSize, activeTab]);
+        const categoryId = searchParams.get("categoryId");
+        const startDate = searchParams.get("startDate");
+        const endDate = searchParams.get("endDate");
+        const type = searchParams.get("type");
+        
+        if (categoryId || startDate || endDate || type) {
+            const newFilters = {
+                startDate: startDate ? dayjs(startDate) : dayjs().startOf("month"),
+                endDate: endDate ? dayjs(endDate) : dayjs().endOf("month"),
+                type: type || "all",
+                walletId: "all",
+                categoryId: categoryId || "all",
+                isRecurring: false,
+            };
+            
+            setFilters(newFilters);
+            
+            // Set activeTab nếu có type
+            if (type && type !== "all") {
+                setActiveTab(type);
+            }
+        }
+        
+        // Đánh dấu đã đọc URL params
+        setUrlParamsLoaded(true);
+    }, [searchParams]);
+
+    useEffect(() => {
+        // Load transactions sau khi đã đọc URL params (nếu có) hoặc ngay khi component mount
+        // Nếu có URL params, đợi đến khi đã set filter từ URL
+        const hasUrlParams = searchParams.get("categoryId") || searchParams.get("startDate") || searchParams.get("endDate") || searchParams.get("type");
+        if (!hasUrlParams || urlParamsLoaded) {
+            loadTransactions();
+            loadStats();
+        }
+    }, [filters, pagination.current, pagination.pageSize, activeTab, urlParamsLoaded]);
 
     const loadWallets = async () => {
         try {
@@ -312,7 +348,7 @@ const TransactionsIndex = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#F9FAFB]">
+        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
             <div className="max-w-7xl mx-auto px-6 py-8">
                 {/* Header Section - Redesigned */}
                 <div className="flex items-center justify-between mb-8">

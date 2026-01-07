@@ -119,8 +119,8 @@ const CategoriesIndex = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#F9FAFB]">
-            <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
+            <div className="max-w-[95%] mx-auto px-2 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-10">
                 {/* Header Section */}
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="ds-heading-1" style={{ fontSize: "24px", fontWeight: 700 }}>

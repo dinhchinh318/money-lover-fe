@@ -674,19 +674,19 @@ const ReportsDashboard = () => {
 
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
+            <div className="max-w-7xl mx-auto p-4 sm:p-6">
                 {/* Header Section */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                            <DollarSign className="text-white" size={24} />
+                <div className="mb-6 sm:mb-8">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-4">
+                        <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                            <DollarSign className="text-white w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
-                        <div className="flex-1">
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text text-transparent">
+                        <div className="flex-1 min-w-0">
+                            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text text-transparent">
                                 Tổng quan Tài chính
                             </h1>
-                            <div className="flex items-center gap-3 mt-2">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mt-2">
                                 <Card className="p-0 border-2 border-gray-200 shadow-md rounded-xl overflow-hidden">
                                     <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-white to-gray-50">
                                         <Button
@@ -728,7 +728,7 @@ const ReportsDashboard = () => {
                 </div>
 
                 {/* Financial Overview Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                     {/* Total Income */}
                     <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50">
                         <div className="flex items-center justify-between mb-4">
@@ -765,7 +765,7 @@ const ReportsDashboard = () => {
                                 <TrendingDown size={24} className="text-white" />
                             </div>
                         </div>
-                        <div className="text-3xl font-bold text-[#EF4444] mb-3">
+                        <div className="text-2xl sm:text-3xl font-bold text-[#EF4444] mb-3 break-words">
                             {formatCurrency(overview.totalExpense)}
                         </div>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg border border-red-200">
@@ -791,7 +791,7 @@ const ReportsDashboard = () => {
                                 <Wallet size={24} className="text-white" />
                             </div>
                         </div>
-                        <div className="text-3xl font-bold text-[#3B82F6] mb-3">
+                        <div className="text-2xl sm:text-3xl font-bold text-[#3B82F6] mb-3 break-words">
                             {formatCurrency(overview.totalBalance)}
                         </div>
                         <div className="px-3 py-1.5 bg-white rounded-lg border border-blue-200">
@@ -809,7 +809,7 @@ const ReportsDashboard = () => {
                                 <Scale size={24} className="text-white" />
                             </div>
                         </div>
-                        <div className={`text-3xl font-bold mb-3 ${overview.difference >= 0 ? "text-[#10B981]" : "text-[#EF4444]"}`}>
+                        <div className={`text-2xl sm:text-3xl font-bold mb-3 break-words ${overview.difference >= 0 ? "text-[#10B981]" : "text-[#EF4444]"}`}>
                             {formatCurrency(overview.difference)}
                         </div>
                         <div className="px-3 py-1.5 bg-white rounded-lg border border-gray-200">

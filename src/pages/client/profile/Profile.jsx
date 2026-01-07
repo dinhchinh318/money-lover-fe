@@ -1,618 +1,581 @@
-import { useState, useEffect } from "react";
-import { useCurrentApp } from "../../../components/context/app.context";
-import { message, Upload } from "antd";
-import { Camera, Loader2 } from "lucide-react";
-import { updateUserAPI, fetchAccountAPI, changePasswordAPI } from "../../../services/api.user";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Card,
+  Form,
+  Input,
+  Button,
+  message,
+  Space,
+  Typography,
+  Divider,
+  Skeleton,
+  Row,
+  Col,
+  Avatar,
+  Tag,
+  Tooltip,
+  Progress,
+  Upload,
+  DatePicker,
+  Popconfirm,
+  Radio,
+  Result,
+} from "antd";
+import {
+  UserOutlined,
+  MailOutlined,
+  ReloadOutlined,
+  CheckCircleFilled,
+  CameraOutlined,
+  EditOutlined,
+  InfoCircleOutlined,
+  WomanOutlined,
+  ManOutlined,
+  LockOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import { getMyProfileAPI, updateMyProfileAPI } from "../../services/api.profile";
+import { useCurrentApp } from "../../components/context/app.context";
+
+const { Title, Text } = Typography;
+
+const COLORS = {
+  primary: "#10b981",
+  cyan: "#22d3ee",
+  ink: "#0f172a",
+  muted: "#64748b",
+  bgGradient: "linear-gradient(135deg, #ecfeff 0%, #f0fdf4 35%, #ffffff 100%)",
+  cardShadow:
+    "0 12px 30px -10px rgba(16, 185, 129, 0.18), 0 10px 18px -14px rgba(0,0,0,0.08)",
+  softBorder: "1px solid rgba(16,185,129,0.14)",
+};
+
+const labelMap = {
+  displayName: "Tên hiển thị",
+  email: "Địa chỉ Email",
+  phone: "Số điện thoại",
+  address: "Địa chỉ cư trú",
+  dateOfBirth: "Ngày sinh",
+  bio: "Giới thiệu bản thân",
+  gender: "Giới tính",
+};
+
+const SYSTEM_FIELDS = [
+  "_id",
+  "userId",
+  "createdAt",
+  "updatedAt",
+  "deletedAt",
+  "__v",
+  // bỏ các field không muốn hiện/sửa
+  "occupation",
+  "hasCompletedOnboarding",
+  "favoriteCategories",
+  "deleted",
+  "url",
+];
+
+const genderMap = {
+  toUI: (val) => (val === "male" ? "Nam" : val === "female" ? "Nữ" : null),
+  toBE: (val) => (val === "Nam" ? "male" : "female"),
+};
 
 const ProfilePage = () => {
-  const { user, setUser, theme, setTheme } = useCurrentApp();
+  const [form] = Form.useForm();
+  const { setProfile } = useCurrentApp();
 
-  // Basic Info State
-  const [basicInfo, setBasicInfo] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    description: "",
-    avatar: "",
-  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const [avatarUrl, setAvatarUrl] = useState("");
-  const [basicInfoLoading, setBasicInfoLoading] = useState(false);
-  const [avatarUploading, setAvatarUploading] = useState(false);
-  const [hasBasicChanges, setHasBasicChanges] = useState(false);
+  const [rawProfile, setRawProfile] = useState(null);
 
-  // Security State
-  const [security, setSecurity] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const [passwordErrors, setPasswordErrors] = useState({});
+  // edit mode
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
-  // Preferences State
-  const [preferences, setPreferences] = useState({
-    language: "vi",
-    theme: "light",
-    notifyEmail: true,
-    notifyPush: true,
-  });
-  const [preferencesLoading, setPreferencesLoading] = useState(false);
+  // lưu snapshot để cancel không cần refetch
+  const [initialFormValues, setInitialFormValues] = useState(null);
 
-  // Load user data on mount
-  useEffect(() => {
-    if (user) {
-      setBasicInfo({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        address: user.address || "",
-        description: user.description || "",
-        avatar: user.avatar || "",
-      });
-      setAvatarUrl(user.avatar || "");
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState(null); // base64 preview (tùy chọn)
 
-      // Load preferences from localStorage or user data
-      const savedLanguage = localStorage.getItem("language") || "vi";
-      const savedTheme = localStorage.getItem("theme") || theme || "light";
-      const savedNotifyEmail = localStorage.getItem("notifyEmail") !== "false";
-      const savedNotifyPush = localStorage.getItem("notifyPush") !== "false";
+  const editableKeys = useMemo(() => {
+    if (!rawProfile) return [];
+    return Object.keys(rawProfile).filter((k) => !SYSTEM_FIELDS.includes(k));
+  }, [rawProfile]);
 
-      setPreferences({
-        language: savedLanguage,
-        theme: savedTheme,
-        notifyEmail: savedNotifyEmail,
-        notifyPush: savedNotifyPush,
-      });
-    }
-  }, [user, theme]);
+  const profileCompletion = useMemo(() => {
+    if (!rawProfile) return 0;
+    const important = ["displayName", "email", "phone", "address", "dateOfBirth", "gender"];
+    const values = form.getFieldsValue();
+    const filled = important.filter((f) => !!values?.[f]).length;
+    return Math.round((filled / important.length) * 100);
+  }, [rawProfile, isDirty, form]);
 
-  // Track basic info changes
-  useEffect(() => {
-    if (user) {
-      const hasChanges =
-        basicInfo.name !== (user.name || "") ||
-        basicInfo.phone !== (user.phone || "") ||
-        basicInfo.address !== (user.address || "") ||
-        basicInfo.description !== (user.description || "") ||
-        avatarUrl !== (user.avatar || "");
-      setHasBasicChanges(hasChanges);
-    }
-  }, [basicInfo, avatarUrl, user]);
+  const buildFormattedProfile = (profile) => {
+    const formatted = { ...profile };
 
-  // Handle Avatar Upload
-  const handleAvatarChange = (info) => {
-    if (info.file.status === "uploading") {
-      setAvatarUploading(true);
-      return;
-    }
-    if (info.file.status === "done" || info.file.status === "success") {
-      setAvatarUploading(false);
-    }
-    if (info.file.status === "error") {
-      setAvatarUploading(false);
-      message.error("Lỗi khi upload ảnh!");
+    // map gender
+    if (profile.gender) formatted.gender = genderMap.toUI(profile.gender);
+
+    // map dateOfBirth -> dayjs cho DatePicker
+    if (profile.dateOfBirth) formatted.dateOfBirth = dayjs(profile.dateOfBirth);
+
+    return formatted;
+  };
+
+  const fetchProfile = async () => {
+    setLoading(true);
+    try {
+      const res = await getMyProfileAPI();
+      const profile = res?.data?.data ?? res?.data ?? null;
+
+      if (profile) {
+        const formatted = buildFormattedProfile(profile);
+
+        setRawProfile(profile);
+        form.setFieldsValue(formatted);
+        setInitialFormValues(formatted);
+
+        setProfile?.(profile);
+
+        setIsEditing(false);
+        setIsDirty(false);
+        setAvatarPreview(null);
+      }
+    } catch (e) {
+      message.error("Không thể tải hồ sơ");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Compress image before converting to base64
-  const compressImage = (file, maxWidth = 800, quality = 0.8) => {
-    return new Promise((resolve) => {
+  useEffect(() => {
+    fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const enterEditMode = () => {
+    setIsEditing(true);
+    setIsDirty(false);
+  };
+
+  const cancelEdit = () => {
+    if (initialFormValues) form.setFieldsValue(initialFormValues);
+    setIsEditing(false);
+    setIsDirty(false);
+    setAvatarPreview(null);
+    message.info("Đã hủy chỉnh sửa");
+  };
+
+  // ✅ FIX: không bao giờ trả về "" cho src
+  const avatarSrc = useMemo(() => {
+    // ưu tiên preview (khi vừa chọn ảnh)
+    if (avatarPreview) return avatarPreview;
+    const url = rawProfile?.avatarUrl; // ✅ đúng schema
+    return url && url.trim() ? url : null; // ✅ null thay vì ""
+  }, [avatarPreview, rawProfile]);
+
+  // helper: file -> base64 để preview
+  const fileToBase64 = (file) =>
+    new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-
-          // Calculate new dimensions
-          if (width > maxWidth) {
-            height = (height * maxWidth) / width;
-            width = maxWidth;
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          // Convert to base64 with compression
-          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-          resolve(compressedBase64);
-        };
-        img.src = e.target.result;
-      };
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
-  };
 
-  const beforeUpload = (file) => {
-    const isJpgOrPng =
-      file.type === "image/jpeg" ||
-      file.type === "image/png" ||
-      file.type === "image/jpg" ||
-      file.type === "image/webp";
-
-    if (!isJpgOrPng) {
-      message.error("Chỉ chấp nhận file JPG/PNG/WEBP!");
-      return false;
-    }
+  const handleUploadAvatar = async ({ file, onSuccess, onError }) => {
+    // nếu bạn muốn chỉ cho upload khi edit:
+    // if (!isEditing) return;
 
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error("Ảnh phải nhỏ hơn 2MB!");
-      return false;
-    }
-
-    return true;
-  };
-
-  // Handle Save Basic Info
-  const handleSaveBasic = async () => {
-    // Validation
-    if (!basicInfo.name || basicInfo.name.trim() === "") {
-      message.warning("Vui lòng nhập họ và tên!");
+      message.error("Ảnh phải nhỏ hơn 2MB");
+      onError?.(new Error("File too large"));
       return;
     }
 
+    setAvatarLoading(true);
     try {
-      setBasicInfoLoading(true);
-      const updateData = {
-        name: basicInfo.name.trim(),
-        phone: basicInfo.phone || "",
-        address: basicInfo.address || "",
-        description: basicInfo.description || "",
-        avatar: avatarUrl || "",
-      };
+      // preview ngay
+      const preview = await fileToBase64(file);
+      setAvatarPreview(preview);
 
-      const res = await updateUserAPI(updateData);
-      if (res.EC === 0) {
-        message.success("Đã lưu thông tin cơ bản thành công!");
-        // Reload user data
-        const accountRes = await fetchAccountAPI();
-        if (accountRes.EC === 0 && accountRes.data?.user) {
-          const updatedUser = accountRes.data.user;
-          setUser(updatedUser);
-          // Trigger storage event to sync across tabs
-          localStorage.setItem('userUpdated', Date.now().toString());
-          // Force update context to ensure avatar is updated everywhere
-          setTimeout(() => {
-            // Trigger a re-render by updating user state again
-            setUser({ ...updatedUser });
-          }, 100);
+      // gửi lên BE
+      const formData = new FormData();
+      // ⚠️ field name phải đúng backend (bạn đang dùng avatar trong code trước)
+      // Nếu BE của bạn dùng "avatar" -> giữ "avatar"
+      // Nếu BE dùng "avatarUrl" (string) thì KHÔNG gửi file như này
+      formData.append("avatar", file);
+
+      await updateMyProfileAPI(formData);
+
+      message.success("Cập nhật ảnh đại diện thành công");
+      onSuccess?.("ok");
+
+      await fetchProfile();
+    } catch (e) {
+      message.error("Không thể tải ảnh lên");
+      onError?.(e);
+    } finally {
+      setAvatarLoading(false);
+    }
+  };
+
+  const onSave = async () => {
+    try {
+      const values = await form.validateFields();
+      setSaving(true);
+
+      const payload = {};
+      editableKeys.forEach((key) => {
+        let val = values[key];
+
+        if (val === undefined) return;
+
+        if (key === "dateOfBirth") {
+          payload.dateOfBirth = val ? val.format("YYYY-MM-DD") : null;
+          return;
         }
-        setHasBasicChanges(false);
-      } else {
-        message.error(res.message || "Lưu thông tin thất bại!");
-      }
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      message.error("Có lỗi xảy ra khi lưu thông tin!");
-    } finally {
-      setBasicInfoLoading(false);
-    }
-  };
 
-  // Handle Cancel Basic Info
-  const handleCancelBasic = () => {
-    if (user) {
-      setBasicInfo({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        address: user.address || "",
-        description: user.description || "",
-        avatar: user.avatar || "",
+        if (key === "gender") {
+          payload.gender = val ? genderMap.toBE(val) : "unknown";
+          return;
+        }
+
+        payload[key] = val;
       });
-      setAvatarUrl(user.avatar || "");
-      setHasBasicChanges(false);
-    }
-  };
 
-  // Handle Change Password
-  const validatePassword = () => {
-    const errors = {};
+      // ✅ đảm bảo đúng field schema (displayName, bio, phone, address, gender, dateOfBirth)
+      await updateMyProfileAPI(payload);
 
-    if (!security.currentPassword) {
-      errors.currentPassword = "Vui lòng nhập mật khẩu hiện tại";
-    }
+      message.success("Hồ sơ đã được cập nhật");
+      setIsDirty(false);
+      setIsEditing(false);
+      setAvatarPreview(null);
 
-    if (!security.newPassword) {
-      errors.newPassword = "Vui lòng nhập mật khẩu mới";
-    } else if (security.newPassword.length < 6) {
-      errors.newPassword = "Mật khẩu mới phải có ít nhất 6 ký tự";
-    }
-
-    if (!security.confirmPassword) {
-      errors.confirmPassword = "Vui lòng xác nhận mật khẩu mới";
-    } else if (security.newPassword !== security.confirmPassword) {
-      errors.confirmPassword = "Mật khẩu xác nhận không khớp";
-    }
-
-    if (security.currentPassword === security.newPassword) {
-      errors.newPassword = "Mật khẩu mới phải khác mật khẩu hiện tại";
-    }
-
-    setPasswordErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleChangePassword = async () => {
-    if (!validatePassword()) {
-      return;
-    }
-
-    try {
-      setPasswordLoading(true);
-      const res = await changePasswordAPI(security.currentPassword, security.newPassword);
-
-      if (res.EC === 0) {
-        message.success("Đổi mật khẩu thành công!");
-        setSecurity({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-        setPasswordErrors({});
-      } else {
-        message.error(res.message || "Đổi mật khẩu thất bại!");
-      }
-    } catch (error) {
-      console.error("Error changing password:", error);
-      message.error("Có lỗi xảy ra khi đổi mật khẩu!");
+      await fetchProfile();
+    } catch (err) {
+      if (err?.errorFields) return;
+      message.error("Cập nhật thất bại");
     } finally {
-      setPasswordLoading(false);
+      setSaving(false);
     }
   };
 
-  // Handle Save Preferences
-  const handleSavePreferences = async () => {
-    try {
-      setPreferencesLoading(true);
+  const renderField = (key) => {
+    const label = labelMap[key] || key;
+    const isEmail = key === "email";
+    const isBio = key === "bio";
+    const isDate = key === "dateOfBirth";
+    const disabled = !isEditing || isEmail;
 
-      // Update theme in context FIRST (this will trigger useEffect to apply theme)
-      if (setTheme && preferences.theme !== theme) {
-        setTheme(preferences.theme);
-      }
-
-      // Save to localStorage
-      localStorage.setItem("language", preferences.language);
-      localStorage.setItem("theme", preferences.theme);
-      localStorage.setItem("notifyEmail", preferences.notifyEmail.toString());
-      localStorage.setItem("notifyPush", preferences.notifyPush.toString());
-
-      // Optionally save to backend
-      const updateData = {
-        language: preferences.language,
-        theme: preferences.theme,
-        notifyEmail: preferences.notifyEmail,
-        notifyPush: preferences.notifyPush,
-      };
-
-      const res = await updateUserAPI(updateData);
-      if (res.EC === 0) {
-        message.success("Đã lưu tùy chỉnh thành công!");
-      } else {
-        // Still show success if localStorage saved
-        message.success("Đã lưu tùy chỉnh thành công!");
-      }
-    } catch (error) {
-      console.error("Error saving preferences:", error);
-      message.error("Có lỗi xảy ra khi lưu tùy chỉnh!");
-    } finally {
-      setPreferencesLoading(false);
+    if (key === "gender") {
+      return (
+        <Form.Item name={key} label={label} key={key}>
+          <Radio.Group
+            disabled={!isEditing}
+            optionType="button"
+            buttonStyle="solid"
+            style={{ width: "100%" }}
+          >
+            <Radio.Button value="Nam" style={{ width: "50%", textAlign: "center" }}>
+              <ManOutlined /> Nam
+            </Radio.Button>
+            <Radio.Button value="Nữ" style={{ width: "50%", textAlign: "center" }}>
+              <WomanOutlined /> Nữ
+            </Radio.Button>
+          </Radio.Group>
+        </Form.Item>
+      );
     }
+
+    if (isDate) {
+      return (
+        <Form.Item name={key} label={label} key={key}>
+          <DatePicker
+            disabled={!isEditing}
+            format="DD/MM/YYYY"
+            style={{ width: "100%" }}
+            placeholder="Chọn ngày sinh"
+            className="fintech-input"
+          />
+        </Form.Item>
+      );
+    }
+
+    if (isBio) {
+      return (
+        <Form.Item name={key} label={label} key={key}>
+          <Input.TextArea
+            disabled={!isEditing}
+            rows={3}
+            placeholder="Ví dụ: Tôi ưu tiên tiết kiệm 20% thu nhập hàng tháng..."
+            className="fintech-input"
+          />
+        </Form.Item>
+      );
+    }
+
+    return (
+      <Form.Item
+        name={key}
+        label={label}
+        key={key}
+        rules={
+          key === "phone"
+            ? [
+                {
+                  pattern: /^(0[3|5|7|8|9])([0-9]{8})$/,
+                  message: "Số điện thoại không hợp lệ",
+                },
+              ]
+            : []
+        }
+      >
+        <Input
+          disabled={disabled}
+          prefix={isEmail ? <MailOutlined /> : <EditOutlined />}
+          suffix={
+            isEmail ? (
+              <Tooltip title="Email định danh không thể thay đổi">
+                <LockOutlined style={{ color: "#94a3b8" }} />
+              </Tooltip>
+            ) : null
+          }
+          placeholder={`Nhập ${label.toLowerCase()}...`}
+          className="fintech-input"
+        />
+      </Form.Item>
+    );
   };
+
+  if (!loading && !rawProfile) {
+    return (
+      <Result
+        status="404"
+        title="Không tìm thấy hồ sơ"
+        subTitle="Có lỗi khi tải dữ liệu người dùng."
+        extra={
+          <Button type="primary" icon={<ReloadOutlined />} onClick={fetchProfile}>
+            Thử lại
+          </Button>
+        }
+      />
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#F3F5F8] dark:bg-gray-900">
-      <div className="max-w-6xl mx-auto px-4 lg:px-0 py-8">
-        <h1 className="text-2xl font-bold text-[#111827] dark:text-white mb-6">Thông tin tài khoản</h1>
+    <div style={{ background: COLORS.bgGradient, minHeight: "100vh", padding: "44px 20px" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+        {loading ? (
+          <Skeleton active avatar paragraph={{ rows: 12 }} />
+        ) : (
+          <Row gutter={[32, 32]}>
+            <Col xs={24} lg={8}>
+              <Card
+                variant="outlined"
+                style={{
+                  borderRadius: 26,
+                  textAlign: "center",
+                  boxShadow: COLORS.cardShadow,
+                  border: COLORS.softBorder,
+                }}
+              >
+                <div style={{ position: "relative", display: "inline-block", marginBottom: 14 }}>
+                  <Avatar
+                    size={132}
+                    src={avatarSrc} // ✅ null nếu không có
+                    icon={<UserOutlined />}
+                    style={{ border: "4px solid #fff", boxShadow: "0 12px 26px rgba(0,0,0,0.10)" }}
+                  />
+                  <Upload showUploadList={false} customRequest={handleUploadAvatar} accept="image/*">
+                    <Button
+                      shape="circle"
+                      icon={<CameraOutlined />}
+                      loading={avatarLoading}
+                      style={{
+                        position: "absolute",
+                        right: 6,
+                        bottom: 6,
+                        background: `linear-gradient(90deg, ${COLORS.primary}, ${COLORS.cyan})`,
+                        border: "none",
+                        color: "#fff",
+                      }}
+                    />
+                  </Upload>
+                </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Basic Info Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-[#E5E7EB] dark:border-gray-700 shadow-sm">
-            <div className="px-6 py-4 border-b border-[#E5E7EB] dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-[#111827] dark:text-white">Thông tin Cơ bản</h2>
-            </div>
-            <div className="p-6 space-y-4">
-              {/* Avatar Upload */}
-              <div className="flex items-center gap-4">
-                <Upload
-                  name="avatar"
-                  listType="picture-circle"
-                  showUploadList={false}
-                  beforeUpload={beforeUpload}
-                  onChange={handleAvatarChange}
-                  customRequest={async ({ file, onSuccess }) => {
-                    try {
-                      setAvatarUploading(true);
-                      // Compress image before converting to base64
-                      const compressedBase64 = await compressImage(file, 800, 0.8);
-                      setAvatarUrl(compressedBase64);
-                      setBasicInfo({ ...basicInfo, avatar: compressedBase64 });
-                      if (onSuccess) {
-                        onSuccess(compressedBase64);
-                      }
-                      setAvatarUploading(false);
-                    } catch (error) {
-                      console.error("Error compressing image:", error);
-                      // Fallback to original if compression fails
-                      const reader = new FileReader();
-                      reader.onload = (e) => {
-                        const base64 = e.target?.result;
-                        setAvatarUrl(base64);
-                        setBasicInfo({ ...basicInfo, avatar: base64 });
-                        if (onSuccess) {
-                          onSuccess(base64);
-                        }
-                        setAvatarUploading(false);
-                      };
-                      reader.readAsDataURL(file);
-                    }
+                <Title level={3} style={{ marginBottom: 2, fontWeight: 900, color: COLORS.ink }}>
+                  {rawProfile?.displayName || "Người dùng"}
+                  <CheckCircleFilled style={{ color: COLORS.primary, marginLeft: 8, fontSize: 18 }} />
+                </Title>
+
+                <Text type="secondary">
+                  <MailOutlined /> {rawProfile?.email || "—"}
+                </Text>
+
+                <div style={{ marginTop: 16 }}>
+                  <Tag color="success" style={{ borderRadius: 999, padding: "4px 12px", fontWeight: 700 }}>
+                    Hồ sơ tin cậy
+                  </Tag>
+                </div>
+
+                <div style={{ marginTop: 18, textAlign: "left" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                    <Text strong style={{ color: "#0f766e" }}>
+                      Mức độ hoàn thiện
+                    </Text>
+                    <Text strong style={{ color: COLORS.primary }}>
+                      {profileCompletion}%
+                    </Text>
+                  </div>
+                  <Progress
+                    percent={profileCompletion}
+                    showInfo={false}
+                    strokeColor={`linear-gradient(90deg, ${COLORS.primary} 0%, ${COLORS.cyan} 100%)`}
+                    trailColor="#e2e8f0"
+                  />
+                  <Text style={{ fontSize: 12, color: COLORS.muted, marginTop: 8, display: "block" }}>
+                    Hoàn thiện hồ sơ để trải nghiệm cá nhân hóa tốt hơn.
+                  </Text>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={24} lg={16}>
+              {/* ✅ FIX: Form luôn có form={form} => hết warning useForm */}
+              <Form
+                form={form}
+                layout="vertical"
+                requiredMark={false}
+                onValuesChange={() => {
+                  if (!isEditing) return;
+                  setIsDirty(true);
+                }}
+              >
+                <Card
+                  variant="outlined"
+                  style={{
+                    borderRadius: 26,
+                    boxShadow: COLORS.cardShadow,
+                    border: COLORS.softBorder,
+                    padding: "8px",
                   }}
-                >
-                  {avatarUploading ? (
-                    <div className="w-16 h-16 rounded-full bg-[#E5F7ED] flex items-center justify-center">
-                      <Loader2 className="w-6 h-6 text-[#0EA25E] animate-spin" />
-                    </div>
-                  ) : avatarUrl ? (
-                    <div className="relative group">
-                      <img
-                        src={avatarUrl}
-                        alt="avatar"
-                        className="w-16 h-16 rounded-full object-cover"
+                  title={
+                    <Space>
+                      <div
+                        style={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: 999,
+                          background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.cyan} 100%)`,
+                        }}
                       />
-                      <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                        <Camera size={20} className="text-white" />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-[#E5F7ED] flex items-center justify-center text-[#0EA25E] font-bold text-xl cursor-pointer hover:bg-[#D1F2E5] transition-colors">
-                      {basicInfo.name?.[0]?.toUpperCase() || "U"}
-                    </div>
-                  )}
-                </Upload>
-                <div className="flex flex-col">
-                  <span className="text-sm text-[#6B7280] mb-1">Đổi ảnh đại diện</span>
-                  <span className="text-xs text-[#9CA3AF]">JPG, PNG hoặc WEBP (tối đa 2MB)</span>
-                </div>
-              </div>
+                      <span style={{ fontWeight: 900, fontSize: 18, color: COLORS.ink }}>
+                        Thông tin cá nhân
+                      </span>
+                    </Space>
+                  }
+                  extra={
+                    <Space>
+                      {isEditing ? (
+                        <Tag color="gold" icon={<InfoCircleOutlined />}>
+                          Đang chỉnh sửa
+                        </Tag>
+                      ) : (
+                        <Tag color="green">Chế độ xem</Tag>
+                      )}
 
-              {/* Form Fields */}
-              <div className="space-y-2">
-                <label className="text-sm text-[#6B7280]">Họ và tên <span className="text-red-500">*</span></label>
-                <input
-                  value={basicInfo.name}
-                  onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
-                  className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-                  placeholder="Nhập họ và tên"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm text-[#6B7280]">Email</label>
-                <input
-                  value={basicInfo.email}
-                  readOnly
-                  className="w-full rounded-lg border border-[#E5E7EB] bg-gray-50 px-3 py-2 text-sm text-gray-500 cursor-not-allowed"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm text-[#6B7280]">Số điện thoại</label>
-                <input
-                  value={basicInfo.phone}
-                  onChange={(e) => setBasicInfo({ ...basicInfo, phone: e.target.value })}
-                  className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-                  placeholder="Nhập số điện thoại"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm text-[#6B7280]">Địa chỉ</label>
-                <input
-                  value={basicInfo.address}
-                  onChange={(e) => setBasicInfo({ ...basicInfo, address: e.target.value })}
-                  className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-                  placeholder="Nhập địa chỉ"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm text-[#6B7280]">Mô tả</label>
-                <textarea
-                  value={basicInfo.description}
-                  onChange={(e) => setBasicInfo({ ...basicInfo, description: e.target.value })}
-                  className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-                  rows={3}
-                  placeholder="Nhập mô tả về bản thân..."
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={handleSaveBasic}
-                  disabled={basicInfoLoading || !hasBasicChanges}
-                  className="px-4 py-2 rounded-lg bg-[#2563EB] text-white text-sm font-semibold hover:bg-[#1D4ED8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      <Button icon={<EditOutlined />} onClick={enterEditMode} disabled={isEditing}>
+                        Chỉnh sửa
+                      </Button>
+                    </Space>
+                  }
                 >
-                  {basicInfoLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {basicInfoLoading ? "Đang lưu..." : "Lưu thay đổi"}
-                </button>
-                <button
-                  onClick={handleCancelBasic}
-                  disabled={basicInfoLoading || !hasBasicChanges}
-                  className="px-4 py-2 rounded-lg border border-[#E5E7EB] text-sm text-[#374151] hover:border-[#2563EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Hủy
-                </button>
-              </div>
-            </div>
-          </div>
+                  <Row gutter={20}>
+                    {["displayName", "gender", "dateOfBirth"].map((key) => (
+                      <Col xs={24} md={key === "displayName" ? 24 : 12} key={key}>
+                        {renderField(key)}
+                      </Col>
+                    ))}
+                  </Row>
 
-          {/* Security & Preferences */}
-          <div className="space-y-6">
-            {/* Security Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-[#E5E7EB] dark:border-gray-700 shadow-sm">
-              <div className="px-6 py-4 border-b border-[#E5E7EB] dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-[#111827] dark:text-white">Bảo mật</h2>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm text-[#6B7280]">Mật khẩu hiện tại</label>
-                  <input
-                    type="password"
-                    value={security.currentPassword}
-                    onChange={(e) => {
-                      setSecurity({ ...security, currentPassword: e.target.value });
-                      if (passwordErrors.currentPassword) {
-                        setPasswordErrors({ ...passwordErrors, currentPassword: "" });
-                      }
+                  <Divider style={{ margin: "24px 0" }} />
+
+                  <Row gutter={20}>
+                    {["email", "phone", "address"].map((key) => (
+                      <Col xs={24} md={12} key={key}>
+                        {renderField(key)}
+                      </Col>
+                    ))}
+                  </Row>
+
+                  <Divider style={{ margin: "24px 0" }} />
+                  {renderField("bio")}
+
+                  <div
+                    style={{
+                      marginTop: 28,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      borderTop: "1px solid rgba(2,132,199,0.10)",
+                      paddingTop: 18,
+                      gap: 12,
+                      flexWrap: "wrap",
                     }}
-                    className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${passwordErrors.currentPassword
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-[#E5E7EB] focus:ring-[#2563EB]"
-                      }`}
-                    placeholder="Nhập mật khẩu hiện tại"
-                  />
-                  {passwordErrors.currentPassword && (
-                    <p className="text-xs text-red-500">{passwordErrors.currentPassword}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm text-[#6B7280]">Mật khẩu mới</label>
-                  <input
-                    type="password"
-                    value={security.newPassword}
-                    onChange={(e) => {
-                      setSecurity({ ...security, newPassword: e.target.value });
-                      if (passwordErrors.newPassword) {
-                        setPasswordErrors({ ...passwordErrors, newPassword: "" });
-                      }
-                    }}
-                    className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${passwordErrors.newPassword
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-[#E5E7EB] focus:ring-[#2563EB]"
-                      }`}
-                    placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
-                  />
-                  {passwordErrors.newPassword && (
-                    <p className="text-xs text-red-500">{passwordErrors.newPassword}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm text-[#6B7280]">Xác nhận mật khẩu mới</label>
-                  <input
-                    type="password"
-                    value={security.confirmPassword}
-                    onChange={(e) => {
-                      setSecurity({ ...security, confirmPassword: e.target.value });
-                      if (passwordErrors.confirmPassword) {
-                        setPasswordErrors({ ...passwordErrors, confirmPassword: "" });
-                      }
-                    }}
-                    className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${passwordErrors.confirmPassword
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-[#E5E7EB] focus:ring-[#2563EB]"
-                      }`}
-                    placeholder="Nhập lại mật khẩu mới"
-                  />
-                  {passwordErrors.confirmPassword && (
-                    <p className="text-xs text-red-500">{passwordErrors.confirmPassword}</p>
-                  )}
-                </div>
-
-                <button
-                  onClick={handleChangePassword}
-                  disabled={passwordLoading || !security.currentPassword || !security.newPassword || !security.confirmPassword}
-                  className="w-full px-4 py-2 rounded-lg bg-[#2563EB] text-white text-sm font-semibold hover:bg-[#1D4ED8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {passwordLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {passwordLoading ? "Đang xử lý..." : "Đổi mật khẩu"}
-                </button>
-              </div>
-            </div>
-
-            {/* Preferences Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-[#E5E7EB] dark:border-gray-700 shadow-sm">
-              <div className="px-6 py-4 border-b border-[#E5E7EB] dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-[#111827] dark:text-white">Tùy chỉnh</h2>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm text-[#6B7280]">Ngôn ngữ</label>
-                    <select
-                      value={preferences.language}
-                      onChange={(e) => setPreferences({ ...preferences, language: e.target.value })}
-                      className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                  >
+                    <Popconfirm
+                      title="Hủy chỉnh sửa?"
+                      description="Mọi thay đổi sẽ bị bỏ và quay lại dữ liệu trước đó."
+                      onConfirm={cancelEdit}
+                      okText="Hủy chỉnh sửa"
+                      cancelText="Tiếp tục sửa"
+                      disabled={!isEditing || saving}
                     >
-                      <option value="vi">Tiếng Việt</option>
-                      <option value="en">English</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm text-[#6B7280]">Giao diện</label>
-                    <select
-                      value={preferences.theme}
-                      onChange={(e) => setPreferences({ ...preferences, theme: e.target.value })}
-                      className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-                    >
-                      <option value="light">Light</option>
-                      <option value="dark">Dark</option>
-                      <option value="auto">Auto</option>
-                    </select>
-                  </div>
-                </div>
+                      <Button danger type="text" icon={<ReloadOutlined />} disabled={!isEditing || saving}>
+                        Hủy
+                      </Button>
+                    </Popconfirm>
 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-[#374151]">Thông báo Email</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={preferences.notifyEmail}
-                        onChange={(e) => setPreferences({ ...preferences, notifyEmail: e.target.checked })}
-                      />
-                      <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-[#2563EB] transition-colors"></div>
-                      <div className="absolute left-1 top-1 w-3.5 h-3.5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
-                    </label>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-[#374151]">Thông báo Push</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={preferences.notifyPush}
-                        onChange={(e) => setPreferences({ ...preferences, notifyPush: e.target.checked })}
-                      />
-                      <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-[#2563EB] transition-colors"></div>
-                      <div className="absolute left-1 top-1 w-3.5 h-3.5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
-                    </label>
-                  </div>
-                </div>
+                    <Space>
+                      <Button onClick={fetchProfile} icon={<ReloadOutlined />} disabled={saving}>
+                        Tải lại
+                      </Button>
 
-                <button
-                  onClick={handleSavePreferences}
-                  disabled={preferencesLoading}
-                  className="w-full px-4 py-2 rounded-lg bg-[#2563EB] text-white text-sm font-semibold hover:bg-[#1D4ED8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {preferencesLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {preferencesLoading ? "Đang lưu..." : "Lưu tùy chỉnh"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+                      <Button
+                        type="primary"
+                        size="large"
+                        onClick={onSave}
+                        loading={saving}
+                        disabled={!isEditing || !isDirty}
+                        style={{
+                          borderRadius: 14,
+                          fontWeight: 900,
+                          border: "none",
+                          background: `linear-gradient(90deg, ${COLORS.primary} 0%, ${COLORS.cyan} 100%)`,
+                          boxShadow: "0 10px 20px rgba(16, 185, 129, 0.22)",
+                        }}
+                      >
+                        Cập nhật hồ sơ
+                      </Button>
+                    </Space>
+                  </div>
+                </Card>
+              </Form>
+            </Col>
+          </Row>
+        )}
       </div>
+
+      <style jsx="true">{`
+        .fintech-input {
+          border-radius: 12px !important;
+          padding: 8px 12px;
+        }
+      `}</style>
     </div>
   );
 };

@@ -211,7 +211,7 @@ const WalletsIndex = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#F9FAFB]">
+        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
             <div className="max-w-7xl mx-auto px-6 py-8">
                 {/* Header Section - Redesigned */}
                 <div className="flex items-center justify-between mb-8">
