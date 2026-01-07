@@ -49,7 +49,33 @@ const CategoriesIndex = () => {
 
     const getIconEmoji = (iconValue) => {
         const iconMap = {
+            // fallback
             default: "📁",
+
+            // ===== NEW SEED KEYS (lucide-like keys) =====
+            "utensils": "🍔",
+            "coffee": "☕",
+            "car": "🛵",
+            "shopping-bag": "🛍️",
+            "home": "🏠",
+            "zap": "💡",
+            "smartphone": "📱",
+            "gamepad-2": "🎮",
+            "plane": "✈️",
+            "stethoscope": "🏥",
+            "graduation-cap": "📚",
+            "gift": "🎁",
+            "more-horizontal": "📦",
+
+            "briefcase": "💼",
+            "party-popper": "🎉",
+            "laptop": "🧑‍💻",
+            "store": "🏪",
+            "trending-up": "📈",
+            "credit-card": "💳",
+            "plus": "📥",
+
+            // ===== OLD KEYS (backward compatible) =====
             food: "🍔",
             shopping: "🛒",
             transport: "🚗",
@@ -59,11 +85,13 @@ const CategoriesIndex = () => {
             education: "📚",
             salary: "💰",
             investment: "📈",
-            gift: "🎁",
             other: "📦",
         };
-        return iconMap[iconValue] || "📁";
+
+        if (!iconValue) return iconMap.default;
+        return iconMap[iconValue] || iconMap.default;
     };
+
 
     const handleAddCategory = () => {
         setEditingCategory(null);
