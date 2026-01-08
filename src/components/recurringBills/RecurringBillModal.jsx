@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal, Form, Input, Select, InputNumber, DatePicker, Radio, Switch, message } from "antd";
-import { createRecurringBillAPI, updateRecurringBillAPI } from "../../services/api.recurringBill";
+import { createRecurringBillAPI, updateRecurringBillAPI, payRecurringBillAPI } from "../../services/api.recurringBill";
 import { getWalletsAPI } from "../../services/api.wallet";
 import { getCategoriesAPI } from "../../services/api.category";
 import dayjs from "dayjs";
@@ -84,7 +84,45 @@ const RecurringBillModal = ({ open, onClose, bill, onSuccess }) => {
             console.error("Error loading categories:", error);
         }
     };
+    const handlePayNow = async () => {
+        if (!bill?._id) return;
 
+        Modal.confirm({
+            title: "Xác nhận thanh toán",
+            content: (
+                <>
+                    <p><b>{bill.name}</b></p>
+                    <p>
+                        Số tiền:{" "}
+                        {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                        }).format(bill.amount)}
+                    </p>
+                </>
+            ),
+            okText: "Thanh toán",
+            cancelText: "Hủy",
+            onOk: async () => {
+                try {
+                    setLoading(true);
+                    const res = await payRecurringBillAPI(bill._id);
+
+                    if (res?.data?.status) {
+                        message.success("Thanh toán thành công!");
+                        onSuccess?.();   // reload data bên ngoài
+                        onClose();       // đóng modal
+                    } else {
+                        message.error(res?.data?.message || "Thanh toán thất bại!");
+                    }
+                } catch (err) {
+                    message.error("Có lỗi xảy ra!");
+                } finally {
+                    setLoading(false);
+                }
+            },
+        });
+    };
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields();
@@ -93,12 +131,13 @@ const RecurringBillModal = ({ open, onClose, bill, onSuccess }) => {
             const billData = {
                 name: values.name.trim(),
                 type: values.type,
-                wallet: values.wallet,
+                walletId: values.wallet,
+                categoryId: values.category,
                 amount: values.amount,
                 frequency: values.frequency,
                 next_run: values.next_run.toISOString(),
-                active: values.active !== undefined ? values.active : true,
-                auto_create_transaction: values.auto_create_transaction !== undefined ? values.auto_create_transaction : true,
+                active: values.active,
+                auto_create_transaction: values.auto_create_transaction,
                 description: values.description || "",
             };
 
@@ -159,8 +198,33 @@ const RecurringBillModal = ({ open, onClose, bill, onSuccess }) => {
             onOk={handleSubmit}
             confirmLoading={loading}
             width={700}
-            okText="Lưu"
-            cancelText="Hủy"
+            footer={[
+                bill && (
+                    <button
+                        key="pay"
+                        className="ant-btn ant-btn-primary ant-btn-dangerous"
+                        onClick={handlePayNow}
+                        disabled={loading}
+                    >
+                        Thanh toán ngay
+                    </button>
+                ),
+                <button
+                    key="cancel"
+                    className="ant-btn"
+                    onClick={onClose}
+                >
+                    Hủy
+                </button>,
+                <button
+                    key="submit"
+                    className="ant-btn ant-btn-primary"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                >
+                    Lưu
+                </button>,
+            ]}
         >
             <Form form={form} layout="vertical">
                 <Form.Item
@@ -218,8 +282,10 @@ const RecurringBillModal = ({ open, onClose, bill, onSuccess }) => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item label="Danh mục" name="category">
-                    <Select placeholder="Chọn danh mục (tùy chọn)" allowClear>
+                <Form.Item label="Danh mục" name="category"
+                    rules={[{ required: true, message: "Vui lòng chọn danh mục!" }]}
+                >
+                    <Select placeholder="Chọn danh mục">
                         {categories
                             .filter((cat) => cat.type === billType)
                             .map((category) => (
@@ -283,31 +349,20 @@ const RecurringBillModal = ({ open, onClose, bill, onSuccess }) => {
                     <TextArea rows={3} placeholder="Nhập mô tả (tùy chọn)" />
                 </Form.Item>
 
-                <Form.Item name="active" valuePropName="checked">
-                    <label style={{ cursor: "pointer" }}>
-                        <Switch
-                            checked={form.getFieldValue("active")}
-                            onChange={(checked) => form.setFieldsValue({ active: checked })}
-                            style={{ marginRight: 8 }}
-                        />
-                        Đang hoạt động
-                    </label>
+                <Form.Item name="active" valuePropName="checked" initialValue={true}>
+                    <Switch />
+                    <span style={{ marginLeft: 8 }}> Đang hoạt động </span>
                 </Form.Item>
 
-                <Form.Item name="auto_create_transaction" valuePropName="checked">
-                    <label style={{ cursor: "pointer" }}>
-                        <Switch
-                            checked={form.getFieldValue("auto_create_transaction")}
-                            onChange={(checked) => form.setFieldsValue({ auto_create_transaction: checked })}
-                            style={{ marginRight: 8 }}
-                        />
-                        Tự động tạo giao dịch
-                    </label>
+                <Form.Item name="auto_create_transaction" valuePropName="checked" initialValue={true}>
+                    <Switch />
+                    <span style={{ marginLeft: 8 }}> Tự động tạo giao dịch </span>
                 </Form.Item>
             </Form>
         </Modal>
     );
 };
+
 
 export default RecurringBillModal;
 
