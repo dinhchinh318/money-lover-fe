@@ -124,95 +124,13 @@ const ReportsDashboard = () => {
         },
     });
 
-    // Wallet Fluctuations - Test data với nhiều ví để test scroll
-    const [walletFluctuations, setWalletFluctuations] = useState([
-        {
-            walletId: "1",
-            walletName: "Ví tiền mặt",
-            walletType: "cash",
-            currentBalance: 5000000,
-            change: 500000,
-            changePercent: 11.11,
-            periodIncome: 2000000,
-            periodExpense: 1500000,
-        },
-        {
-            walletId: "2",
-            walletName: "Tài khoản ngân hàng",
-            walletType: "bank",
-            currentBalance: 10000000,
-            change: -200000,
-            changePercent: -1.96,
-            periodIncome: 5000000,
-            periodExpense: 5200000,
-        },
-        {
-            walletId: "3",
-            walletName: "Ví tiết kiệm",
-            walletType: "saving",
-            currentBalance: 25000000,
-            change: 1000000,
-            changePercent: 4.17,
-            periodIncome: 3000000,
-            periodExpense: 2000000,
-        },
-        {
-            walletId: "4",
-            walletName: "Thẻ tín dụng",
-            walletType: "credit",
-            currentBalance: -5000000,
-            change: -300000,
-            changePercent: 6.38,
-            periodIncome: 0,
-            periodExpense: 300000,
-        },
-        {
-            walletId: "5",
-            walletName: "Ví đầu tư",
-            walletType: "cash",
-            currentBalance: 15000000,
-            change: 2500000,
-            changePercent: 20.00,
-            periodIncome: 5000000,
-            periodExpense: 2500000,
-        },
-        {
-            walletId: "6",
-            walletName: "Ví phụ",
-            walletType: "cash",
-            currentBalance: 2000000,
-            change: -100000,
-            changePercent: -4.76,
-            periodIncome: 500000,
-            periodExpense: 600000,
-        },
-        {
-            walletId: "7",
-            walletName: "Ví dự phòng",
-            walletType: "bank",
-            currentBalance: 8000000,
-            change: 1500000,
-            changePercent: 23.08,
-            periodIncome: 4000000,
-            periodExpense: 2500000,
-        },
-        {
-            walletId: "8",
-            walletName: "Ví chi tiêu hàng ngày",
-            walletType: "cash",
-            currentBalance: 3000000,
-            change: -500000,
-            changePercent: -14.29,
-            periodIncome: 1000000,
-            periodExpense: 1500000,
-        },
-    ]);
+    // Wallet Fluctuations - Dữ liệu từ API
+    const [walletFluctuations, setWalletFluctuations] = useState([]);
 
     useEffect(() => {
         loadDashboardData();
         loadComparisonData();
-        // Tạm thời comment để test với test data
-        // loadWalletChanges();
+        loadWalletChanges();
         loadChartData();
         loadCategoryExpenseData();
     }, [comparisonTab, chartTab, selectedPeriod]);
@@ -297,20 +215,25 @@ const ReportsDashboard = () => {
                 startDate: monthStart.format("YYYY-MM-DD"),
                 endDate: monthEnd.format("YYYY-MM-DD"),
             };
+            
+            console.log("[loadWalletChanges] Calling API with params:", params);
             const res = await getWalletChangesAPI(params);
+            console.log("[loadWalletChanges] API response:", res);
 
             // Backend trả về: { status: true, error: 0, data: {wallets: [...], period: {...}} }
             if ((res?.status === true || res?.error === 0) && res?.data) {
-                // Lấy mảng wallets từ data, không phải toàn bộ data object
+                // Lấy mảng wallets từ data
                 const wallets = res.data.wallets || [];
-
-                // Chỉ set data nếu có ít nhất 1 ví, nếu không thì giữ test data
-                if (wallets.length > 0) {
-                    setWalletFluctuations(wallets);
-                }
+                console.log("[loadWalletChanges] Setting wallets:", wallets.length, "wallets");
+                setWalletFluctuations(wallets);
+            } else {
+                // Nếu không có dữ liệu, set mảng rỗng
+                console.log("[loadWalletChanges] No valid data, setting empty array");
+                setWalletFluctuations([]);
             }
         } catch (error) {
-            // Error loading wallet changes
+            console.error("Error loading wallet changes:", error);
+            setWalletFluctuations([]);
         }
     };
 
@@ -965,6 +888,45 @@ const ReportsDashboard = () => {
                                 Biến động Ví
                             </h3>
                         </div>
+                        
+                        {/* Overall Change Rate Summary */}
+                        {walletFluctuations.length > 0 && (() => {
+                            // Tính tỷ lệ thay đổi trung bình (weighted by balance)
+                            const totalStartBalance = walletFluctuations.reduce((sum, w) => sum + (w.estimatedStartBalance || 0), 0);
+                            const totalChange = walletFluctuations.reduce((sum, w) => sum + (w.change || 0), 0);
+                            const overallChangePercent = totalStartBalance !== 0 
+                                ? (totalChange / Math.abs(totalStartBalance)) * 100 
+                                : 0;
+                            
+                            return (
+                                <div className="mb-4 p-4 bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="text-sm font-semibold text-gray-600">
+                                            Tỷ lệ thay đổi
+                                        </span>
+                                        <span className={`font-bold text-sm ${overallChangePercent >= 0 ? "text-[#10B981]" : "text-[#EF4444]"}`}>
+                                            {overallChangePercent >= 0 ? "+" : ""}
+                                            {overallChangePercent.toFixed(2)}%
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                        <div
+                                            className={`h-full rounded-full transition-all duration-500 ${
+                                                overallChangePercent >= 0
+                                                    ? "bg-gradient-to-r from-green-400 to-emerald-500"
+                                                    : overallChangePercent < -10
+                                                        ? "bg-gradient-to-r from-red-400 to-pink-500"
+                                                        : "bg-gray-400"
+                                            }`}
+                                            style={{
+                                                width: `${Math.min(Math.abs(overallChangePercent), 100)}%`,
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                        
                         <div
                             className="space-y-4 overflow-y-auto"
                             style={{
