@@ -56,22 +56,35 @@ const RecurringBillsIndex = () => {
     };
 
     const calculateSummary = () => {
-        const total = bills.length;
-        const totalAmount = bills.reduce((sum, b) => sum + (b.amount || 0), 0);
+        const totalBills = bills.length;
+
+        const totalAmount = bills.reduce(
+            (sum, b) => sum + (b.amount || 0),
+            0
+        );
+
         const now = dayjs();
-        const upcoming = bills.filter((b) => {
+
+        const upcomingCount = bills.filter((b) => {
             if (!b.active) return false;
             const nextRun = dayjs(b.next_run);
             return nextRun.isAfter(now) && nextRun.isBefore(now.add(7, "days"));
         }).length;
 
+        // 🔥 NEW: ĐÃ THANH TOÁN THÁNG NÀY
+        const paidThisMonth = bills.filter((b) => {
+            if (!b.last_paid_at) return false;
+            return dayjs(b.last_paid_at).isSame(now, "month");
+        }).length;
+
         setSummary({
-            totalBills: total,
+            totalBills,
             totalAmount,
-            upcomingCount: upcoming,
-            paidThisMonth: 0, // TODO: Calculate from transactions
+            upcomingCount,
+            paidThisMonth,
         });
     };
+
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat("vi-VN", {
@@ -191,12 +204,17 @@ const RecurringBillsIndex = () => {
         });
     };
 
+
     const getBillMenuItems = (bill) => {
+        const isPaidThisMonth =
+            bill.last_paid_at &&
+            dayjs(bill.last_paid_at).isSame(dayjs(), "month");
         return [
             {
                 key: "pay",
-                label: "Thanh toán ngay",
+                label: isPaidThisMonth ? "Đã thanh toán" : "Thanh toán ngay",
                 icon: <CreditCard size={16} />,
+                disabled: isPaidThisMonth,
                 onClick: () => handlePayNow(bill),
             },
             {
@@ -339,7 +357,12 @@ const RecurringBillsIndex = () => {
                 ) : filteredBills.length > 0 ? (
                     <div className="space-y-4">
                         {filteredBills.map((bill) => {
-                            const isUpcoming = dayjs(bill.next_run).diff(dayjs(), "day") <= 7 && bill.active;
+                            const isUpcoming =
+                                dayjs(bill.next_run).diff(dayjs(), "day") <= 7 && bill.active;
+
+                            const isPaidThisMonth =
+                                bill.last_paid_at &&
+                                dayjs(bill.last_paid_at).isSame(dayjs(), "month");
                             return (
                                 <div
                                     key={bill._id}
@@ -389,6 +412,12 @@ const RecurringBillsIndex = () => {
                                         {/* Content */}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-3 mb-2">
+                                                {isPaidThisMonth && (
+                                                    <Badge
+                                                        color="green"
+                                                        text="Đã thanh toán tháng này"
+                                                    />
+                                                )}
                                                 <h3 className="ds-heading-3">{bill.name}</h3>
                                                 <Badge
                                                     count={bill.active ? "Đang hoạt động" : "Đã tạm dừng"}
