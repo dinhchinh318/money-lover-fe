@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Plus, Edit, Trash2, TrendingUp, TrendingDown, ArrowRight, Wallet, BarChart3 } from "lucide-react";
+import { Plus, Edit, Trash2, TrendingUp, TrendingDown, ArrowRight, Wallet, BarChart3, ChevronLeft, ChevronRight } from "lucide-react";
 import { message, Dropdown, Modal, Pagination, Select } from "antd";
 import { getAllTransactionsAPI, deleteTransactionAPI, getOverviewStatsAPI } from "../../../services/api.transaction";
 import { getWalletsAPI } from "../../../services/api.wallet";
@@ -19,6 +19,7 @@ const TransactionsIndex = () => {
         totalIncome: 0,
         totalExpense: 0,
         balance: 0,
+        totalWalletBalance: 0,
         transactionCount: 0,
     });
     const [filters, setFilters] = useState({
@@ -178,6 +179,7 @@ const TransactionsIndex = () => {
                     totalIncome: data.totalIncome || 0,
                     totalExpense: data.totalExpense || 0,
                     balance: (data.totalIncome || 0) - (data.totalExpense || 0),
+                    totalWalletBalance: data.totalWalletBalance || 0,
                     transactionCount: data.transactionCount || 0,
                 });
             }
@@ -417,7 +419,7 @@ const TransactionsIndex = () => {
                             </div>
                             <p className="text-sm font-medium text-gray-600 mb-2">Số dư</p>
                             <p className="text-3xl font-bold text-[#3B82F6] mb-1">
-                                {formatCurrency(stats.balance)}
+                                {formatCurrency(stats.totalWalletBalance)}
                             </p>
                         </div>
                     </div>
@@ -688,35 +690,72 @@ const TransactionsIndex = () => {
 
                 {/* Pagination - Redesigned */}
                 {pagination.total > 0 && (
-                    <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <div className="flex flex-wrap items-center gap-4">
-                            <span className="text-sm text-gray-600 font-medium">
-                                Hiển thị <span className="font-bold text-gray-900">{(pagination.current - 1) * pagination.pageSize + 1}</span>-
-                                <span className="font-bold text-gray-900">{Math.min(pagination.current * pagination.pageSize, pagination.total)}</span> trong tổng{" "}
-                                <span className="font-bold text-gray-900">{pagination.total}</span> giao dịch
-                            </span>
+                    <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <div className="text-sm text-gray-600 font-medium">
+                            Tổng <span className="font-bold text-gray-900">{pagination.total}</span> bản ghi
+                        </div>
+                        <div className="flex items-center gap-3">
+                            {/* Previous Button */}
+                            <button
+                                onClick={() => {
+                                    if (pagination.current > 1) {
+                                        setPagination((prev) => ({ ...prev, current: prev.current - 1 }));
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }
+                                }}
+                                disabled={pagination.current === 1}
+                                className={`p-2 rounded-lg border transition-all duration-200 ${
+                                    pagination.current === 1
+                                        ? "border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50"
+                                        : "border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400"
+                                }`}
+                            >
+                                <ChevronLeft size={18} />
+                            </button>
+
+                            {/* Current Page */}
+                            <button
+                                className="px-4 py-2 rounded-lg border-2 border-purple-500 text-purple-600 font-semibold bg-white hover:bg-purple-50 transition-all duration-200"
+                            >
+                                {pagination.current}
+                            </button>
+
+                            {/* Next Button */}
+                            <button
+                                onClick={() => {
+                                    const totalPages = Math.ceil(pagination.total / pagination.pageSize);
+                                    if (pagination.current < totalPages) {
+                                        setPagination((prev) => ({ ...prev, current: prev.current + 1 }));
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }
+                                }}
+                                disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}
+                                className={`p-2 rounded-lg border transition-all duration-200 ${
+                                    pagination.current >= Math.ceil(pagination.total / pagination.pageSize)
+                                        ? "border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50"
+                                        : "border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400"
+                                }`}
+                            >
+                                <ChevronRight size={18} />
+                            </button>
+
+                            {/* Items per page selector */}
                             <Select
                                 value={pagination.pageSize}
-                                onChange={(value) =>
-                                    setPagination((prev) => ({ ...prev, pageSize: value, current: 1 }))
-                                }
-                                className="min-w-[120px]"
+                                onChange={(value) => {
+                                    setPagination((prev) => ({ ...prev, pageSize: value, current: 1 }));
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="min-w-[110px]"
                                 size="middle"
+                                suffixIcon={<span className="text-gray-400">▼</span>}
                             >
-                                <Select.Option value={10}>10/trang</Select.Option>
-                                <Select.Option value={20}>20/trang</Select.Option>
-                                <Select.Option value={50}>50/trang</Select.Option>
-                                <Select.Option value={100}>100/trang</Select.Option>
+                                <Select.Option value={10}>10 / page</Select.Option>
+                                <Select.Option value={20}>20 / page</Select.Option>
+                                <Select.Option value={50}>50 / page</Select.Option>
+                                <Select.Option value={100}>100 / page</Select.Option>
                             </Select>
                         </div>
-                        <Pagination
-                            current={pagination.current}
-                            total={pagination.total}
-                            pageSize={pagination.pageSize}
-                            onChange={(page) => setPagination((prev) => ({ ...prev, current: page }))}
-                            showSizeChanger={false}
-                            className="[&_.ant-pagination-item]:rounded-lg [&_.ant-pagination-item-active]:bg-gradient-to-r [&_.ant-pagination-item-active]:from-[#10B981] [&_.ant-pagination-item-active]:to-emerald-600 [&_.ant-pagination-item-active]:border-none [&_.ant-pagination-item-active_a]:text-white"
-                        />
                     </div>
                 )}
             </div>

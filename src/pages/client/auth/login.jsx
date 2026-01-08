@@ -193,7 +193,14 @@ const Login = () => {
               <div 
                 id="google-signin-button" 
                 className="w-full flex justify-center min-h-[50px] transition-all hover:scale-[1.01]"
-              ></div>
+              >
+                {googleLoading && (
+                  <div className="flex items-center justify-center gap-2 text-slate-500">
+                    <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-sm font-medium">Đang đăng nhập...</span>
+                  </div>
+                )}
+              </div>
 
               <p className="text-center text-slate-500 font-medium mt-10">
                 Chưa có tài khoản?{' '}
