@@ -418,6 +418,13 @@ const RecurringBillsIndex = () => {
                                                         text="Đã thanh toán tháng này"
                                                     />
                                                 )}
+                                                {bill.auto_create_transaction && (
+                                                    <Badge
+                                                        color="blue"
+                                                        text="Tự động"
+                                                    />
+                                                )}
+
                                                 <h3 className="ds-heading-3">{bill.name}</h3>
                                                 <Badge
                                                     count={bill.active ? "Đang hoạt động" : "Đã tạm dừng"}
