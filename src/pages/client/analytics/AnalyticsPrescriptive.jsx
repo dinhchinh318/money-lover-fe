@@ -78,9 +78,6 @@ const AnalyticsPrescriptive = () => {
                 suggestBudgetAdjustmentAPI(),
             ]);
 
-            console.log("🔍 [Optimize] API Response:", optRes);
-            console.log("🔍 [Budget] API Response:", budgetRes);
-
             // Xử lý response optimize - chỉ dùng dữ liệu từ API
             let suggestions = [];
             let savings = 0;
@@ -90,14 +87,10 @@ const AnalyticsPrescriptive = () => {
                 suggestions = Array.isArray(suggestions) ? suggestions : [];
                 savings = optRes.data.potentialTotalSavings ||
                     suggestions.reduce((sum, item) => sum + (item.suggestion?.potentialSavings || item.potentialSavings || 0), 0);
-                console.log("✅ [Optimize] Loaded suggestions:", suggestions.length, "items, savings:", savings);
             } else if (optRes?.EC === 0 && optRes?.data) {
                 suggestions = optRes.data.suggestions || optRes.data || [];
                 suggestions = Array.isArray(suggestions) ? suggestions : [];
                 savings = suggestions.reduce((sum, item) => sum + (item.suggestion?.potentialSavings || item.potentialSavings || 0), 0);
-                console.log("✅ [Optimize] Loaded suggestions (EC=0):", suggestions.length, "items, savings:", savings);
-            } else {
-                console.warn("⚠️ [Optimize] No valid data in response:", optRes);
             }
 
             setOptimizeSuggestions(suggestions);
@@ -109,13 +102,9 @@ const AnalyticsPrescriptive = () => {
             if (budgetRes?.status === true && budgetRes?.data) {
                 budgetSuggestions = budgetRes.data.suggestions || budgetRes.data || [];
                 budgetSuggestions = Array.isArray(budgetSuggestions) ? budgetSuggestions : [];
-                console.log("✅ [Budget] Loaded suggestions:", budgetSuggestions.length, "items");
             } else if (budgetRes?.EC === 0 && budgetRes?.data) {
                 budgetSuggestions = budgetRes.data.suggestions || budgetRes.data || [];
                 budgetSuggestions = Array.isArray(budgetSuggestions) ? budgetSuggestions : [];
-                console.log("✅ [Budget] Loaded suggestions (EC=0):", budgetSuggestions.length, "items");
-            } else {
-                console.warn("⚠️ [Budget] No valid data in response:", budgetRes);
             }
 
             setBudgetSuggestions(budgetSuggestions);
@@ -132,21 +121,15 @@ const AnalyticsPrescriptive = () => {
         try {
             const res = await suggestWalletTransferAPI();
 
-            console.log("🔍 [Transfer] API Response:", res);
-
             // Xử lý response - chỉ dùng dữ liệu từ API
             let suggestions = [];
 
             if (res?.status === true && res?.data) {
                 suggestions = res.data.suggestions || res.data || [];
                 suggestions = Array.isArray(suggestions) ? suggestions : [];
-                console.log("✅ [Transfer] Loaded suggestions:", suggestions.length, "items");
             } else if (res?.EC === 0 && res?.data) {
                 suggestions = res.data.suggestions || res.data || [];
                 suggestions = Array.isArray(suggestions) ? suggestions : [];
-                console.log("✅ [Transfer] Loaded suggestions (EC=0):", suggestions.length, "items");
-            } else {
-                console.warn("⚠️ [Transfer] No valid data in response:", res);
             }
 
             setTransferSuggestions(suggestions);
@@ -402,18 +385,18 @@ const AnalyticsPrescriptive = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
                 {/* Header Section */}
-                <div className="mb-10">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
-                        <div className="p-4 bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-2xl shadow-xl shadow-purple-500/20 transform hover:scale-105 transition-transform duration-300">
-                            <Sparkles className="text-white" size={28} />
+                <div className="mb-6 sm:mb-10">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <div className="p-3 sm:p-4 bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-2xl shadow-xl shadow-purple-500/20 transform hover:scale-105 transition-transform duration-300">
+                            <Sparkles className="text-white" size={24} />
                         </div>
-                        <div className="flex-1">
-                            <h1 className="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">
+                        <div className="flex-1 min-w-0">
+                            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">
                                 Khuyến nghị Hành động
                             </h1>
-                            <p className="text-gray-600 text-base sm:text-lg max-w-2xl">
+                            <p className="text-gray-600 text-sm sm:text-base lg:text-lg max-w-2xl">
                                 Gợi ý tối ưu, khuyến nghị và cảnh báo thông minh để quản lý tài chính hiệu quả
                             </p>
                         </div>
@@ -421,15 +404,15 @@ const AnalyticsPrescriptive = () => {
                 </div>
 
                 {loading ? (
-                    <div className="flex flex-col justify-center items-center py-32">
+                    <div className="flex flex-col justify-center items-center py-20 sm:py-32">
                         <div className="relative">
                             <Spin size="large" className="custom-spin" />
                             <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-30 animate-pulse"></div>
                         </div>
-                        <p className="mt-6 text-gray-600 font-medium text-lg">Đang tải khuyến nghị thông minh...</p>
+                        <p className="mt-6 text-gray-600 font-medium text-sm sm:text-lg">Đang tải khuyến nghị thông minh...</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                         {/* Section A: Gợi ý Tối ưu */}
                         <div className="lg:col-span-1 space-y-6">
                             <Card
@@ -444,20 +427,20 @@ const AnalyticsPrescriptive = () => {
                                 }
                             >
                                 {/* A1: Tổng số tiền có thể tiết kiệm */}
-                                <div className="mb-8 p-6 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200/60 rounded-2xl shadow-lg relative overflow-hidden">
+                                <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200/60 rounded-2xl shadow-lg relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                                     <div className="relative text-center">
-                                        <div className="flex items-center justify-center gap-2 mb-4">
-                                            <PiggyBank className="text-green-600" size={24} />
-                                            <span className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                                        <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
+                                            <PiggyBank className="text-green-600" size={20} />
+                                            <span className="text-xs sm:text-sm font-bold text-gray-700 uppercase tracking-wide">
                                                 Số tiền có thể tiết kiệm
                                             </span>
                                         </div>
-                                        <div className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 mb-4">
+                                        <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 mb-3 sm:mb-4 break-words">
                                             {formatCurrency(totalSavings)}
                                         </div>
-                                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border-2 border-green-200 shadow-md">
-                                            <Zap className="text-green-500 animate-pulse" size={16} />
+                                        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border-2 border-green-200 shadow-md">
+                                            <Zap className="text-green-500 animate-pulse" size={14} />
                                             <span className="text-xs font-bold text-gray-700">
                                                 {optimizeSuggestions.length} danh mục được gợi ý
                                             </span>
