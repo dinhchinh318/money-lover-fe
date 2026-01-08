@@ -73,6 +73,7 @@ const AppHeader = () => {
     { key: "wallets", label: "Ví của tôi", path: "/wallets", icon: Folder },
     { key: "budgets", label: "Ngân sách", path: "/budgets", icon: PieChart },
     { key: "reports", label: "Báo cáo", path: "/reports", icon: FileText },
+    { key: "ai", label: "AI Center", path: "/ai", icon: TrendingUp },
   ];
 
   const toolNav = [
