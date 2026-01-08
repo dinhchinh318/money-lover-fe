@@ -3,7 +3,6 @@ import { Link, useLocation, Outlet } from "react-router-dom";
 import { Home, Clock3, List, Wallet, Menu as MenuIcon, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 
-
 const ReportsLayout = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
