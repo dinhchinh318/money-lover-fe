@@ -20,17 +20,41 @@ import {
   Plus,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dropdown, message, Avatar, Badge } from "antd";
 import { useCurrentApp } from "../context/app.context";
 import { logoutAPI } from "../../services/api.user";
 
 const AppHeader = () => {
-  const { setIsAuthenticated, isAuthenticated, user, setUser, profile, setProfile } = useCurrentApp();
+  const {
+    setIsAuthenticated,
+    isAuthenticated,
+    user,
+    setUser,
+    profile,
+    setProfile,
+  } = useCurrentApp();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  // ===== Derived UI values (FIX: fallback + avoid undefined) =====
+  const avatarSrc = useMemo(() => {
+    return (
+      profile?.avatarUrl ||
+      null
+    );
+  }, [profile, user]);
+
+  const displayName = useMemo(() => {
+    return profile?.displayName || "Người dùng";
+  }, [profile, user]);
+
+  const email = useMemo(() => {
+    return profile?.email || "";
+  }, [profile, user]);
 
   // ===== Helpers =====
   const scrollToTop = () => {
@@ -49,15 +73,22 @@ const AppHeader = () => {
     scrollToTop();
   };
 
-  // ===== Logout =====
+  // ===== Logout (FIX: clear profile + remove token keys) =====
   const handleLogout = async () => {
     try {
       const res = await logoutAPI();
       if (res?.error === 0) {
         message.success("Đăng xuất thành công");
+
         setUser(null);
+        setProfile(null);
         setIsAuthenticated(false);
+
+        // remove all common token keys to avoid mismatch
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("token");
+
         navigate("/login");
         scrollToTop();
       }
@@ -73,7 +104,6 @@ const AppHeader = () => {
     { key: "wallets", label: "Ví của tôi", path: "/wallets", icon: Folder },
     { key: "budgets", label: "Ngân sách", path: "/budgets", icon: PieChart },
     { key: "reports", label: "Báo cáo", path: "/reports", icon: FileText },
-    { key: "ai", label: "AI Center", path: "/ai", icon: TrendingUp },
   ];
 
   const toolNav = [
@@ -81,6 +111,7 @@ const AppHeader = () => {
     { key: "recurring-bills", label: "Hóa đơn định kỳ", path: "/recurring-bills", icon: CalendarClock },
     { key: "saving-goals", label: "Tiết kiệm", path: "/saving-goals", icon: PiggyBank },
     { key: "analytics", label: "Phân tích", path: "/analytics", icon: TrendingUp },
+    { key: "ai", label: "AI Center", path: "/ai", icon: TrendingUp },
     { key: "groups", label: "Nhóm", path: "/groups", icon: Users },
   ];
 
@@ -111,17 +142,18 @@ const AppHeader = () => {
           <div className="flex items-center gap-3">
             <Avatar
               size={44}
-              src={profile?.avatarUrl}
+              src={avatarSrc || undefined}
               className="border-2 border-emerald-500 bg-emerald-50 text-emerald-600 font-bold"
             >
-              {profile?.displayName?.[0]?.toUpperCase()}
+              {(displayName?.[0] || "U").toUpperCase()}
             </Avatar>
+
             <div className="flex flex-col overflow-hidden">
               <p className="text-sm font-black text-slate-900 truncate leading-tight">
-                {profile?.displayName || "Người dùng"}
+                {displayName}
               </p>
               <p className="text-[10px] text-slate-400 truncate mt-0.5 uppercase tracking-wider font-bold">
-                {user?.email}
+                {email}
               </p>
             </div>
           </div>
@@ -246,7 +278,6 @@ const AppHeader = () => {
             {/* Notification */}
             {isAuthenticated && (
               <button
-                // onClick={scrollToTop}
                 onClick={() => goAndScroll("/notification")}
                 className="relative p-2 text-slate-400 hover:text-emerald-600 transition-colors"
                 title="Thông báo"
@@ -267,11 +298,11 @@ const AppHeader = () => {
               >
                 <button className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-3 transition-all hover:border-emerald-200 hover:shadow-md outline-none">
                   <Avatar
-                    src={profile?.avatarUrl}
+                    src={avatarSrc || undefined}
                     className="bg-emerald-500 shadow-sm border border-white"
                     size={32}
                   >
-                    {profile?.displayName?.[0]}
+                    {(displayName?.[0] || "U").toUpperCase()}
                   </Avatar>
                   <ChevronDown size={14} className="text-slate-400" />
                 </button>
@@ -347,7 +378,7 @@ const AppHeader = () => {
                     <Link
                       key={item.key}
                       to={item.path}
-                      onClick={closeMenuAndScrollTop}   // ✅ đóng menu + scroll top
+                      onClick={closeMenuAndScrollTop}
                       className={[
                         "flex items-center gap-4 px-4 py-3.5 rounded-2xl font-bold transition-all",
                         isActive ? "bg-emerald-50 text-emerald-600" : "text-slate-600 hover:bg-slate-50",
@@ -372,7 +403,7 @@ const AppHeader = () => {
                     <Link
                       key={item.key}
                       to={item.path}
-                      onClick={closeMenuAndScrollTop} // ✅ đóng menu + scroll top
+                      onClick={closeMenuAndScrollTop}
                       className={[
                         "flex items-center gap-4 px-4 py-3.5 rounded-2xl font-bold transition-all",
                         isActive ? "bg-emerald-50 text-emerald-600" : "text-slate-600 hover:bg-slate-50",

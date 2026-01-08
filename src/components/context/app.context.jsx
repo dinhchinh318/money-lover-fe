@@ -1,35 +1,45 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { fetchAccountAPI } from "../../services/api.user";
 
 const AppContext = createContext(null);
 
+const DEFAULT_AVATAR =
+  "https://res.cloudinary.com/dijy8yams/image/upload/v1742894461/avatars/lgitn3wbciwcm515y0cb.jpg";
+
+const normalizeProfile = (profile, user) => {
+  if (!profile && !user) return null;
+
+  const email = profile?.email ?? user?.email ?? profile?.user?.email ?? "";
+
+  const avatarUrl =
+    profile?.avatarUrl ||
+    user?.avatarUrl ||
+    user?.avatar ||
+    DEFAULT_AVATAR;
+
+  return {
+    ...(profile ?? {}),
+    email,
+    avatarUrl,
+    displayName: profile?.displayName ?? user?.name ?? "Người Dùng",
+  };
+};
+
+
 export const AppContextProvider = ({ children }) => {
-  // Authentication
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
 
-  // Theme
-  const [theme, setTheme] = useState(() => {
-    return localStorage?.getItem("theme") ?? "light";
-  });
+  const [theme, setTheme] = useState(() => localStorage?.getItem("theme") ?? "light");
 
-  // Apply theme to document
   useEffect(() => {
     const root = document.documentElement;
     const body = document.body;
 
-    // Remove existing theme classes
     root.classList.remove("light", "dark");
     body.classList.remove("light", "dark");
 
-    // Apply new theme
     if (theme === "dark") {
       root.classList.add("dark");
       body.classList.add("dark");
@@ -39,7 +49,6 @@ export const AppContextProvider = ({ children }) => {
       body.classList.add("light");
       root.style.colorScheme = "light";
     } else {
-      // Auto mode - detect system preference
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       if (prefersDark) {
         root.classList.add("dark");
@@ -52,51 +61,43 @@ export const AppContextProvider = ({ children }) => {
       }
     }
 
-    // Save to localStorage
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Fetch account on mount
-  useEffect(() => {
-    const fetchAccount = async () => {
-      try {
-        const res = await fetchAccountAPI();
-        if (res.data) {
-          setUser(res.data.user);
-          setProfile(res.data.profile);
-          setIsAuthenticated(true);
-        }
-      } catch (err) {
-        console.error("Fetch account failed:", err);
+  const reloadAccount = useCallback(async () => {
+    try {
+      const res = await fetchAccountAPI();
+      if (res?.data) {
+        setUser(res.data.user ?? null);
+        setProfile(normalizeProfile(res.data.profile, res.data.user));
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setProfile(null);
+        setIsAuthenticated(false);
       }
-    };
-    fetchAccount();
+    } catch (err) {
+      console.error("Fetch account failed:", err);
+      setUser(null);
+      setProfile(null);
+      setIsAuthenticated(false);
+    }
   }, []);
 
-  // Listen for storage events to sync user data across tabs
+  useEffect(() => {
+    reloadAccount();
+  }, [reloadAccount]);
+
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === 'userUpdated') {
-        // Reload user data when user is updated in another tab
-        const fetchAccount = async () => {
-          try {
-            const res = await fetchAccountAPI();
-            if (res.data) {
-              setUser(res.data.user);
-              setProfile(res.data.profile);
-            }
-          } catch (err) {
-            console.error("Fetch account failed:", err);
-          }
-        };
-        fetchAccount();
-        localStorage.removeItem('userUpdated');
+      if (e.key === "userUpdated") {
+        reloadAccount();
+        localStorage.removeItem("userUpdated");
       }
     };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [reloadAccount]);
 
   return (
     <AppContext.Provider
@@ -109,6 +110,7 @@ export const AppContextProvider = ({ children }) => {
         setUser,
         profile,
         setProfile,
+        reloadAccount, // ✅ quan trọng
       }}
     >
       {children}
@@ -118,8 +120,6 @@ export const AppContextProvider = ({ children }) => {
 
 export const useCurrentApp = () => {
   const context = useContext(AppContext);
-  if (!context) {
-    throw new Error("useCurrentApp must be used within AppContextProvider");
-  }
+  if (!context) throw new Error("useCurrentApp must be used within AppContextProvider");
   return context;
 };
