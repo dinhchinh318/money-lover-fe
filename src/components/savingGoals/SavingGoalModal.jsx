@@ -59,7 +59,7 @@ const SavingGoalModal = ({ open, onClose, goal, onSuccess }) => {
 
             const goalData = {
                 name: values.name.trim(),
-                wallet: values.wallet,
+                walletId: values.wallet,
                 target_amount: values.target_amount,
                 current_amount: values.current_amount || 0,
                 description: values.description || "",
