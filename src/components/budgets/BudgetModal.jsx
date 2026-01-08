@@ -114,7 +114,7 @@ const BudgetModal = ({ open, onClose, budget, onSuccess }) => {
                 }
             }
 
-            if (budget) {
+            if (budget && budget._id) {
                 // Update
                 const res = await updateBudgetAPI(budget._id, { data: budgetData });
                 if (res.status || res.EC === 0) {
@@ -196,7 +196,6 @@ const BudgetModal = ({ open, onClose, budget, onSuccess }) => {
 
                 <Form.Item label="Ví" name="wallet">
                     <Select placeholder="Tất cả ví (tùy chọn)" allowClear>
-                        <Option value={null}>Tất cả ví</Option>
                         {wallets.map((wallet) => (
                             <Option key={wallet._id} value={wallet._id}>
                                 {wallet.name} ({formatCurrency(wallet.balance || 0)})

@@ -162,7 +162,7 @@ const BudgetsIndex = () => {
     };
 
     const handleCopyBudget = (budget) => {
-        setEditingBudget({ ...budget, _id: null, name: `${budget.name || budget.category?.name} (Copy)` });
+        setEditingBudget({ ...budget, _id:undefined, name: `${budget.name || budget.category?.name} (Copy)` });
         setModalOpen(true);
     };
 
