@@ -93,12 +93,13 @@ const RecurringBillModal = ({ open, onClose, bill, onSuccess }) => {
             const billData = {
                 name: values.name.trim(),
                 type: values.type,
-                wallet: values.wallet,
+                walletId: values.wallet,
+                categoryId: values.category,
                 amount: values.amount,
                 frequency: values.frequency,
                 next_run: values.next_run.toISOString(),
-                active: values.active !== undefined ? values.active : true,
-                auto_create_transaction: values.auto_create_transaction !== undefined ? values.auto_create_transaction : true,
+                active: values.active,
+                auto_create_transaction: values.auto_create_transaction,
                 description: values.description || "",
             };
 
@@ -218,8 +219,10 @@ const RecurringBillModal = ({ open, onClose, bill, onSuccess }) => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item label="Danh mục" name="category">
-                    <Select placeholder="Chọn danh mục (tùy chọn)" allowClear>
+                <Form.Item label="Danh mục" name="category"
+                rules={[{ required: true, message: "Vui lòng chọn danh mục!" }]}
+                >
+                    <Select placeholder="Chọn danh mục">
                         {categories
                             .filter((cat) => cat.type === billType)
                             .map((category) => (
@@ -283,26 +286,14 @@ const RecurringBillModal = ({ open, onClose, bill, onSuccess }) => {
                     <TextArea rows={3} placeholder="Nhập mô tả (tùy chọn)" />
                 </Form.Item>
 
-                <Form.Item name="active" valuePropName="checked">
-                    <label style={{ cursor: "pointer" }}>
-                        <Switch
-                            checked={form.getFieldValue("active")}
-                            onChange={(checked) => form.setFieldsValue({ active: checked })}
-                            style={{ marginRight: 8 }}
-                        />
-                        Đang hoạt động
-                    </label>
+                <Form.Item name="active" valuePropName="checked" initialValue={true}>
+                        <Switch/>
+                            <span style={{marginLeft: 8}}> Đang hoạt động </span>
                 </Form.Item>
 
-                <Form.Item name="auto_create_transaction" valuePropName="checked">
-                    <label style={{ cursor: "pointer" }}>
-                        <Switch
-                            checked={form.getFieldValue("auto_create_transaction")}
-                            onChange={(checked) => form.setFieldsValue({ auto_create_transaction: checked })}
-                            style={{ marginRight: 8 }}
-                        />
-                        Tự động tạo giao dịch
-                    </label>
+                <Form.Item name="auto_create_transaction" valuePropName="checked" initialValue={true}>
+                        <Switch/>
+                            <span style={{marginLeft: 8}}> Tự động tạo giao dịch </span>
                 </Form.Item>
             </Form>
         </Modal>
