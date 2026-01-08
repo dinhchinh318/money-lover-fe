@@ -1,5 +1,5 @@
 // Import patch cho React 19 trước khi import bất kỳ component nào sử dụng antd
-import '@ant-design/v5-patch-for-react-19';
+import "@ant-design/v5-patch-for-react-19";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -32,11 +32,16 @@ import RecurringBillsIndex from "./pages/client/recurringBills/RecurringBillsInd
 import SavingGoalsIndex from "./pages/client/savingGoals/SavingGoalsIndex.jsx";
 // import ProfilePage from "./pages/client/profile/Profile.jsx";
 import SavingGoalDetail from "./pages/client/savingGoals/SavingGoalDetail.jsx";
-import { AppContextProvider, useCurrentApp } from "./components/context/app.context.jsx";
+import {
+  AppContextProvider,
+  useCurrentApp,
+} from "./components/context/app.context.jsx";
 
 import SettingPage from "./pages/client/SettingPage.jsx";
 import ProfilePageNew from "./pages/client/ProfilePage.jsx";
 import NotificationPage from "./pages/client/NotificationPage.jsx";
+
+import AiCenterPage from "./pages/client/ai/AiCenterPage.jsx";
 
 // import "antd/dist/reset.css"; // nếu dùng Ant Design
 
@@ -121,6 +126,13 @@ const router = createBrowserRouter([
           { path: ":id", element: <SavingGoalDetail /> },
         ],
       },
+
+      // AI Center
+      {
+        path: "/ai",
+        element: <AiCenterPage />,
+      },
+
       // Profile
       {
         path: "/profile",
