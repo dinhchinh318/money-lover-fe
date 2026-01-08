@@ -25,15 +25,7 @@ const deleteSavingGoalAPI = (id) => {
     return axios.delete(urlBackend);
 }
 
-const addAmountAPI = (id, amount) => {
-    const urlBackend = `/v1/api/saving-goal/${id}/add`;
-    return axios.post(urlBackend, { amount });
-}
 
-const withdrawAmountAPI = (id, amount) => {
-    const urlBackend = `/v1/api/saving-goal/${id}/withdraw`;
-    return axios.post(urlBackend, { amount });
-}
 
 export {
     getAllSavingGoalsAPI,
@@ -41,8 +33,6 @@ export {
     createSavingGoalAPI,
     updateSavingGoalAPI,
     deleteSavingGoalAPI,
-    addAmountAPI,
-    withdrawAmountAPI,
 };
 
 

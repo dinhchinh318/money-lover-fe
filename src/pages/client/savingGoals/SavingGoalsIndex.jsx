@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit, Trash2, Pause, Play, Target, Wallet, TrendingUp, AlertCircle, CheckCircle, PiggyBank, Calendar } from "lucide-react";
 import { message, Modal, Dropdown, InputNumber, Badge, Alert } from "antd";
-import { getAllSavingGoalsAPI, deleteSavingGoalAPI, addAmountAPI, withdrawAmountAPI } from "../../../services/api.savingGoal";
+import { getAllSavingGoalsAPI, deleteSavingGoalAPI } from "../../../services/api.savingGoal";
 import SavingGoalModal from "../../../components/savingGoals/SavingGoalModal";
 import dayjs from "dayjs";
 
@@ -14,10 +14,6 @@ const SavingGoalsIndex = () => {
     const [activeTab, setActiveTab] = useState("all");
     const [modalOpen, setModalOpen] = useState(false);
     const [editingGoal, setEditingGoal] = useState(null);
-    const [amountModalOpen, setAmountModalOpen] = useState(false);
-    const [selectedGoal, setSelectedGoal] = useState(null);
-    const [amountType, setAmountType] = useState("add"); // add or withdraw
-    const [amount, setAmount] = useState(0);
     const [summary, setSummary] = useState({
         totalGoals: 0,
         totalTarget: 0,
@@ -57,7 +53,7 @@ const SavingGoalsIndex = () => {
             filtered = filtered.filter((g) => g.is_active);
         } else if (activeTab === "completed") {
             filtered = filtered.filter((g) => {
-                const current = g.current_amount || 0;
+                const current = g.current_amount ?? g.wallet?.balance ?? 0;
                 const target = g.target_amount || 1;
                 return current >= target;
             });
@@ -68,14 +64,13 @@ const SavingGoalsIndex = () => {
     const calculateSummary = () => {
         const total = goals.length;
         const totalTarget = goals.reduce((sum, g) => sum + (g.target_amount || 0), 0);
-        const totalSaved = goals.reduce((sum, g) => sum + (g.current_amount || 0), 0);
+        const totalSaved = goals.reduce(
+            (sum, g) => sum + (g.wallet?.balance || 0),
+            0
+        );
         const averageProgress =
             goals.length > 0
-                ? goals.reduce((sum, g) => {
-                    const current = g.current_amount || 0;
-                    const target = g.target_amount || 1;
-                    return sum + (current / target) * 100;
-                }, 0) / goals.length
+                ? goals.reduce((sum, g) => sum + (g.progress || 0), 0) / goals.length
                 : 0;
 
         setSummary({
@@ -108,13 +103,6 @@ const SavingGoalsIndex = () => {
         if (diff < 30) return { text: `Còn ${diff} ngày`, color: "#F59E0B" };
         return { text: `Còn ${diff} ngày`, color: "#6B7280" };
     };
-
-    const calculateProgress = (goal) => {
-        const current = goal.current_amount || 0;
-        const target = goal.target_amount || 1;
-        return Math.min((current / target) * 100, 100);
-    };
-
     const handleAddGoal = () => {
         setEditingGoal(null);
         setModalOpen(true);
@@ -148,66 +136,9 @@ const SavingGoalsIndex = () => {
         });
     };
 
-    const handleAddAmount = (goal) => {
-        setSelectedGoal(goal);
-        setAmountType("add");
-        setAmount(0);
-        setAmountModalOpen(true);
-    };
-
-    const handleWithdrawAmount = (goal) => {
-        setSelectedGoal(goal);
-        setAmountType("withdraw");
-        setAmount(0);
-        setAmountModalOpen(true);
-    };
-
-    const handleSubmitAmount = async () => {
-        if (!selectedGoal || amount <= 0) {
-            message.error("Vui lòng nhập số tiền hợp lệ!");
-            return;
-        }
-
-        try {
-            let res;
-            if (amountType === "add") {
-                res = await addAmountAPI(selectedGoal._id, amount);
-            } else {
-                if (amount > (selectedGoal.current_amount || 0)) {
-                    message.error("Số tiền rút không được vượt quá số tiền hiện có!");
-                    return;
-                }
-                res = await withdrawAmountAPI(selectedGoal._id, amount);
-            }
-
-            if (res.status || res.EC === 0) {
-                message.success(`${amountType === "add" ? "Thêm" : "Rút"} tiền thành công!`);
-                setAmountModalOpen(false);
-                setSelectedGoal(null);
-                setAmount(0);
-                loadGoals();
-            } else {
-                message.error(res.message || "Thao tác thất bại!");
-            }
-        } catch (error) {
-            message.error("Có lỗi xảy ra!");
-        }
-    };
 
     const getGoalMenuItems = (goal) => {
         return [
-            {
-                key: "add",
-                label: "Thêm tiền",
-                icon: <TrendingUp size={16} />,
-                onClick: () => handleAddAmount(goal),
-            },
-            {
-                key: "withdraw",
-                label: "Rút tiền",
-                icon: <TrendingUp size={16} />,
-                onClick: () => handleWithdrawAmount(goal),
-            },
             {
                 key: "edit",
                 label: "Chỉnh sửa",
@@ -314,8 +245,8 @@ const SavingGoalsIndex = () => {
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 ${activeTab === tab.key
-                                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
-                                    : "text-gray-600 hover:bg-gray-50"
+                                ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
+                                : "text-gray-600 hover:bg-gray-50"
                                 }`}
                         >
                             {tab.label}
@@ -333,8 +264,8 @@ const SavingGoalsIndex = () => {
                 ) : filteredGoals.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredGoals.map((goal) => {
-                            const progress = calculateProgress(goal);
-                            const current = goal.current_amount || 0;
+                            const progress = goal.progress || 0;
+                            const current = goal.current_amount ?? goal.wallet?.balance ?? 0;
                             const target = goal.target_amount || 1;
                             const remaining = target - current;
                             const timeRemaining = getTimeRemaining(goal.target_date);
@@ -345,12 +276,12 @@ const SavingGoalsIndex = () => {
                                 <div
                                     key={goal._id}
                                     className={`relative group cursor-pointer hover:scale-[1.02] transition-all duration-300 rounded-2xl shadow-lg hover:shadow-xl p-6 ${isCompleted
-                                            ? "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300"
-                                            : isOverdue
-                                                ? "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-300"
-                                                : timeRemaining && timeRemaining.color === "#F59E0B"
-                                                    ? "bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300"
-                                                    : "bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200"
+                                        ? "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300"
+                                        : isOverdue
+                                            ? "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-300"
+                                            : timeRemaining && timeRemaining.color === "#F59E0B"
+                                                ? "bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300"
+                                                : "bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200"
                                         }`}
                                     onClick={() => navigate(`/saving-goals/${goal._id}`)}
                                 >
@@ -539,50 +470,6 @@ const SavingGoalsIndex = () => {
                 goal={editingGoal}
                 onSuccess={loadGoals}
             />
-
-            {/* Amount Modal */}
-            <Modal
-                title={amountType === "add" ? "Thêm tiền" : "Rút tiền"}
-                open={amountModalOpen}
-                onCancel={() => {
-                    setAmountModalOpen(false);
-                    setSelectedGoal(null);
-                    setAmount(0);
-                }}
-                onOk={handleSubmitAmount}
-                okText={amountType === "add" ? "Thêm" : "Rút"}
-                cancelText="Hủy"
-            >
-                {selectedGoal && (
-                    <div className="space-y-4">
-                        <div>
-                            <p className="ds-text-secondary mb-1">Mục tiêu</p>
-                            <p className="font-semibold">{selectedGoal.name}</p>
-                        </div>
-                        <div>
-                            <p className="ds-text-secondary mb-1">Số tiền hiện tại</p>
-                            <p className="font-semibold text-[#10B981]">
-                                {formatCurrency(selectedGoal.current_amount || 0)}
-                            </p>
-                        </div>
-                        <div>
-                            <label className="block ds-text-secondary mb-2">
-                                Số tiền {amountType === "add" ? "thêm" : "rút"}
-                            </label>
-                            <InputNumber
-                                style={{ width: "100%" }}
-                                placeholder="0"
-                                value={amount}
-                                onChange={(value) => setAmount(value || 0)}
-                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                                min={1}
-                                addonAfter="VND"
-                            />
-                        </div>
-                    </div>
-                )}
-            </Modal>
         </div>
     );
 };

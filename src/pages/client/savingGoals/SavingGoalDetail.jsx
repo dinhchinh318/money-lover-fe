@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Target, Edit, Trash2, TrendingUp, TrendingDown } from "lucide-react";
-import { message, Modal, Tabs, InputNumber } from "antd";
-import { getSavingGoalByIdAPI, deleteSavingGoalAPI, addAmountAPI, withdrawAmountAPI } from "../../../services/api.savingGoal";
+import { ArrowLeft, Target, Edit, Trash2} from "lucide-react";
+import { message, Modal, Tabs} from "antd";
+import { getSavingGoalByIdAPI, deleteSavingGoalAPI } from "../../../services/api.savingGoal";
 import SavingGoalModal from "../../../components/savingGoals/SavingGoalModal";
 import dayjs from "dayjs";
 
@@ -13,9 +13,6 @@ const SavingGoalDetail = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("info");
     const [modalOpen, setModalOpen] = useState(false);
-    const [amountModalOpen, setAmountModalOpen] = useState(false);
-    const [amountType, setAmountType] = useState("add");
-    const [amount, setAmount] = useState(0);
 
     useEffect(() => {
         if (id) {
@@ -52,14 +49,6 @@ const SavingGoalDetail = () => {
         if (!date) return "Không có hạn";
         return dayjs(date).format("DD/MM/YYYY");
     };
-
-    const calculateProgress = () => {
-        if (!goal) return 0;
-        const current = goal.current_amount || 0;
-        const target = goal.target_amount || 1;
-        return Math.min((current / target) * 100, 100);
-    };
-
     const getTimeRemaining = () => {
         if (!goal || !goal.target_date) return null;
         const now = dayjs();
@@ -97,50 +86,6 @@ const SavingGoalDetail = () => {
             },
         });
     };
-
-    const handleAddAmount = () => {
-        setAmountType("add");
-        setAmount(0);
-        setAmountModalOpen(true);
-    };
-
-    const handleWithdrawAmount = () => {
-        setAmountType("withdraw");
-        setAmount(0);
-        setAmountModalOpen(true);
-    };
-
-    const handleSubmitAmount = async () => {
-        if (!goal || amount <= 0) {
-            message.error("Vui lòng nhập số tiền hợp lệ!");
-            return;
-        }
-
-        try {
-            let res;
-            if (amountType === "add") {
-                res = await addAmountAPI(goal._id, amount);
-            } else {
-                if (amount > (goal.current_amount || 0)) {
-                    message.error("Số tiền rút không được vượt quá số tiền hiện có!");
-                    return;
-                }
-                res = await withdrawAmountAPI(goal._id, amount);
-            }
-
-            if (res.status || res.EC === 0) {
-                message.success(`${amountType === "add" ? "Thêm" : "Rút"} tiền thành công!`);
-                setAmountModalOpen(false);
-                setAmount(0);
-                loadGoal();
-            } else {
-                message.error(res.message || "Thao tác thất bại!");
-            }
-        } catch (error) {
-            message.error("Có lỗi xảy ra!");
-        }
-    };
-
     if (loading) {
         return (
             <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
@@ -156,12 +101,12 @@ const SavingGoalDetail = () => {
         return null;
     }
 
-    const progress = calculateProgress();
-    const current = goal.current_amount || 0;
+    const progress = goal.progress || 0;
+    const current = goal.current_amount ?? goal.wallet?.balance ?? 0;
     const target = goal.target_amount || 1;
     const remaining = target - current;
-    const timeRemaining = getTimeRemaining();
     const isCompleted = current >= target;
+
 
     const tabItems = [
         {
@@ -249,23 +194,7 @@ const SavingGoalDetail = () => {
                         )}
 
                         {/* Actions */}
-                        <div className="flex gap-3 mt-6 pt-6 border-t border-[#E5E7EB]">
-                            <button
-                                onClick={handleAddAmount}
-                                className="ds-button-primary"
-                                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-                            >
-                                <TrendingUp size={18} />
-                                Thêm tiền
-                            </button>
-                            <button
-                                onClick={handleWithdrawAmount}
-                                className="ds-button-secondary"
-                                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-                            >
-                                <TrendingDown size={18} />
-                                Rút tiền
-                            </button>
+                        <div className="flex gap-3 mt-6 pt-6 border-t border-[#E5E7EB]">    
                             <button
                                 onClick={handleEdit}
                                 className="ds-button-secondary"
@@ -349,45 +278,6 @@ const SavingGoalDetail = () => {
                     setModalOpen(false);
                 }}
             />
-
-            {/* Amount Modal */}
-            <Modal
-                title={amountType === "add" ? "Thêm tiền" : "Rút tiền"}
-                open={amountModalOpen}
-                onCancel={() => {
-                    setAmountModalOpen(false);
-                    setAmount(0);
-                }}
-                onOk={handleSubmitAmount}
-                okText={amountType === "add" ? "Thêm" : "Rút"}
-                cancelText="Hủy"
-            >
-                <div className="space-y-4">
-                    <div>
-                        <p className="ds-text-secondary mb-1">Mục tiêu</p>
-                        <p className="font-semibold">{goal.name}</p>
-                    </div>
-                    <div>
-                        <p className="ds-text-secondary mb-1">Số tiền hiện tại</p>
-                        <p className="font-semibold text-[#10B981]">{formatCurrency(current)}</p>
-                    </div>
-                    <div>
-                        <label className="block ds-text-secondary mb-2">
-                            Số tiền {amountType === "add" ? "thêm" : "rút"}
-                        </label>
-                        <InputNumber
-                            style={{ width: "100%" }}
-                            placeholder="0"
-                            value={amount}
-                            onChange={(value) => setAmount(value || 0)}
-                            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                            parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                            min={1}
-                            addonAfter="VND"
-                        />
-                    </div>
-                </div>
-            </Modal>
         </div>
     );
 };
