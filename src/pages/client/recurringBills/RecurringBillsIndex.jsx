@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Pause, Play, CreditCard, Calendar, Wallet, CheckCircle, Receipt, Clock, AlertCircle } from "lucide-react";
 import { message, Modal, Dropdown, Badge, Alert } from "antd";
-import { getAllRecurringBillsAPI, deleteRecurringBillAPI, payRecurringBillAPI } from "../../../services/api.recurringBill";
+import { getAllRecurringBillsAPI, deleteRecurringBillAPI, payRecurringBillAPI, pauseRecurringBillAPI, resumeRecurringBillAPI } from "../../../services/api.recurringBill";
 import RecurringBillModal from "../../../components/recurringBills/RecurringBillModal";
 import dayjs from "dayjs";
 
@@ -160,8 +160,35 @@ const RecurringBillsIndex = () => {
     };
 
     const handleToggleActive = async (bill) => {
-        // TODO: Implement toggle active API
-        message.info("Tính năng đang phát triển");
+        Modal.confirm({
+            title: bill.active ? "Tạm dừng hóa đơn" : "Kích hoạt hóa đơn",
+            content: bill.active
+                ? `Bạn có chắc chắn muốn tạm dừng "${bill.name}"?`
+                : `Bạn có chắc chắn muốn kích hoạt lại "${bill.name}"?`,
+            okText: bill.active ? "Tạm dừng" : "Kích hoạt",
+            cancelText: "Hủy",
+            okType: bill.active ? "danger" : "primary",
+            onOk: async () => {
+                try {
+                    const res = bill.active
+                        ? await pauseRecurringBillAPI(bill._id)
+                        : await resumeRecurringBillAPI(bill._id);
+
+                    if (res?.data?.status || res?.status || res?.EC === 0) {
+                        message.success(
+                            bill.active
+                                ? "Đã tạm dừng hóa đơn!"
+                                : "Đã kích hoạt hóa đơn!"
+                        );
+                        loadBills(); // reload list
+                    } else {
+                        message.error(res?.data?.message || "Thao tác thất bại!");
+                    }
+                } catch (error) {
+                    message.error("Có lỗi xảy ra!");
+                }
+            },
+        });
     };
 
     const getBillMenuItems = (bill) => {
@@ -293,8 +320,8 @@ const RecurringBillsIndex = () => {
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 ${activeTab === tab.key
-                                    ? "bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg"
-                                    : "text-gray-600 hover:bg-gray-50"
+                                ? "bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg"
+                                : "text-gray-600 hover:bg-gray-50"
                                 }`}
                         >
                             {tab.label}
@@ -317,10 +344,10 @@ const RecurringBillsIndex = () => {
                                 <div
                                     key={bill._id}
                                     className={`relative rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 ${isUpcoming
-                                            ? "bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300"
-                                            : bill.type === "income"
-                                                ? "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200"
-                                                : "bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200"
+                                        ? "bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300"
+                                        : bill.type === "income"
+                                            ? "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200"
+                                            : "bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200"
                                         }`}
                                 >
                                     {/* Actions Menu */}
@@ -352,8 +379,8 @@ const RecurringBillsIndex = () => {
                                         {/* Icon */}
                                         <div
                                             className={`w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${bill.type === "income"
-                                                    ? "bg-gradient-to-br from-green-400 to-emerald-600"
-                                                    : "bg-gradient-to-br from-red-400 to-rose-600"
+                                                ? "bg-gradient-to-br from-green-400 to-emerald-600"
+                                                : "bg-gradient-to-br from-red-400 to-rose-600"
                                                 }`}
                                         >
                                             <CreditCard className="text-white w-10 h-10" />
