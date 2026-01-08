@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit, Trash2, Pause, Play, Target, Wallet, TrendingUp, AlertCircle, CheckCircle, PiggyBank, Calendar } from "lucide-react";
 import { message, Modal, Dropdown, InputNumber, Badge, Alert } from "antd";
-import { getAllSavingGoalsAPI, deleteSavingGoalAPI } from "../../../services/api.savingGoal";
+import { getAllSavingGoalsAPI, deleteSavingGoalAPI, completeSavingGoalAPI } from "../../../services/api.savingGoal";
 import SavingGoalModal from "../../../components/savingGoals/SavingGoalModal";
 import dayjs from "dayjs";
 
@@ -49,15 +49,19 @@ const SavingGoalsIndex = () => {
 
     const filterGoals = () => {
         let filtered = [...goals];
+
         if (activeTab === "active") {
-            filtered = filtered.filter((g) => g.is_active);
-        } else if (activeTab === "completed") {
-            filtered = filtered.filter((g) => {
-                const current = g.current_amount ?? g.wallet?.balance ?? 0;
-                const target = g.target_amount || 1;
-                return current >= target;
-            });
+            filtered = filtered.filter(
+                (g) => g.is_active && !g.is_completed
+            );
         }
+
+        if (activeTab === "completed") {
+            filtered = filtered.filter(
+                (g) => g.is_completed
+            );
+        }
+
         setFilteredGoals(filtered);
     };
 
@@ -112,6 +116,23 @@ const SavingGoalsIndex = () => {
         setEditingGoal(goal);
         setModalOpen(true);
     };
+    const handleCompleteGoal = (goal) => {
+        Modal.confirm({
+            title: "Đánh dấu hoàn thành?",
+            content: "Sau khi hoàn thành, tiến độ sẽ được giữ cố định 100%.",
+            okText: "Hoàn thành",
+            cancelText: "Hủy",
+            onOk: async () => {
+                const res = await completeSavingGoalAPI(goal._id);
+                if (res.status || res.EC === 0) {
+                    message.success("Đã đánh dấu hoàn thành!");
+                    loadGoals();
+                } else {
+                    message.error("Thao tác thất bại");
+                }
+            },
+        });
+    };
 
     const handleDeleteGoal = (goal) => {
         Modal.confirm({
@@ -138,7 +159,18 @@ const SavingGoalsIndex = () => {
 
 
     const getGoalMenuItems = (goal) => {
-        return [
+        const items = [];
+
+        if (!goal.is_completed) {
+            items.push({
+                key: "complete",
+                label: "Đánh dấu đã hoàn thành",
+                icon: <CheckCircle size={16} />,
+                onClick: () => handleCompleteGoal(goal),
+            });
+        }
+
+        items.push(
             {
                 key: "edit",
                 label: "Chỉnh sửa",
@@ -154,9 +186,12 @@ const SavingGoalsIndex = () => {
                 icon: <Trash2 size={16} />,
                 danger: true,
                 onClick: () => handleDeleteGoal(goal),
-            },
-        ];
+            }
+        );
+
+        return items;
     };
+
 
     const tabs = [
         { key: "all", label: "Tất cả" },

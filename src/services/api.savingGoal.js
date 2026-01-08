@@ -24,6 +24,9 @@ const deleteSavingGoalAPI = (id) => {
     const urlBackend = `/v1/api/saving-goal/${id}`;
     return axios.delete(urlBackend);
 }
+const completeSavingGoalAPI = (id) => {
+  return axios.patch(`/v1/api/saving-goal/${id}/complete`);
+};
 
 
 
@@ -33,6 +36,7 @@ export {
     createSavingGoalAPI,
     updateSavingGoalAPI,
     deleteSavingGoalAPI,
+    completeSavingGoalAPI,
 };
 
 

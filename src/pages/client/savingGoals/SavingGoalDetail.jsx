@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Target, Edit, Trash2} from "lucide-react";
-import { message, Modal, Tabs} from "antd";
+import { ArrowLeft, Target, Edit, Trash2 } from "lucide-react";
+import { message, Modal, Tabs } from "antd";
 import { getSavingGoalByIdAPI, deleteSavingGoalAPI } from "../../../services/api.savingGoal";
 import SavingGoalModal from "../../../components/savingGoals/SavingGoalModal";
 import dayjs from "dayjs";
@@ -101,11 +101,17 @@ const SavingGoalDetail = () => {
         return null;
     }
 
-    const progress = goal.progress || 0;
-    const current = goal.current_amount ?? goal.wallet?.balance ?? 0;
+    const isCompleted = goal.is_completed;
+
+    const progress = isCompleted ? 100 : (goal.progress || 0);
+
+    const current = isCompleted
+        ? goal.target_amount
+        : (goal.current_amount ?? goal.wallet?.balance ?? 0);
+
     const target = goal.target_amount || 1;
     const remaining = target - current;
-    const isCompleted = current >= target;
+    const timeRemaining = getTimeRemaining();
 
 
     const tabItems = [
@@ -129,7 +135,7 @@ const SavingGoalDetail = () => {
                                     {!goal.is_active && (
                                         <span className="ds-badge ds-badge-warning">Đã tạm dừng</span>
                                     )}
-                                    {timeRemaining && timeRemaining.color === "#F59E0B" && (
+                                    {!isCompleted && timeRemaining && timeRemaining.color === "#F59E0B" && (
                                         <span className="ds-badge" style={{ backgroundColor: "#F59E0B20", color: "#F59E0B" }}>
                                             Sắp đến hạn
                                         </span>
@@ -194,7 +200,19 @@ const SavingGoalDetail = () => {
                         )}
 
                         {/* Actions */}
-                        <div className="flex gap-3 mt-6 pt-6 border-t border-[#E5E7EB]">    
+
+                        <div className="flex gap-3 mt-6 pt-6 border-t border-[#E5E7EB]">
+                            {!goal.is_completed && (
+                                <button
+                                    onClick={handleCompleteGoal}
+                                    className="ds-button-primary"
+                                    style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                                >
+                                    <CheckCircle size={18} />
+                                    Đánh dấu hoàn thành
+                                </button>
+                            )}
+
                             <button
                                 onClick={handleEdit}
                                 className="ds-button-secondary"
@@ -203,6 +221,7 @@ const SavingGoalDetail = () => {
                                 <Edit size={18} />
                                 Sửa
                             </button>
+
                             <button
                                 onClick={handleDelete}
                                 className="ds-button-danger"
@@ -215,37 +234,7 @@ const SavingGoalDetail = () => {
                     </div>
                 </div>
             ),
-        },
-        {
-            key: "history",
-            label: "Lịch sử",
-            children: (
-                <div className="space-y-6">
-                    <div className="ds-card">
-                        <h3 className="ds-heading-3 mb-4">Lịch sử giao dịch</h3>
-                        <div className="ds-empty-state" style={{ minHeight: "200px" }}>
-                            <p className="ds-empty-state-text">Danh sách giao dịch sẽ được hiển thị ở đây</p>
-                            <p className="ds-text-small">Tính năng đang phát triển</p>
-                        </div>
-                    </div>
-                </div>
-            ),
-        },
-        {
-            key: "statistics",
-            label: "Thống kê",
-            children: (
-                <div className="space-y-6">
-                    <div className="ds-card">
-                        <h3 className="ds-heading-3 mb-4">Biểu đồ tiến độ</h3>
-                        <div className="ds-empty-state" style={{ minHeight: "300px" }}>
-                            <p className="ds-empty-state-text">Biểu đồ sẽ được hiển thị ở đây</p>
-                            <p className="ds-text-small">Tính năng đang phát triển</p>
-                        </div>
-                    </div>
-                </div>
-            ),
-        },
+        },     
     ];
 
     return (
