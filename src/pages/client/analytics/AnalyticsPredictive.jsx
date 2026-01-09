@@ -284,19 +284,7 @@ const AnalyticsPredictive = () => {
 
     const loadBudgetData = async () => {
         try {
-            console.log("=".repeat(60));
-            console.log("🔍 [DỰ ĐOÁN VƯỢT NGÂN SÁCH] Bắt đầu load data...");
-            console.log("=".repeat(60));
-
             const res = await predictBudgetOverrunAPI();
-            console.log("📥 API Response:", {
-                status: res?.status,
-                EC: res?.EC,
-                message: res?.message,
-                hasData: !!res?.data,
-                dataType: Array.isArray(res?.data) ? 'array' : typeof res?.data,
-                dataKeys: res?.data ? Object.keys(res?.data) : []
-            });
 
             let predictions = [];
 
@@ -304,19 +292,12 @@ const AnalyticsPredictive = () => {
             if (res?.status === true && res?.data) {
                 // Backend trả về { data: { predictions: [...], atRisk: [...] } }
                 predictions = res.data.predictions || [];
-                console.log("✅ Lấy predictions từ res.data.predictions:", predictions.length, "items");
             } else if (res?.EC === 0 && res?.data) {
                 predictions = res.data.predictions || res.data || [];
-                console.log("✅ Lấy predictions từ res.data (EC=0):", predictions.length, "items");
             } else if (res?.data && Array.isArray(res.data)) {
                 // Trường hợp data là mảng trực tiếp
                 predictions = res.data;
-                console.log("✅ Lấy predictions từ res.data (array):", predictions.length, "items");
-            } else {
-                console.warn("⚠️ Không tìm thấy predictions trong response");
             }
-
-            console.log("📊 Raw Predictions từ API:", predictions);
 
             // Kiểm tra xem có dữ liệu hợp lệ không
             // Chấp nhận cả trường hợp spent = 0 (chưa có chi tiêu)
@@ -327,7 +308,6 @@ const AnalyticsPredictive = () => {
                 });
 
             if (hasValidData) {
-                console.log("✅ Sử dụng dữ liệu thật từ API");
                 // Đảm bảo dữ liệu có đầy đủ các trường cần thiết
                 predictions = predictions.map((b, index) => {
                     const spent = b.spent || 0;
@@ -335,18 +315,6 @@ const AnalyticsPredictive = () => {
                     const usagePercent = b.usagePercent !== undefined
                         ? b.usagePercent
                         : (limit > 0 ? (spent / limit * 100) : 0);
-
-                    console.log(`📋 Budget ${index + 1}:`, {
-                        name: b.budgetName || b.categoryName || b.category?.name,
-                        spent: spent.toLocaleString('vi-VN') + ' VND',
-                        limit: limit.toLocaleString('vi-VN') + ' VND',
-                        usagePercent: usagePercent.toFixed(2) + '%',
-                        categoryId: b.category?.id || b.categoryId,
-                        walletId: b.wallet || 'all',
-                        predictedTotal: b.prediction?.predictedTotal?.toLocaleString('vi-VN') + ' VND' || 'N/A',
-                        predictedOverrun: b.prediction?.predictedOverrun?.toLocaleString('vi-VN') + ' VND' || '0',
-                        isAtRisk: b.isAtRisk
-                    });
 
                     return {
                         ...b,
@@ -372,9 +340,6 @@ const AnalyticsPredictive = () => {
                     };
                 });
             }
-
-            console.log("📋 Processed Predictions (sau khi xử lý):", predictions.length, "items");
-            console.log("=".repeat(60));
 
             // Set budget overruns - chỉ khi có dữ liệu hợp lệ
             if (hasValidData) {
@@ -477,46 +442,15 @@ const AnalyticsPredictive = () => {
             });
         }
 
-        console.log("📈 [CHART] Chart data created:", {
-            budgetName: primaryBudget.budgetName || primaryBudget.categoryName,
-            daysInMonth,
-            daysPassed,
-            spent: spent.toLocaleString('vi-VN') + ' VND',
-            limit: limit.toLocaleString('vi-VN') + ' VND',
-            dailySpending: dailySpending.toLocaleString('vi-VN') + ' VND/ngày',
-            predictedTotal: predictedTotal ? predictedTotal.toLocaleString('vi-VN') + ' VND' : "N/A",
-            predictedDaily: predictedDaily.toLocaleString('vi-VN') + ' VND/ngày',
-            chartDataLength: chartData.length,
-            actualDataPoints: chartData.filter(d => d.actual !== undefined && d.actual !== null).length,
-            predictedDataPoints: chartData.filter(d => d.predicted !== undefined && d.predicted !== null).length,
-            firstActual: chartData.find(d => d.actual !== undefined)?.actual?.toLocaleString('vi-VN') + ' VND' || 'N/A',
-            lastActual: chartData.filter(d => d.actual !== undefined).slice(-1)[0]?.actual?.toLocaleString('vi-VN') + ' VND' || 'N/A',
-            firstPredicted: chartData.find(d => d.predicted !== undefined)?.predicted?.toLocaleString('vi-VN') + ' VND' || 'N/A',
-            lastPredicted: chartData.filter(d => d.predicted !== undefined).slice(-1)[0]?.predicted?.toLocaleString('vi-VN') + ' VND' || 'N/A'
-        });
-
         return chartData;
     };
 
     const loadCategoryData = async () => {
         try {
             const res = await predictCategorySpendingAPI({ days: 30 });
-            console.log("🔍 [DỰ ĐOÁN DANH MỤC] API Response:", res);
 
             if (res?.status === true && res?.data) {
                 const predictions = res.data.predictions || res.data || [];
-                console.log("📊 [DỰ ĐOÁN DANH MỤC] Predictions:", predictions);
-
-                // Log chi tiết từng category
-                predictions.forEach((pred, idx) => {
-                    console.log(`📋 Category ${idx + 1}:`, {
-                        name: pred.categoryName || pred.category?.name,
-                        weeklyAmounts: pred.historical?.weeklyAmounts,
-                        weeklyAmountsLength: pred.historical?.weeklyAmounts?.length || 0,
-                        avgPerWeek: pred.historical?.avgPerWeek,
-                        totalAmount: pred.historical?.totalAmount,
-                    });
-                });
 
                 // Kiểm tra xem có dữ liệu thực sự không - chỉ dùng dữ liệu từ API
                 if (Array.isArray(predictions) && predictions.length > 0) {
@@ -659,27 +593,27 @@ const AnalyticsPredictive = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
-            <div className="max-w-7xl mx-auto p-6">
+            <div className="max-w-7xl mx-auto p-4 sm:p-6">
                 {/* Header Section */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-3 bg-gradient-to-br from-orange-500 to-pink-500 rounded-xl shadow-lg">
-                            <BarChart3 className="text-white" size={24} />
+                <div className="mb-6 sm:mb-8">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-4">
+                        <div className="p-2 sm:p-3 bg-gradient-to-br from-orange-500 to-pink-500 rounded-xl shadow-lg">
+                            <BarChart3 className="text-white" size={20} />
                         </div>
-                        <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-orange-800 to-gray-900 bg-clip-text text-transparent">
+                        <div className="flex-1 min-w-0">
+                            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 via-orange-800 to-gray-900 bg-clip-text text-transparent">
                                 Dự đoán chi tiêu cuối tháng
                             </h1>
-                            <p className="text-gray-600 mt-1 text-sm">
+                            <p className="text-gray-600 mt-1 text-xs sm:text-sm">
                                 Dự đoán chi tiêu và nguy cơ vượt ngân sách dựa trên dữ liệu thực tế
                             </p>
                         </div>
                     </div>
 
                     {/* Date Range Picker */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                        <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                            <Calendar className="text-orange-500" size={16} />
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+                        <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <Calendar className="text-orange-500" size={14} />
                             Khoảng thời gian phân tích
                         </label>
                         <DateRangePicker
@@ -694,10 +628,10 @@ const AnalyticsPredictive = () => {
                 {loading ? (
                     <div className="flex flex-col justify-center items-center py-20">
                         <Spin size="large" />
-                        <p className="mt-4 text-gray-500">Đang tính toán dự đoán...</p>
+                        <p className="mt-4 text-gray-500 text-sm sm:text-base">Đang tính toán dự đoán...</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                         {/* Section A: Dự đoán chi tiêu cuối tháng */}
                         <div className="lg:col-span-1 space-y-4">
                             <Card
@@ -721,7 +655,7 @@ const AnalyticsPredictive = () => {
                                                 Dựa trên 7 ngày gần nhất
                                             </span>
                                         </div>
-                                        <div className="text-2xl font-bold text-blue-600 mb-2">
+                                        <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-2 break-words">
                                             {prediction7Days?.prediction?.predictedMonthEnd !== undefined && prediction7Days.prediction.predictedMonthEnd !== null
                                                 ? formatCurrency(prediction7Days.prediction.predictedMonthEnd)
                                                 : prediction7Days === null
@@ -761,7 +695,7 @@ const AnalyticsPredictive = () => {
                                                 Dựa trên 30 ngày gần nhất
                                             </span>
                                         </div>
-                                        <div className="text-2xl font-bold text-green-600 mb-2">
+                                        <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2 break-words">
                                             {prediction30Days?.prediction?.predictedMonthEnd !== undefined && prediction30Days.prediction.predictedMonthEnd !== null
                                                 ? formatCurrency(prediction30Days.prediction.predictedMonthEnd)
                                                 : prediction30Days === null
@@ -815,7 +749,7 @@ const AnalyticsPredictive = () => {
                                                 />
                                             )}
                                         </div>
-                                        <div className="text-2xl font-bold text-purple-600 mb-2">
+                                        <div className="text-xl sm:text-2xl font-bold text-purple-600 mb-2 break-words">
                                             {predictionTrend?.prediction?.predictedMonthEnd !== undefined && predictionTrend.prediction.predictedMonthEnd !== null
                                                 ? formatCurrency(predictionTrend.prediction.predictedMonthEnd)
                                                 : predictionTrend === null
@@ -856,8 +790,8 @@ const AnalyticsPredictive = () => {
                                         <h3 className="text-sm font-bold text-gray-800">Biểu đồ Dự đoán Chi tiêu Cuối Tháng</h3>
                                     </div>
                                     {monthlyChartData.length > 0 ? (
-                                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                            <ResponsiveContainer width="100%" height={320}>
+                                        <div className="bg-gray-50 rounded-lg p-2 sm:p-4 border border-gray-200">
+                                            <ResponsiveContainer width="100%" height={280}>
                                                 <AreaChart data={monthlyChartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
                                                     <defs>
                                                         <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">

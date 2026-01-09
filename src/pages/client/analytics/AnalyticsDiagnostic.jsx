@@ -355,32 +355,13 @@ const AnalyticsDiagnostic = () => {
       }
 
       // Xử lý Frequent Categories - chỉ dùng dữ liệu từ API
-      console.log("🔍 [DANH MỤC PHÁT SINH NHIỀU NHẤT] API Response:", catRes);
       if (catRes?.status === true && catRes?.data) {
         const categories = Array.isArray(catRes.data) ? catRes.data : [];
-        console.log(
-          "✅ [DANH MỤC PHÁT SINH NHIỀU NHẤT] Categories từ API:",
-          categories
-        );
-        categories.forEach((cat, idx) => {
-          console.log(
-            `  ${idx + 1}. ${cat.categoryName}: ${
-              cat.count
-            } giao dịch, ${cat.totalAmount?.toLocaleString("vi-VN")} VND`
-          );
-        });
         setFrequentCategories(categories);
       } else if (catRes?.EC === 0 && catRes?.data) {
         const categories = Array.isArray(catRes.data) ? catRes.data : [];
-        console.log(
-          "✅ [DANH MỤC PHÁT SINH NHIỀU NHẤT] Categories từ API (EC=0):",
-          categories
-        );
         setFrequentCategories(categories);
       } else {
-        console.warn(
-          "⚠️ [DANH MỤC PHÁT SINH NHIỀU NHẤT] Không có dữ liệu từ API"
-        );
         setFrequentCategories([]);
       }
 
@@ -588,29 +569,25 @@ const AnalyticsDiagnostic = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
         {/* Header Section */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
                 Phân tích Nguyên nhân
               </h1>
-              <p className="text-gray-600 mt-2 text-sm">
+              <p className="text-gray-600 mt-2 text-xs sm:text-sm">
                 Phân tích biến động, phát hiện bất thường và thói quen chi tiêu
                 của bạn
               </p>
             </div>
-            {/* <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200">
-                            <Calendar className="text-blue-500" size={18} />
-                            <span className="text-sm font-medium text-gray-700">Chọn khoảng thời gian</span>
-                        </div> */}
           </div>
 
           {/* Date Range Picker */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <Calendar className="text-blue-500" size={16} />
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+            <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Calendar className="text-blue-500" size={14} />
               Khoảng thời gian phân tích
             </label>
             <DateRangePicker
@@ -625,10 +602,10 @@ const AnalyticsDiagnostic = () => {
         {loading ? (
           <div className="flex flex-col justify-center items-center py-20">
             <Spin size="large" />
-            <p className="mt-4 text-gray-500">Đang tải dữ liệu...</p>
+            <p className="mt-4 text-gray-500 text-sm sm:text-base">Đang tải dữ liệu...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Card 1: Biến động chi tiêu */}
             <Card
               className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50"
@@ -872,15 +849,15 @@ const AnalyticsDiagnostic = () => {
                 </div>
                 {monthlySpikes.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={formatMonthlyData()}>
+                    <BarChart data={formatMonthlyData()} margin={{ top: 5, right: 10, left: 0, bottom: 60 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                       <XAxis
                         dataKey="month"
                         stroke="#6B7280"
                         angle={-45}
                         textAnchor="end"
-                        height={80}
-                        fontSize={10}
+                        height={60}
+                        fontSize={9}
                       />
                       <YAxis stroke="#6B7280" />
                       {monthlyStats.threshold > 0 && (
@@ -936,7 +913,7 @@ const AnalyticsDiagnostic = () => {
                     <ResponsiveContainer width="100%" height={200}>
                       <BarChart
                         data={hourlySpending}
-                        margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+                        margin={{ top: 5, right: 5, left: 0, bottom: 40 }}
                       >
                         <CartesianGrid
                           strokeDasharray="3 3"
@@ -946,10 +923,12 @@ const AnalyticsDiagnostic = () => {
                         <XAxis
                           dataKey="hour"
                           stroke="#6B7280"
-                          fontSize={9}
+                          fontSize={8}
                           tick={{ fill: "#6B7280" }}
-                          interval={1}
+                          interval={2}
                           tickMargin={8}
+                          angle={-45}
+                          textAnchor="end"
                         />
                         <YAxis
                           stroke="#6B7280"
