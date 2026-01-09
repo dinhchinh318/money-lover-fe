@@ -63,6 +63,27 @@ const SavingGoalDetail = () => {
     const handleEdit = () => {
         setModalOpen(true);
     };
+    const handleCompleteGoal = () => {
+        Modal.confirm({
+            title: "Đánh dấu hoàn thành mục tiêu?",
+            content: "Sau khi hoàn thành, tiến độ sẽ được giữ cố định 100%.",
+            okText: "Hoàn thành",
+            cancelText: "Hủy",
+            onOk: async () => {
+                try {
+                    const res = await completeSavingGoalAPI(goal._id);
+                    if (res?.status || res?.data?.status) {
+                        message.success("Đã hoàn thành mục tiêu!");
+                        loadGoal();
+                    } else {
+                        message.error("Thao tác thất bại");
+                    }
+                } catch (err) {
+                    message.error("Có lỗi xảy ra");
+                }
+            },
+        });
+    };
 
     const handleDelete = () => {
         Modal.confirm({
@@ -234,7 +255,7 @@ const SavingGoalDetail = () => {
                     </div>
                 </div>
             ),
-        },     
+        },
     ];
 
     return (
