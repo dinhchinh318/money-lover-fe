@@ -213,76 +213,76 @@ const SavingGoalsIndex = () => {
         <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
             <div className="max-w-7xl mx-auto px-6 py-8">
                 {/* Header Section */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg">
-                            <PiggyBank className="text-white" size={24} />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-gray-900 bg-clip-text text-transparent">
-                                Quản lý Mục tiêu Tiết kiệm
-                            </h1>
-                            <p className="text-gray-600 mt-1 text-sm">
-                                Tạo và theo dõi mục tiêu tiết kiệm theo thời gian
-                            </p>
-                        </div>
+                <div className="flex items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+                    <div className="min-w-0">
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 truncate">
+                            Mục tiêu Tiết kiệm
+                        </h1>
+                        <p className="text-gray-600 mt-1 text-sm">
+                            Theo dõi và đạt được các mục tiêu tài chính
+                        </p>
                     </div>
+
                     <button
                         onClick={handleAddGoal}
-                        className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+                        className="shrink-0 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 shadow-md hover:shadow-lg transition flex items-center gap-2"
                     >
-                        <Plus size={20} />
-                        Thêm mục tiêu
+                        <Plus size={18} />
+                        <span className="hidden sm:inline">Thêm mục tiêu</span>
                     </button>
                 </div>
 
+
                 {/* Summary Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div className="bg-gradient-to-br from-emerald-50 to-teal-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-emerald-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
-                                <Target className="text-white w-7 h-7" />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-500">Tổng mục tiêu</span>
+                            <div className="h-9 w-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                <Target className="text-emerald-600" size={18} />
                             </div>
                         </div>
-                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng mục tiêu</p>
-                        <p className="text-3xl font-bold text-emerald-600">{summary.totalGoals}</p>
+                        <div className="mt-2 text-xl sm:text-2xl font-extrabold text-gray-900">
+                            {summary.totalGoals}
+                        </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
-                                <Wallet className="text-white w-7 h-7" />
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-500">Tổng mục tiêu tiền</span>
+                            <div className="h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center">
+                                <Wallet className="text-blue-600" size={18} />
                             </div>
                         </div>
-                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng số tiền mục tiêu</p>
-                        <p className="text-3xl font-bold text-blue-600">
+                        <div className="mt-2 text-base sm:text-lg font-extrabold text-blue-700 truncate">
                             {formatCurrency(summary.totalTarget)}
-                        </p>
+                        </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-green-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                                <TrendingUp className="text-white w-7 h-7" />
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-500">Đã tiết kiệm</span>
+                            <div className="h-9 w-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                <TrendingUp className="text-emerald-600" size={18} />
                             </div>
                         </div>
-                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng đã tiết kiệm</p>
-                        <p className="text-3xl font-bold text-green-600">
+                        <div className="mt-2 text-base sm:text-lg font-extrabold text-emerald-700 truncate">
                             {formatCurrency(summary.totalSaved)}
-                        </p>
+                        </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-purple-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-pink-600 rounded-xl flex items-center justify-center shadow-md">
-                                <PiggyBank className="text-white w-7 h-7" />
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-500">Tiến độ TB</span>
+                            <div className="h-9 w-9 rounded-xl bg-violet-50 flex items-center justify-center">
+                                <PiggyBank className="text-violet-600" size={18} />
                             </div>
                         </div>
-                        <p className="text-gray-600 mb-1 text-sm font-medium">Tiến độ trung bình</p>
-                        <p className="text-3xl font-bold text-purple-600">{summary.averageProgress}%</p>
+                        <div className="mt-2 text-xl sm:text-2xl font-extrabold text-gray-900">
+                            {summary.averageProgress}%
+                        </div>
                     </div>
                 </div>
-
                 {/* Filter Tabs */}
                 <div className="sticky top-0 z-10 bg-white mb-4">
                     <div className="flex gap-2 mb-6 bg-white p-1.5 rounded-xl border-2 border-gray-200 shadow-sm inline-flex">
