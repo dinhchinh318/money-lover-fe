@@ -203,77 +203,90 @@ const BudgetsIndex = () => {
         <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
             <div className="max-w-7xl mx-auto px-6 py-8">
                 {/* Header Section */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
-                            <Target className="text-white" size={24} />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-gray-900 bg-clip-text text-transparent">
-                                Quản lý Ngân sách
-                            </h1>
-                            <p className="text-gray-600 mt-1 text-sm">
-                                Đặt hạn mức chi tiêu và theo dõi mức độ sử dụng ngân sách
-                            </p>
-                        </div>
+                <div className="flex items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+                    <div className="min-w-0">
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 truncate">
+                            Quản lý Ngân sách
+                        </h1>
+                        <p className="text-gray-600 mt-1 text-sm">
+                            Đặt hạn mức chi tiêu và theo dõi ngân sách
+                        </p>
                     </div>
+
                     <button
                         onClick={handleAddBudget}
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+                        className="shrink-0 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg transition flex items-center gap-2"
                     >
-                        <Plus size={20} />
-                        Thêm ngân sách
+                        <Plus size={18} />
+                        <span className="hidden sm:inline">Thêm ngân sách</span>
                     </button>
                 </div>
 
+
                 {/* Summary Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
-                                <Target className="text-white w-7 h-7" />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    {/* Tổng ngân sách */}
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-500">
+                                Tổng ngân sách
+                            </span>
+                            <div className="h-9 w-9 rounded-xl bg-indigo-50 flex items-center justify-center">
+                                <Target className="text-indigo-600" size={18} />
                             </div>
                         </div>
-                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng ngân sách</p>
-                        <p className="text-3xl font-bold text-blue-600">
+
+                        <div className="mt-2 text-xl sm:text-2xl font-extrabold text-gray-900">
                             {loading ? "..." : summary.totalBudgets}
-                        </p>
+                        </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-green-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                                <DollarSign className="text-white w-7 h-7" />
+                    {/* Tổng hạn mức */}
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-500">
+                                Tổng hạn mức
+                            </span>
+                            <div className="h-9 w-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                <DollarSign className="text-emerald-600" size={18} />
                             </div>
                         </div>
-                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng hạn mức</p>
-                        <p className="text-3xl font-bold text-green-600">
+
+                        <div className="mt-2 text-base sm:text-lg font-extrabold text-emerald-700 truncate">
                             {loading ? "..." : formatCurrency(summary.totalLimit)}
-                        </p>
+                        </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-red-50 to-rose-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-red-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-red-400 to-rose-600 rounded-xl flex items-center justify-center shadow-md">
-                                <TrendingUp className="text-white w-7 h-7" />
+                    {/* Tổng đã chi */}
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-500">
+                                Tổng đã chi
+                            </span>
+                            <div className="h-9 w-9 rounded-xl bg-rose-50 flex items-center justify-center">
+                                <TrendingUp className="text-rose-600" size={18} />
                             </div>
                         </div>
-                        <p className="text-gray-600 mb-1 text-sm font-medium">Tổng đã chi</p>
-                        <p className="text-3xl font-bold text-red-600">
+
+                        <div className="mt-2 text-base sm:text-lg font-extrabold text-rose-700 truncate">
                             {loading ? "..." : formatCurrency(summary.totalSpent)}
-                        </p>
+                        </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-amber-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
-                                <AlertTriangle className="text-white w-7 h-7" />
+                    {/* Ngân sách cảnh báo */}
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-500">
+                                Ngân sách cảnh báo
+                            </span>
+                            <div className="h-9 w-9 rounded-xl bg-amber-50 flex items-center justify-center">
+                                <AlertTriangle className="text-amber-600" size={18} />
                             </div>
                         </div>
-                        <p className="text-gray-600 mb-1 text-sm font-medium">Ngân sách cảnh báo</p>
-                        <p className="text-3xl font-bold text-amber-600">
+
+                        <div className="mt-2 text-xl sm:text-2xl font-extrabold text-gray-900">
                             {loading ? "..." : summary.warningCount}
-                        </p>
+                        </div>
                     </div>
                 </div>
 
@@ -289,12 +302,12 @@ const BudgetsIndex = () => {
                 )}
 
                 {/* Filter Tabs */}
-                <div className="flex gap-2 mb-6 bg-white p-1.5 rounded-xl border-2 border-gray-200 shadow-sm inline-flex">
+                <div className="flex gap-1 mb-5 bg-white p-1 rounded-lg border border-gray-200 shadow-sm inline-flex">
                     {tabs.map((tab) => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 ${activeTab === tab.key
+                            className={`px-3 py-1.5 sm:px-5 sm:py-2 text-sm rounded-lg font-semibold transition-all duration-300 ${activeTab === tab.key
                                 ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
                                 : "text-gray-600 hover:bg-gray-50"
                                 }`}
@@ -391,10 +404,10 @@ const BudgetRow = ({ budget, onClick, onEdit, onDelete }) => {
         >
             {/* Icon */}
             <div
-                className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+                className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ background: `${color}22` }}
             >
-                <BarChart3 size={26} style={{ color }} />
+                <BarChart3 size={20} style={{ color }} />
             </div>
 
             {/* Content */}
@@ -411,7 +424,7 @@ const BudgetRow = ({ budget, onClick, onEdit, onDelete }) => {
                         : dayjs(budget.end_date).format("DD/MM")}
                 </p>
 
-                <div className="mt-1.5 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="mt-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                     <div
                         className="h-full rounded-full"
                         style={{ width: `${percent}%`, backgroundColor: color }}
@@ -421,7 +434,7 @@ const BudgetRow = ({ budget, onClick, onEdit, onDelete }) => {
 
             {/* Right */}
             <div className="flex flex-col items-end gap-1">
-                <span className="text-sm sm:text-lg font-extrabold tabular-nums" style={{ color }}>
+                <span className="text-xs sm:text-lg font-extrabold tabular-nums" style={{ color }}>
                     {percent.toFixed(0)}%
                 </span>
 
