@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Wallet, Edit, Trash2, Copy, Pause } from "lucide-react";
 import { message, Modal, Tabs } from "antd";
-import { getBudgetByIdAPI, deleteBudgetAPI, getBudgetStatsAPI } from "../../../services/api.budget";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from "recharts";
+import { getBudgetByIdAPI, deleteBudgetAPI, getBudgetStatsAPI, getBudgetTransactionsAPI } from "../../../services/api.budget";
 import BudgetModal from "../../../components/budgets/BudgetModal";
 import dayjs from "dayjs";
 
@@ -14,15 +15,22 @@ const BudgetDetail = () => {
     const [activeTab, setActiveTab] = useState("info");
     const [modalOpen, setModalOpen] = useState(false);
     const [stats, setStats] = useState(null);
+    const [transactions, setTransactions] = useState([]);
+    const [loadingTx, setLoadingTx] = useState(false);
 
     useEffect(() => {
         if (id) {
             loadBudget();
         }
     }, [id]);
-
     useEffect(() => {
         if (activeTab === "transactions" && budget) {
+            loadTransactions();
+        }
+    }, [activeTab, budget]);
+
+    useEffect(() => {
+        if (activeTab === "statistics" && budget) {
             loadStats();
         }
     }, [activeTab, budget]);
@@ -85,6 +93,27 @@ const BudgetDetail = () => {
     const handleEdit = () => {
         setModalOpen(true);
     };
+    const loadTransactions = async () => {
+        try {
+            setLoadingTx(true);
+            const res = await getBudgetTransactionsAPI(budget._id);
+            if (res.status || res.EC === 0) {
+                const raw = res.data || [];
+                const mapped = raw.map(t => ({
+                    id: t._id,
+                    amount: Number(t.amount),
+                    date: t.date || t.createdAt,
+                    category: t.categoryId?.name || "Chi tiêu",
+                    note: t.note || "",
+                }));
+                setTransactions(mapped);
+            }
+        } catch (e) {
+            message.error("Không thể tải giao dịch");
+        } finally {
+            setLoadingTx(false);
+        }
+    };
 
     const handleDelete = () => {
         Modal.confirm({
@@ -123,11 +152,45 @@ const BudgetDetail = () => {
     if (!budget) {
         return null;
     }
+    const safeStats = stats || {
+        limit: budget.limit_amount || 0,
+        spent: budget.spent_amount || 0,
+        remaining: (budget.limit_amount || 0) - (budget.spent_amount || 0),
+        percent: 0,
+        byDate: [],
+    };
+    const groupedTransactions = transactions.reduce((acc, tx) => {
+        const dateKey = dayjs(tx.date).format("DD/MM/YYYY");
+        if (!acc[dateKey]) acc[dateKey] = [];
+        acc[dateKey].push(tx);
+        return acc;
+    }, {});
 
     const budgetStatus = calculateBudgetStatus();
-    const spent = budget.spent_amount || 0;
-    const limit = budget.limit_amount || 1;
-    const remaining = limit - spent;
+    const spent = safeStats.spent;
+    const limit = safeStats.limit || 1;
+    const remaining = safeStats.remaining;
+    const percent = safeStats.percent;
+
+    const progressColor =
+        percent >= 100
+            ? "#EF4444"
+            : percent >= 80
+                ? "#F59E0B"
+                : "#10B981";
+
+    const pieData = [
+        {
+            name: "Đã chi",
+            value: safeStats.spent,
+            color: "#EF4444",
+        },
+        {
+            name: "Còn lại",
+            value: Math.max(safeStats.limit - safeStats.spent, 0),
+            color: "#10B981",
+        },
+    ];
 
     const tabItems = [
         {
@@ -150,10 +213,10 @@ const BudgetDetail = () => {
                                         {budget.period === "weekly"
                                             ? "Hàng tuần"
                                             : budget.period === "monthly"
-                                            ? "Hàng tháng"
-                                            : budget.period === "yearly"
-                                            ? "Hàng năm"
-                                            : "Tùy chỉnh"}
+                                                ? "Hàng tháng"
+                                                : budget.period === "yearly"
+                                                    ? "Hàng năm"
+                                                    : "Tùy chỉnh"}
                                     </span>
                                 </div>
                             </div>
@@ -250,31 +313,243 @@ const BudgetDetail = () => {
             label: "Chi tiêu",
             children: (
                 <div className="space-y-6">
-                    <div className="ds-card">
-                        <h3 className="ds-heading-3 mb-4">Giao dịch trong ngân sách</h3>
-                        <div className="ds-empty-state" style={{ minHeight: "200px" }}>
-                            <p className="ds-empty-state-text">Danh sách giao dịch sẽ được hiển thị ở đây</p>
-                            <p className="ds-text-small">Tính năng đang phát triển</p>
+                    <div className="ds-card flex flex-col max-h-[calc(100vh-260px)]">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-base font-bold">Danh sách chi tiêu</h3>
+                            <span className="ds-text-secondary">
+                                {transactions.length} mục
+                            </span>
                         </div>
+
+                        {loadingTx ? (
+                            <p className="ds-text-secondary">Đang tải...</p>
+                        ) : transactions.length > 0 ? (
+                            <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-6 pb-4">
+                                {Object.entries(groupedTransactions).map(([date, items]) => (
+                                    <div key={date}>
+                                        {/* Date header */}
+                                        <p className="text-xs font-semibold text-gray-500 mb-2 sticky top-0 bg-white py-1 z-10">
+                                            {date}
+                                        </p>
+
+                                        <div className="space-y-2">
+                                            {items.map((t) => (
+                                                <div
+                                                    key={t.id}
+                                                    className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition"
+                                                >
+                                                    {/* Icon */}
+                                                    <div className="w-10 h-10 flex-shrink-0 rounded-full bg-rose-100 flex items-center justify-center">
+                                                        <span className="text-rose-600 font-bold text-sm">₫</span>
+                                                    </div>
+
+                                                    {/* Nội dung */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="font-semibold text-gray-900 truncate">
+                                                            {t.note || t.category}
+                                                        </p>
+                                                        <p className="text-xs text-gray-500">
+                                                            {dayjs(t.date).format("HH:mm")}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Amount */}
+                                                    <p className="flex-shrink-0 font-bold text-rose-600 text-sm">
+                                                        -{formatCurrency(t.amount)}
+                                                    </p>
+                                                </div>
+
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="ds-empty-state">
+                                <p className="ds-empty-state-text">
+                                    Chưa có chi tiêu nào trong ngân sách này
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             ),
         },
+
         {
             key: "statistics",
             label: "Thống kê",
             children: (
-                <div className="space-y-6">
-                    <div className="ds-card">
-                        <h3 className="ds-heading-3 mb-4">Biểu đồ chi tiêu</h3>
-                        <div className="ds-empty-state" style={{ minHeight: "300px" }}>
-                            <p className="ds-empty-state-text">Biểu đồ sẽ được hiển thị ở đây</p>
-                            <p className="ds-text-small">Tính năng đang phát triển</p>
+                <div className="space-y-4">
+                    {/* Summary cards */}
+                    {stats ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div className="ds-card">
+                                <p className="ds-text-secondary">Hạn mức</p>
+                                <p className="text-emerald-700 font-extrabold text-xl">
+                                    {formatCurrency(safeStats.limit)}
+                                </p>
+                            </div>
+
+                            <div className="ds-card">
+                                <p className="ds-text-secondary">Đã chi</p>
+                                <p className="text-rose-600 font-extrabold text-xl">
+                                    {formatCurrency(safeStats.spent)}
+                                </p>
+                            </div>
+
+                            <div className="ds-card">
+                                <p className="ds-text-secondary">Còn lại</p>
+                                <p className="text-sky-600 font-extrabold text-xl">
+                                    {formatCurrency(safeStats.remaining)}
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="ds-card">Đang tải...</div>
+                    )}
+
+                    {/* Progress */}
+                    <div className="bg-white rounded-2xl border border-gray-200 p-5">
+                        <p className="text-sm text-gray-500 mb-2">Tiến độ sử dụng</p>
+
+                        <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                                className="h-full rounded-full transition-all duration-700"
+                                style={{
+                                    width: `${percent}%`,
+                                    backgroundColor: progressColor,
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex justify-end mt-2">
+                            <span
+                                className="font-semibold text-sm"
+                                style={{ color: progressColor }}
+                            >
+                                {percent}%
+                            </span>
                         </div>
                     </div>
+                    {/* Pie Chart */}
+                    <div className="bg-white rounded-2xl border border-gray-200 p-5">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold">Phân bổ ngân sách</h3>
+                            <span className="text-sm text-gray-500">
+                                Tổng: {formatCurrency(safeStats.limit)}
+                            </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            {/* Donut */}
+                            <div className="h-[260px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={pieData}
+                                            innerRadius={70}
+                                            outerRadius={100}
+                                            paddingAngle={4}
+                                            dataKey="value"
+                                        >
+                                            {pieData.map((entry, index) => (
+                                                <Cell key={index} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            formatter={(v) =>
+                                                `${new Intl.NumberFormat("vi-VN").format(v)} đ`
+                                            }
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+
+                            {/* Legend */}
+                            <div className="space-y-4">
+                                {pieData.map((item) => {
+                                    const percent = Math.round(
+                                        (item.value / safeStats.limit) * 100
+                                    );
+
+                                    return (
+                                        <div key={item.name}>
+                                            <div className="flex justify-between text-sm font-medium">
+                                                <span>{item.name}</span>
+                                                <span>{percent}%</span>
+                                            </div>
+                                            <div className="w-full h-2 bg-gray-200 rounded-full mt-1">
+                                                <div
+                                                    className="h-full rounded-full"
+                                                    style={{
+                                                        width: `${percent}%`,
+                                                        backgroundColor: item.color,
+                                                    }}
+                                                />
+                                            </div>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {formatCurrency(item.value)}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Chart */}
+                    {stats?.byDate && safeStats.byDate.length > 0 ? (
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">
+                                Chi tiêu theo thời gian
+                            </h3>
+
+                            {/* QUAN TRỌNG: container PHẢI có height */}
+                            <div className="h-[320px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={safeStats.byDate}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis
+                                            dataKey="date"
+                                            tick={{ fontSize: 12 }}
+                                        />
+                                        <YAxis
+                                            tick={{ fontSize: 12 }}
+                                            tickFormatter={(v) =>
+                                                new Intl.NumberFormat("vi-VN").format(v)
+                                            }
+                                        />
+                                        <Tooltip
+                                            formatter={(value) =>
+                                                `${new Intl.NumberFormat("vi-VN").format(value)} đ`
+                                            }
+                                            labelFormatter={(label) => `Ngày ${label}`}
+                                        />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="amount"
+                                            stroke="#3B82F6"
+                                            strokeWidth={3}
+                                            dot={{ r: 4 }}
+                                            activeDot={{ r: 6 }}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-10 text-center">
+                            <p className="text-gray-500 font-medium">
+                                Chưa có dữ liệu chi tiêu theo thời gian
+                            </p>
+                        </div>
+                    )}
                 </div>
             ),
-        },
+        }
+
+
     ];
 
     return (
