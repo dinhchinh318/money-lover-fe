@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit, Trash2, Pause, Play, Target, Wallet, TrendingUp, AlertCircle, CheckCircle, PiggyBank, Calendar } from "lucide-react";
 import { message, Modal, Dropdown, InputNumber, Badge, Alert } from "antd";
-import { getAllSavingGoalsAPI, deleteSavingGoalAPI, completeSavingGoalAPI } from "../../../services/api.savingGoal";
+import { getAllSavingGoalsAPI, deleteSavingGoalAPI, completeSavingGoalAPI, depositSavingGoalAPI, withdrawSavingGoalAPI } from "../../../services/api.savingGoal";
 import SavingGoalModal from "../../../components/savingGoals/SavingGoalModal";
 import dayjs from "dayjs";
 
@@ -13,6 +13,10 @@ const SavingGoalsIndex = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("all");
     const [modalOpen, setModalOpen] = useState(false);
+    const [moneyModalOpen, setMoneyModalOpen] = useState(false);
+    const [moneyAction, setMoneyAction] = useState(null); // "deposit" | "withdraw"
+    const [selectedGoal, setSelectedGoal] = useState(null);
+    const [amount, setAmount] = useState(0);
     const [editingGoal, setEditingGoal] = useState(null);
     const [summary, setSummary] = useState({
         totalGoals: 0,
@@ -64,12 +68,18 @@ const SavingGoalsIndex = () => {
 
         setFilteredGoals(filtered);
     };
+    const openMoneyModal = (goal, action) => {
+        setSelectedGoal(goal);
+        setMoneyAction(action);
+        setAmount(0);
+        setMoneyModalOpen(true);
+    };
 
     const calculateSummary = () => {
         const total = goals.length;
         const totalTarget = goals.reduce((sum, g) => sum + (g.target_amount || 0), 0);
         const totalSaved = goals.reduce(
-            (sum, g) => sum + (g.wallet?.balance || 0),
+            (sum, g) => sum + (g.current_amount || 0),
             0
         );
         const averageProgress =
@@ -300,7 +310,7 @@ const SavingGoalsIndex = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredGoals.map((goal) => {
                             const progress = goal.progress || 0;
-                            const current = goal.current_amount ?? goal.wallet?.balance ?? 0;
+                            const current = goal.current_amount || 0;
                             const target = goal.target_amount || 1;
                             const remaining = target - current;
                             const timeRemaining = getTimeRemaining(goal.target_date);
@@ -448,6 +458,28 @@ const SavingGoalsIndex = () => {
                                             />
                                         </div>
                                     </div>
+                                    {/* Quick Actions */}
+                                    {goal.is_active && (
+                                        <div
+                                            className="flex gap-2 mt-3"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <button
+                                                className="ds-button-primary"
+                                                onClick={() => openMoneyModal(goal, "deposit")}
+                                            >
+                                                + Thêm tiền
+                                            </button>
+
+                                            <button
+                                                className="ds-button-secondary"
+                                                disabled={current <= 0}
+                                                onClick={() => openMoneyModal(goal, "withdraw")}
+                                            >
+                                                − Rút tiền
+                                            </button>
+                                        </div>
+                                    )}
 
                                     {/* Time Info */}
                                     <div className="border-t border-[#E5E7EB] pt-4">
@@ -494,6 +526,56 @@ const SavingGoalsIndex = () => {
                     </div>
                 )}
             </div>
+            <Modal
+                open={moneyModalOpen}
+                title={moneyAction === "deposit" ? "Thêm tiền vào mục tiêu" : "Rút tiền về ví"}
+                onCancel={() => setMoneyModalOpen(false)}
+                onOk={async () => {
+                    if (!amount || amount <= 0) {
+                        message.error("Vui lòng nhập số tiền hợp lệ");
+                        return;
+                    }
+                    if (
+                        moneyAction === "withdraw" &&
+                        amount > (selectedGoal?.current_amount || 0)
+                    ) {
+                        message.error("Không thể rút nhiều hơn số tiền đã tiết kiệm");
+                        return;
+                    }
+                    try {
+                        if (moneyAction === "deposit") {
+                            await depositSavingGoalAPI(selectedGoal._id, amount);
+                            message.success("Đã thêm tiền");
+                        } else {
+                            await withdrawSavingGoalAPI(selectedGoal._id, amount);
+                            message.success("Đã rút tiền");
+                        }
+                        setMoneyModalOpen(false);
+                        setAmount(0);
+                        loadGoals(); // refresh list
+                    } catch (err) {
+                        message.error(err.response?.data?.message || "Thao tác thất bại");
+                    }
+                }}
+            >
+                <InputNumber
+                    autoFocus
+                    min={1}
+                    value={amount}
+                    onChange={setAmount}
+                    style={{ width: "100%" }}
+                    placeholder="Nhập số tiền"
+                    addonAfter="₫"
+                    formatter={(value) =>
+                        value
+                            ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                            : ""
+                    }
+                    parser={(value) =>
+                        value ? value.replace(/\./g, "") : ""
+                    }
+                />
+            </Modal>
 
             {/* Saving Goal Modal */}
             <SavingGoalModal
