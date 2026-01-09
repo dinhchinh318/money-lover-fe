@@ -313,9 +313,9 @@ const BudgetDetail = () => {
             label: "Chi tiêu",
             children: (
                 <div className="space-y-6">
-                    <div className="ds-card">
+                    <div className="ds-card flex flex-col max-h-[calc(100vh-260px)]">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="ds-heading-3">Danh sách chi tiêu</h3>
+                            <h3 className="text-base font-bold">Danh sách chi tiêu</h3>
                             <span className="ds-text-secondary">
                                 {transactions.length} mục
                             </span>
@@ -324,11 +324,11 @@ const BudgetDetail = () => {
                         {loadingTx ? (
                             <p className="ds-text-secondary">Đang tải...</p>
                         ) : transactions.length > 0 ? (
-                            <div className="space-y-6">
+                            <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-6 pb-4">
                                 {Object.entries(groupedTransactions).map(([date, items]) => (
                                     <div key={date}>
                                         {/* Date header */}
-                                        <p className="text-sm font-semibold text-gray-500 mb-2">
+                                        <p className="text-xs font-semibold text-gray-500 mb-2 sticky top-0 bg-white py-1 z-10">
                                             {date}
                                         </p>
 
@@ -336,29 +336,29 @@ const BudgetDetail = () => {
                                             {items.map((t) => (
                                                 <div
                                                     key={t.id}
-                                                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition"
+                                                    className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition"
                                                 >
-                                                    {/* Left */}
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center">
-                                                            <span className="text-rose-600 font-bold">₫</span>
-                                                        </div>
-
-                                                        <div>
-                                                            <p className="font-semibold text-gray-900">
-                                                                {t.note || t.category}
-                                                            </p>
-                                                            <p className="text-xs text-gray-500">
-                                                                {dayjs(t.date).format("HH:mm")}
-                                                            </p>
-                                                        </div>
+                                                    {/* Icon */}
+                                                    <div className="w-10 h-10 flex-shrink-0 rounded-full bg-rose-100 flex items-center justify-center">
+                                                        <span className="text-rose-600 font-bold text-sm">₫</span>
                                                     </div>
 
-                                                    {/* Right */}
-                                                    <p className="font-extrabold text-rose-600">
-                                                        - {formatCurrency(t.amount)}
+                                                    {/* Nội dung */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="font-semibold text-gray-900 truncate">
+                                                            {t.note || t.category}
+                                                        </p>
+                                                        <p className="text-xs text-gray-500">
+                                                            {dayjs(t.date).format("HH:mm")}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Amount */}
+                                                    <p className="flex-shrink-0 font-bold text-rose-600 text-sm">
+                                                        -{formatCurrency(t.amount)}
                                                     </p>
                                                 </div>
+
                                             ))}
                                         </div>
                                     </div>
