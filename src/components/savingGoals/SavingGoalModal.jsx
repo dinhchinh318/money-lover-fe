@@ -20,7 +20,6 @@ const SavingGoalModal = ({ open, onClose, goal, onSuccess }) => {
                     name: goal.name,
                     wallet: goal.wallet?._id || goal.wallet,
                     target_amount: goal.target_amount || 0,
-                    current_amount: goal.current_amount || 0,
                     target_date: goal.target_date ? dayjs(goal.target_date) : null,
                     description: goal.description || "",
                 });
@@ -61,7 +60,6 @@ const SavingGoalModal = ({ open, onClose, goal, onSuccess }) => {
                 name: values.name.trim(),
                 walletId: values.wallet,
                 target_amount: values.target_amount,
-                current_amount: values.current_amount || 0,
                 description: values.description || "",
             };
 
@@ -157,25 +155,6 @@ const SavingGoalModal = ({ open, onClose, goal, onSuccess }) => {
                         addonAfter="VND"
                     />
                 </Form.Item>
-
-                <Form.Item
-                    label="Số tiền hiện tại"
-                    name="current_amount"
-                    rules={[
-                        { required: true, message: "Vui lòng nhập số tiền hiện tại!" },
-                        { type: "number", min: 0, message: "Số tiền không được âm!" },
-                    ]}
-                >
-                    <InputNumber
-                        style={{ width: "100%" }}
-                        placeholder="0"
-                        formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                        parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                        min={0}
-                        addonAfter="VND"
-                    />
-                </Form.Item>
-
                 <Form.Item
                     label="Ngày đạt mục tiêu"
                     name="target_date"
