@@ -176,7 +176,7 @@ const SavingGoalDetail = () => {
                 <div className="space-y-6">
                     {/* Main Info Card */}
                     <div className="ds-card">
-                        <div className="flex items-start gap-6 mb-6">
+                        <div className="flex items-start gap-4 mb-6 flex-wrap sm:flex-nowrap">
                             <div className="w-20 h-20 rounded-full bg-[#10B981]/10 flex items-center justify-center flex-shrink-0">
                                 <Target className="text-[#10B981] w-10 h-10" />
                             </div>
@@ -213,7 +213,7 @@ const SavingGoalDetail = () => {
                         </div>
                         {/* Deposit / Withdraw */}
                         {goal.is_active && (
-                            <div className="flex gap-3 mb-6">
+                            <div className="flex flex-col sm:flex-row gap-3 mb-6">
                                 <InputNumber
                                     min={1}
                                     value={amount}
@@ -246,49 +246,33 @@ const SavingGoalDetail = () => {
 
 
                         {/* Details */}
-                        <div className="grid grid-cols-2 gap-4 border-t border-[#E5E7EB] pt-6">
-                            <div>
-                                <p className="ds-text-secondary mb-1">Ví</p>
-                                <p className="font-semibold">{goal.wallet?.name || "N/A"}</p>
-                            </div>
-                            <div>
-                                <p className="ds-text-secondary mb-1">Mục tiêu</p>
-                                <p className="font-bold text-[#3B82F6] text-lg">{formatCurrency(target)}</p>
-                            </div>
-                            <div>
-                                <p className="ds-text-secondary mb-1">Đã tiết kiệm</p>
-                                <p className="font-bold text-[#10B981] text-lg">{formatCurrency(current)}</p>
-                            </div>
-                            <div>
-                                <p className="ds-text-secondary mb-1">Còn thiếu</p>
-                                <p className={`font-bold text-lg ${remaining < 0 ? "text-[#EF4444]" : "text-[#10B981]"}`}>
-                                    {formatCurrency(remaining)}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="ds-text-secondary mb-1">Ngày đạt mục tiêu</p>
-                                <p className="font-semibold">{formatDate(goal.target_date)}</p>
-                            </div>
-                            {timeRemaining && (
-                                <div>
-                                    <p className="ds-text-secondary mb-1">Thời gian còn lại</p>
-                                    <p className="font-semibold" style={{ color: timeRemaining.color }}>
-                                        {timeRemaining.text}
-                                    </p>
-                                </div>
-                            )}
+                        <div className="min-w-0">
+                            <p className="ds-text-secondary mb-1">Ví</p>
+                            <p className="font-semibold break-words">
+                                {goal.wallet?.name || "N/A"}
+                            </p>
                         </div>
 
-                        {goal.description && (
-                            <div className="mt-6 pt-6 border-t border-[#E5E7EB]">
-                                <p className="ds-text-secondary mb-1">Mô tả</p>
-                                <p className="ds-body">{goal.description}</p>
-                            </div>
-                        )}
+                        <div className="min-w-0">
+                            <p className="ds-text-secondary mb-1">Mục tiêu</p>
+                            <p className="font-bold text-[#3B82F6] text-base sm:text-lg break-words leading-tight">
+                                {formatCurrency(target)}
+                            </p>
+                        </div>
+
+                        <div className="min-w-0">
+                            <p className="ds-text-secondary mb-1">Còn thiếu</p>
+                            <p
+                                className={`font-bold text-base sm:text-lg break-words leading-tight ${remaining < 0 ? "text-[#EF4444]" : "text-[#10B981]"
+                                    }`}
+                            >
+                                {formatCurrency(remaining)}
+                            </p>
+                        </div>
 
                         {/* Actions */}
 
-                        <div className="flex gap-3 mt-6 pt-6 border-t border-[#E5E7EB]">
+                        <div className="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t border-[#E5E7EB]">
                             {!goal.is_completed && (
                                 <button
                                     onClick={handleCompleteGoal}
