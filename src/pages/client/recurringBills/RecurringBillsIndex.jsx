@@ -355,153 +355,23 @@ const RecurringBillsIndex = () => {
                         ))}
                     </div>
                 ) : filteredBills.length > 0 ? (
-                    <div className="space-y-4">
-                        {filteredBills.map((bill) => {
-                            const isUpcoming =
-                                dayjs(bill.next_run).diff(dayjs(), "day") <= 7 && bill.active;
-
-                            const isPaidThisMonth =
-                                bill.last_paid_at &&
-                                dayjs(bill.last_paid_at).isSame(dayjs(), "month");
-                            return (
-                                <div
-                                    key={bill._id}
-                                    className={`relative rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 ${isUpcoming
-                                        ? "bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300"
-                                        : bill.type === "income"
-                                            ? "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200"
-                                            : "bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200"
-                                        }`}
-                                >
-                                    {/* Actions Menu */}
-                                    <div className="absolute top-4 right-4 z-10">
-                                        <Dropdown
-                                            menu={{ items: getBillMenuItems(bill) }}
-                                            trigger={["click"]}
-                                            placement="bottomRight"
-                                        >
-                                            <button className="p-2 hover:bg-[#F9FAFB] rounded-lg transition-colors">
-                                                <svg
-                                                    className="w-5 h-5 text-[#6B7280]"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </Dropdown>
-                                    </div>
-
-                                    <div className="flex items-start gap-6">
-                                        {/* Icon */}
-                                        <div
-                                            className={`w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${bill.type === "income"
-                                                ? "bg-gradient-to-br from-green-400 to-emerald-600"
-                                                : "bg-gradient-to-br from-red-400 to-rose-600"
-                                                }`}
-                                        >
-                                            <CreditCard className="text-white w-10 h-10" />
-                                        </div>
-
-                                        {/* Content */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                {isPaidThisMonth && (
-                                                    <Badge
-                                                        color="green"
-                                                        text="Đã thanh toán tháng này"
-                                                    />
-                                                )}
-                                                {bill.auto_create_transaction && (
-                                                    <Badge
-                                                        color="blue"
-                                                        text="Tự động"
-                                                    />
-                                                )}
-
-                                                <h3 className="ds-heading-3">{bill.name}</h3>
-                                                <Badge
-                                                    count={bill.active ? "Đang hoạt động" : "Đã tạm dừng"}
-                                                    style={{
-                                                        backgroundColor: bill.active ? "#10B981" : "#F59E0B",
-                                                        color: "white",
-                                                        padding: "4px 12px",
-                                                        borderRadius: "8px",
-                                                        fontSize: "12px",
-                                                        fontWeight: "600",
-                                                    }}
-                                                />
-                                                {isUpcoming && (
-                                                    <Badge
-                                                        count="Sắp đến hạn"
-                                                        style={{
-                                                            backgroundColor: "#F59E0B",
-                                                            color: "white",
-                                                            padding: "4px 12px",
-                                                            borderRadius: "8px",
-                                                            fontSize: "12px",
-                                                            fontWeight: "600",
-                                                        }}
-                                                    />
-                                                )}
-                                            </div>
-
-                                            <p
-                                                className={`text-2xl font-bold mb-4 ${bill.type === "income" ? "text-[#10B981]" : "text-[#EF4444]"
-                                                    }`}
-                                            >
-                                                {bill.type === "income" ? "+" : "-"}
-                                                {formatCurrency(bill.amount)}
-                                            </p>
-
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">Tần suất</p>
-                                                    <p className="font-semibold">{getFrequencyLabel(bill.frequency)}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">Ví</p>
-                                                    <p className="font-semibold">{bill.wallet?.name || "N/A"}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">Danh mục</p>
-                                                    <p className="font-semibold">{bill.category?.name || "N/A"}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">Loại</p>
-                                                    <p className="font-semibold">
-                                                        {bill.type === "income" ? "Thu nhập" : "Chi tiêu"}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[#E5E7EB]">
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">
-                                                        Lần thanh toán tiếp theo
-                                                    </p>
-                                                    <p className="font-semibold">{formatDateTime(bill.next_run)}</p>
-                                                    <p className="text-sm text-[#F59E0B] mt-1">
-                                                        {getTimeRemaining(bill.next_run)}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">Ngày kết thúc</p>
-                                                    <p className="font-semibold">{formatDate(bill.ends_at)}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                        <div className="h-[70vh] overflow-y-auto">
+                            <div className="space-y-2 p-3 sm:p-4">
+                                {filteredBills.map((bill) => (
+                                    <RecurringBillRow
+                                        key={bill._id}
+                                        bill={bill}
+                                        onEdit={handleEditBill}
+                                        onDelete={handleDeleteBill}
+                                        onPay={handlePayNow}
+                                        onToggle={handleToggleActive}
+                                    />
+                                ))}
+                            </div>
+                        </div>
                     </div>
+
                 ) : (
                     <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-300">
                         <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full flex items-center justify-center mb-4">
@@ -536,6 +406,179 @@ const RecurringBillsIndex = () => {
                 bill={editingBill}
                 onSuccess={loadBills}
             />
+        </div>
+    );
+};
+const RecurringBillRow = ({ bill, onEdit, onDelete, onPay, onToggle }) => {
+    const isPaidThisMonth =
+        bill.last_paid_at && dayjs(bill.last_paid_at).isSame(dayjs(), "month");
+
+    const isUpcoming =
+        bill.active && dayjs(bill.next_run).diff(dayjs(), "day") <= 7;
+
+    const color = bill.type === "income" ? "#10B981" : "#EF4444";
+
+    return (
+        <div
+            className="group flex items-start gap-3 sm:gap-4
+                 bg-white rounded-xl p-3 sm:p-4
+                 border border-gray-200
+                 hover:border-gray-300 hover:shadow-sm
+                 transition"
+        >
+            {/* Icon */}
+            <div
+                className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${color}22` }}
+            >
+                <CreditCard size={26} style={{ color }} />
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+                {/* Name */}
+                <p
+                    className="font-semibold text-gray-900 text-sm sm:text-base
+               line-clamp-2 break-words"
+                >
+                    {bill.name}
+                </p>
+
+                {/* Badges */}
+                <div className="flex flex-wrap items-center gap-1 mt-1">
+                    {bill.active ? (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                            Hoạt động
+                        </span>
+                    ) : (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                            Tạm dừng
+                        </span>
+                    )}
+
+                    {isUpcoming && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">
+                            Sắp đến hạn
+                        </span>
+                    )}
+                </div>
+
+                {/* Meta */}
+                <p className="text-xs sm:text-sm text-gray-500 truncate mt-0.5">
+                    {dayjs(bill.next_run).format("DD/MM/YYYY")} • {bill.frequency}
+                </p>
+            </div>
+
+
+            {/* Amount */}
+            <div className="flex flex-col items-end max-w-[40%] sm:max-w-none">
+                <span
+                    className="text-base sm:text-lg font-extrabold tabular-nums break-words leading-tight"
+                    style={{ color }}
+                >
+                    {bill.type === "income" ? "+" : "-"}
+                    {new Intl.NumberFormat("vi-VN").format(bill.amount)}đ
+                </span>
+
+                {isPaidThisMonth && (
+                    <span className="text-xs text-emerald-600 font-medium">
+                        Đã thanh toán
+                    </span>
+                )}
+            </div>
+            {/* Mobile actions */}
+            <div className="sm:hidden self-start">
+                <Dropdown
+                    trigger={["click"]}
+                    menu={{
+                        items: [
+                            {
+                                key: "pay",
+                                label: "Thanh toán ngay",
+                                icon: <CreditCard size={14} />,
+                                disabled:
+                                    bill.last_paid_at &&
+                                    dayjs(bill.last_paid_at).isSame(dayjs(), "month"),
+                                onClick: () => onPay(bill),
+                            },
+                            {
+                                key: "edit",
+                                label: "Chỉnh sửa",
+                                icon: <Edit size={14} />,
+                                onClick: () => onEdit(bill),
+                            },
+                            {
+                                key: "toggle",
+                                label: bill.active ? "Tạm dừng" : "Kích hoạt",
+                                icon: bill.active ? <Pause size={14} /> : <Play size={14} />,
+                                onClick: () => onToggle(bill),
+                            },
+                            {
+                                type: "divider",
+                            },
+                            {
+                                key: "delete",
+                                label: "Xóa",
+                                danger: true,
+                                icon: <Trash2 size={14} />,
+                                onClick: () => onDelete(bill),
+                            },
+                        ],
+                    }}
+                >
+                    <button className="p-2 rounded-lg hover:bg-gray-100">
+                        <svg
+                            className="w-5 h-5 text-gray-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 5v.01M12 12v.01M12 19v.01"
+                            />
+                        </svg>
+                    </button>
+                </Dropdown>
+            </div>
+
+            {/* Actions desktop */}
+            <div className="hidden sm:flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                <button
+                    onClick={() => onPay(bill)}
+                    disabled={isPaidThisMonth}
+                    className="p-2 rounded-lg hover:bg-emerald-50 disabled:opacity-40"
+                >
+                    <CreditCard size={16} className="text-emerald-600" />
+                </button>
+
+                <button
+                    onClick={() => onEdit(bill)}
+                    className="p-2 rounded-lg hover:bg-blue-50"
+                >
+                    <Edit size={16} className="text-blue-600" />
+                </button>
+
+                <button
+                    onClick={() => onToggle(bill)}
+                    className="p-2 rounded-lg hover:bg-amber-50"
+                >
+                    {bill.active ? (
+                        <Pause size={16} className="text-amber-600" />
+                    ) : (
+                        <Play size={16} className="text-emerald-600" />
+                    )}
+                </button>
+
+                <button
+                    onClick={() => onDelete(bill)}
+                    className="p-2 rounded-lg hover:bg-red-50"
+                >
+                    <Trash2 size={16} className="text-red-600" />
+                </button>
+            </div>
         </div>
     );
 };
