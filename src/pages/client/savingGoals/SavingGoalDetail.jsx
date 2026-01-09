@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Target, Edit, Trash2 } from "lucide-react";
-import { message, Modal, Tabs } from "antd";
-import { getSavingGoalByIdAPI, deleteSavingGoalAPI } from "../../../services/api.savingGoal";
+import { ArrowLeft, Target, Edit, Trash2, CheckCircle } from "lucide-react";
+import { message, Modal, Tabs, InputNumber } from "antd";
+import { getSavingGoalByIdAPI, deleteSavingGoalAPI, depositSavingGoalAPI, withdrawSavingGoalAPI } from "../../../services/api.savingGoal";
 import SavingGoalModal from "../../../components/savingGoals/SavingGoalModal";
 import dayjs from "dayjs";
 
@@ -13,6 +13,8 @@ const SavingGoalDetail = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("info");
     const [modalOpen, setModalOpen] = useState(false);
+    const [amount, setAmount] = useState(0);
+
 
     useEffect(() => {
         if (id) {
@@ -84,6 +86,37 @@ const SavingGoalDetail = () => {
             },
         });
     };
+    const handleDeposit = async () => {
+        if (amount <= 0) {
+            message.error("Số tiền phải lớn hơn 0");
+            return;
+        }
+
+        try {
+            await depositSavingGoalAPI(goal._id, amount);
+            message.success("Đã thêm tiền vào mục tiêu");
+            setAmount(0);
+            loadGoal();
+        } catch (err) {
+            message.error(err.response?.data?.message || "Thêm tiền thất bại");
+        }
+    };
+
+    const handleWithdraw = async () => {
+        if (amount <= 0) {
+            message.error("Số tiền phải lớn hơn 0");
+            return;
+        }
+
+        try {
+            await withdrawSavingGoalAPI(goal._id, amount);
+            message.success("Đã rút tiền về ví");
+            setAmount(0);
+            loadGoal();
+        } catch (err) {
+            message.error(err.response?.data?.message || "Rút tiền thất bại");
+        }
+    };
 
     const handleDelete = () => {
         Modal.confirm({
@@ -128,7 +161,7 @@ const SavingGoalDetail = () => {
 
     const current = isCompleted
         ? goal.target_amount
-        : (goal.current_amount ?? goal.wallet?.balance ?? 0);
+        : (goal.current_amount || 0);
 
     const target = goal.target_amount || 1;
     const remaining = target - current;
@@ -178,6 +211,39 @@ const SavingGoalDetail = () => {
                                 />
                             </div>
                         </div>
+                        {/* Deposit / Withdraw */}
+                        {goal.is_active && (
+                            <div className="flex gap-3 mb-6">
+                                <InputNumber
+                                    min={1}
+                                    value={amount}
+                                    onChange={setAmount}
+                                    style={{ width: 200 }}
+                                    placeholder="Nhập số tiền"
+                                    formatter={(value) =>
+                                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                    }
+                                    parser={(value) => value.replace(/,/g, "")}
+                                    addonAfter="VND"
+                                />
+
+                                <button
+                                    onClick={handleDeposit}
+                                    className="ds-button-primary"
+                                >
+                                    Thêm tiền
+                                </button>
+
+                                <button
+                                    onClick={handleWithdraw}
+                                    className="ds-button-secondary"
+                                    disabled={current <= 0}
+                                >
+                                    Rút về ví
+                                </button>
+                            </div>
+                        )}
+
 
                         {/* Details */}
                         <div className="grid grid-cols-2 gap-4 border-t border-[#E5E7EB] pt-6">
