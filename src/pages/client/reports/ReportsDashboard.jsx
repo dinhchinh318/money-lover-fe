@@ -216,19 +216,15 @@ const ReportsDashboard = () => {
                 endDate: monthEnd.format("YYYY-MM-DD"),
             };
             
-            console.log("[loadWalletChanges] Calling API with params:", params);
             const res = await getWalletChangesAPI(params);
-            console.log("[loadWalletChanges] API response:", res);
 
             // Backend trả về: { status: true, error: 0, data: {wallets: [...], period: {...}} }
             if ((res?.status === true || res?.error === 0) && res?.data) {
                 // Lấy mảng wallets từ data
                 const wallets = res.data.wallets || [];
-                console.log("[loadWalletChanges] Setting wallets:", wallets.length, "wallets");
                 setWalletFluctuations(wallets);
             } else {
                 // Nếu không có dữ liệu, set mảng rỗng
-                console.log("[loadWalletChanges] No valid data, setting empty array");
                 setWalletFluctuations([]);
             }
         } catch (error) {
@@ -743,16 +739,16 @@ const ReportsDashboard = () => {
             </div>
 
             {/* Comparison and Wallet Fluctuations - Side by Side */}
-            <div className="max-w-7xl mx-auto p-6">
-                <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="max-w-7xl mx-auto p-4 sm:p-6">
+                <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Comparison Section - Left */}
                     <Card className="shadow-sm border-0 rounded-xl overflow-hidden">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
                             <div className="flex items-center gap-2">
                                 <div className="p-1.5 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg">
                                     <BarChart3 className="text-white" size={16} />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                                     So sánh với Kỳ trước
                                 </h3>
                             </div>
@@ -768,24 +764,24 @@ const ReportsDashboard = () => {
                                 <Spin />
                             </div>
                         ) : (
-                            <div className="flex justify-center gap-6">
+                            <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
                                 {/* Current Period - Left Column */}
-                                <div className="w-full max-w-[280px]">
+                                <div className="w-full sm:max-w-[280px]">
                                     <div className="mb-4 p-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                                        <h4 className="font-bold text-gray-900 text-sm text-center">
+                                        <h4 className="font-bold text-gray-900 text-xs sm:text-sm text-center">
                                             {getPeriodLabels().current}
                                         </h4>
                                     </div>
                                     <div className="space-y-2">
-                                        <div className="p-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                                        <div className="p-2 sm:p-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg">
                                             <span className="text-xs font-semibold text-gray-600 mb-1 block">
                                                 Tổng thu
                                             </span>
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-bold text-[#10B981] text-base">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-bold text-[#10B981] text-sm sm:text-base truncate">
                                                     {formatCurrency(comparison.current.income)}
                                                 </span>
-                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded border border-green-200">
+                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded border border-green-200 flex-shrink-0">
                                                     {comparison.current.incomeChange >= 0 ? (
                                                         <TrendingUp size={12} className="text-[#10B981]" />
                                                     ) : (
@@ -797,15 +793,15 @@ const ReportsDashboard = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="p-3 bg-gradient-to-br from-red-50 to-pink-50 border border-red-200 rounded-lg">
+                                        <div className="p-2 sm:p-3 bg-gradient-to-br from-red-50 to-pink-50 border border-red-200 rounded-lg">
                                             <span className="text-xs font-semibold text-gray-600 mb-1 block">
                                                 Tổng chi
                                             </span>
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-bold text-[#EF4444] text-base">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-bold text-[#EF4444] text-sm sm:text-base truncate">
                                                     {formatCurrency(comparison.current.expense)}
                                                 </span>
-                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded border border-red-200">
+                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded border border-red-200 flex-shrink-0">
                                                     {comparison.current.expenseChange >= 0 ? (
                                                         <TrendingUp size={12} className="text-[#EF4444]" />
                                                     ) : (
@@ -817,15 +813,15 @@ const ReportsDashboard = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="p-3 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-lg">
+                                        <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-lg">
                                             <span className="text-xs font-semibold text-gray-600 mb-1 block">
                                                 Số dư
                                             </span>
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-bold text-[#3B82F6] text-base">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-bold text-[#3B82F6] text-sm sm:text-base truncate">
                                                     {formatCurrency(comparison.current.balance)}
                                                 </span>
-                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded border border-blue-200">
+                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded border border-blue-200 flex-shrink-0">
                                                     {comparison.current.balanceChange >= 0 ? (
                                                         <TrendingUp size={12} className="text-[#10B981]" />
                                                     ) : (
@@ -841,34 +837,34 @@ const ReportsDashboard = () => {
                                 </div>
 
                                 {/* Previous Period - Right Column */}
-                                <div className="w-full max-w-[280px]">
+                                <div className="w-full sm:max-w-[280px]">
                                     <div className="mb-4 p-2 bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg border border-gray-200">
-                                        <h4 className="font-bold text-gray-900 text-sm text-center">
+                                        <h4 className="font-bold text-gray-900 text-xs sm:text-sm text-center">
                                             {getPeriodLabels().previous}
                                         </h4>
                                     </div>
                                     <div className="space-y-2">
-                                        <div className="p-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg opacity-75">
+                                        <div className="p-2 sm:p-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg opacity-75">
                                             <span className="text-xs font-semibold text-gray-600 mb-1 block">
                                                 Tổng thu
                                             </span>
-                                            <span className="font-bold text-[#10B981] text-base">
+                                            <span className="font-bold text-[#10B981] text-sm sm:text-base">
                                                 {formatCurrency(comparison.previous.income)}
                                             </span>
                                         </div>
-                                        <div className="p-3 bg-gradient-to-br from-red-50 to-pink-50 border border-red-200 rounded-lg opacity-75">
+                                        <div className="p-2 sm:p-3 bg-gradient-to-br from-red-50 to-pink-50 border border-red-200 rounded-lg opacity-75">
                                             <span className="text-xs font-semibold text-gray-600 mb-1 block">
                                                 Tổng chi
                                             </span>
-                                            <span className="font-bold text-[#EF4444] text-base">
+                                            <span className="font-bold text-[#EF4444] text-sm sm:text-base">
                                                 {formatCurrency(comparison.previous.expense)}
                                             </span>
                                         </div>
-                                        <div className="p-3 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-lg opacity-75">
+                                        <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-lg opacity-75">
                                             <span className="text-xs font-semibold text-gray-600 mb-1 block">
                                                 Số dư
                                             </span>
-                                            <span className="font-bold text-[#3B82F6] text-base">
+                                            <span className="font-bold text-[#3B82F6] text-sm sm:text-base">
                                                 {formatCurrency(comparison.previous.balance)}
                                             </span>
                                         </div>
@@ -884,7 +880,7 @@ const ReportsDashboard = () => {
                             <div className="p-1.5 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg">
                                 <Wallet className="text-white" size={16} />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900">
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                                 Biến động Ví
                             </h3>
                         </div>
@@ -957,15 +953,15 @@ const ReportsDashboard = () => {
                                             className="mb-4 border-2 hover:shadow-lg transition-all duration-200 rounded-xl bg-gradient-to-br from-white to-gray-50"
                                         >
                                             <div className="flex items-center justify-between mb-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 flex items-center justify-center">
-                                                        <span className="text-2xl">{wallet.icon || getWalletIcon(wallet.walletType)}</span>
+                                                <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 flex items-center justify-center flex-shrink-0">
+                                                        <span className="text-xl sm:text-2xl">{wallet.icon || getWalletIcon(wallet.walletType)}</span>
                                                     </div>
-                                                    <div>
-                                                        <div className="font-bold text-gray-900">
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="font-bold text-gray-900 text-sm sm:text-base truncate">
                                                             {wallet.walletName || wallet.name || "Ví không tên"}
                                                         </div>
-                                                        <div className="text-xl font-bold text-gray-900">
+                                                        <div className="text-lg sm:text-xl font-bold text-gray-900 truncate">
                                                             {formatCurrency(wallet.currentBalance || wallet.balance || 0)}
                                                         </div>
                                                     </div>
@@ -1057,21 +1053,24 @@ const ReportsDashboard = () => {
                             />
                         </div>
                         {chartLoading ? (
-                            <div className="flex items-center justify-center h-[300px]">
+                            <div className="flex items-center justify-center h-[250px] sm:h-[300px]">
                                 <Spin size="large" />
                             </div>
                         ) : chartData && chartData.length > 0 ? (
                             <ResponsiveContainer width="100%" height={300}>
-                                <BarChart data={chartData}>
+                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 40 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                                     <XAxis
                                         dataKey="label"
                                         stroke="#6B7280"
-                                        tick={{ fontSize: 12 }}
+                                        tick={{ fontSize: 10 }}
+                                        angle={-45}
+                                        textAnchor="end"
+                                        height={60}
                                     />
                                     <YAxis
                                         stroke="#6B7280"
-                                        tick={{ fontSize: 12 }}
+                                        tick={{ fontSize: 10 }}
                                         tickFormatter={(value) => {
                                             if (value >= 1000000) {
                                                 return `${(value / 1000000).toFixed(1)}M`;
@@ -1106,30 +1105,30 @@ const ReportsDashboard = () => {
                 <div className="mb-6">
                     <Card className="shadow-lg border-0 overflow-hidden">
                         {/* Header với date selector đẹp hơn */}
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                    <PieChartIcon className="text-blue-600" size={24} />
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                                    <PieChartIcon className="text-blue-600" size={20} />
                                     Tình hình thu chi
                                 </h3>
-                                <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                                <div className="flex items-center gap-2 sm:gap-3 bg-white px-3 sm:px-4 py-2 rounded-lg shadow-sm border border-gray-200 w-full sm:w-auto">
                                     <Button
                                         type="text"
                                         size="small"
-                                        icon={<ChevronLeft size={18} />}
+                                        icon={<ChevronLeft size={16} />}
                                         onClick={handlePreviousPeriod}
-                                        className="hover:bg-blue-50 transition-colors"
+                                        className="hover:bg-blue-50 transition-colors p-1"
                                     />
-                                    <span className="text-base font-bold text-gray-900 min-w-[100px] text-center">
+                                    <span className="text-sm sm:text-base font-bold text-gray-900 min-w-[80px] sm:min-w-[100px] text-center">
                                         {selectedPeriod.format("MM/YYYY")}
                                     </span>
                                     <Button
                                         type="text"
                                         size="small"
-                                        icon={<ChevronRight size={18} />}
+                                        icon={<ChevronRight size={16} />}
                                         onClick={handleNextPeriod}
                                         disabled={selectedPeriod.isSame(dayjs(), "month") || selectedPeriod.isAfter(dayjs(), "month")}
-                                        className="hover:bg-blue-50 transition-colors disabled:opacity-30"
+                                        className="hover:bg-blue-50 transition-colors disabled:opacity-30 p-1"
                                     />
                                 </div>
                             </div>
@@ -1148,23 +1147,23 @@ const ReportsDashboard = () => {
                                     const totalIncome = overview.totalIncome || 0;
 
                                     return (
-                                        <div className="p-6">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                        <div className="p-4 sm:p-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
                                                 {/* Chi tiêu Card */}
-                                                <div className="relative overflow-hidden bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-6 border-2 border-red-100 shadow-md hover:shadow-lg transition-all duration-300 group">
+                                                <div className="relative overflow-hidden bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-4 sm:p-6 border-2 border-red-100 shadow-md hover:shadow-lg transition-all duration-300 group">
                                                     <div className="absolute top-0 right-0 w-32 h-32 bg-red-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
                                                     <div className="relative z-10">
                                                         <div className="flex items-center justify-between mb-3">
-                                                            <span className="text-sm font-semibold text-red-700 uppercase tracking-wide">Chi tiêu</span>
-                                                            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                                <TrendingUp size={24} className="text-red-600" />
+                                                            <span className="text-xs sm:text-sm font-semibold text-red-700 uppercase tracking-wide">Chi tiêu</span>
+                                                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                                <TrendingUp size={20} className="text-red-600" />
                                                             </div>
                                                         </div>
-                                                        <div className="text-3xl font-bold text-red-600 mb-2">
+                                                        <div className="text-2xl sm:text-3xl font-bold text-red-600 mb-2">
                                                             {formatCurrency(summary.totalExpense)}
                                                         </div>
                                                         {summary.previousTotal > 0 && (
-                                                            <div className="flex items-center gap-2 text-sm">
+                                                            <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                                                                 <span className={`font-semibold ${summary.difference >= 0 ? 'text-red-600' : 'text-green-600'}`}>
                                                                     {summary.difference >= 0 ? '↑' : '↓'} {Math.abs(parseFloat(summary.changePercent))}%
                                                                 </span>
@@ -1175,19 +1174,19 @@ const ReportsDashboard = () => {
                                                 </div>
 
                                                 {/* Thu nhập Card */}
-                                                <div className="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-100 shadow-md hover:shadow-lg transition-all duration-300 group">
+                                                <div className="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 sm:p-6 border-2 border-green-100 shadow-md hover:shadow-lg transition-all duration-300 group">
                                                     <div className="absolute top-0 right-0 w-32 h-32 bg-green-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity"></div>
                                                     <div className="relative z-10">
                                                         <div className="flex items-center justify-between mb-3">
-                                                            <span className="text-sm font-semibold text-green-700 uppercase tracking-wide">Thu nhập</span>
-                                                            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                                <TrendingDown size={24} className="text-green-600 rotate-180" />
+                                                            <span className="text-xs sm:text-sm font-semibold text-green-700 uppercase tracking-wide">Thu nhập</span>
+                                                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                                <TrendingDown size={20} className="text-green-600 rotate-180" />
                                                             </div>
                                                         </div>
-                                                        <div className="text-3xl font-bold text-green-600 mb-2">
+                                                        <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
                                                             {formatCurrency(totalIncome)}
                                                         </div>
-                                                        <div className="flex items-center gap-2 text-sm">
+                                                        <div className="flex items-center gap-2 text-xs sm:text-sm">
                                                             <span className="text-gray-500">Tổng thu nhập trong tháng</span>
                                                         </div>
                                                     </div>
@@ -1197,10 +1196,10 @@ const ReportsDashboard = () => {
 
                                             {/* Donut Chart - Redesigned */}
                                             {pieData.length > 0 ? (
-                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 mb-6">
                                                     {/* Biểu đồ quạt bên trái - Enhanced */}
-                                                    <div className="flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 border border-gray-100">
-                                                        <ResponsiveContainer width="100%" height={400}>
+                                                    <div className="flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-4 sm:p-8 border border-gray-100">
+                                                        <ResponsiveContainer width="100%" height={300}>
                                                             <PieChart>
                                                                 <Pie
                                                                     data={pieData}
@@ -1208,8 +1207,8 @@ const ReportsDashboard = () => {
                                                                     cy="50%"
                                                                     labelLine={false}
                                                                     label={false}
-                                                                    outerRadius={140}
-                                                                    innerRadius={80}
+                                                                    outerRadius="70%"
+                                                                    innerRadius="40%"
                                                                     fill="#8884d8"
                                                                     dataKey="value"
                                                                     paddingAngle={3}
@@ -1246,32 +1245,32 @@ const ReportsDashboard = () => {
                                                     </div>
 
                                                     {/* Danh sách danh mục bên phải - Enhanced */}
-                                                    <div className="space-y-3 flex flex-col justify-center">
+                                                    <div className="space-y-2 sm:space-y-3 flex flex-col justify-center">
                                                         {pieData.map((item, index) => (
                                                             <div
                                                                 key={index}
-                                                                className="group relative flex items-center justify-between p-5 bg-white border-2 border-gray-100 rounded-xl hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
+                                                                className="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-5 bg-white border-2 border-gray-100 rounded-xl hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
                                                             >
                                                                 {/* Hover gradient overlay */}
                                                                 <div className="absolute inset-0 bg-gradient-to-r from-blue-50/0 to-blue-50/0 group-hover:from-blue-50/50 group-hover:to-transparent transition-all duration-300"></div>
 
-                                                                <div className="relative z-10 flex items-center gap-4 flex-1">
+                                                                <div className="relative z-10 flex items-center gap-3 sm:gap-4 flex-1 w-full sm:w-auto">
                                                                     {/* Màu sắc danh mục - Larger */}
                                                                     <div
-                                                                        className="w-6 h-6 rounded-full flex-shrink-0 shadow-md group-hover:scale-110 transition-transform"
+                                                                        className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex-shrink-0 shadow-md group-hover:scale-110 transition-transform"
                                                                         style={{ backgroundColor: item.color }}
                                                                     />
                                                                     {/* Tên danh mục và phần trăm */}
-                                                                    <div className="flex-1">
-                                                                        <div className="font-bold text-gray-900 text-lg mb-1 group-hover:text-blue-600 transition-colors">
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <div className="font-bold text-gray-900 text-base sm:text-lg mb-1 group-hover:text-blue-600 transition-colors truncate">
                                                                             {item.name}
                                                                         </div>
-                                                                        <div className="flex items-center gap-3">
-                                                                            <span className="text-sm font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
+                                                                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                                                            <span className="text-xs sm:text-sm font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
                                                                                 {item.percentage}%
                                                                             </span>
                                                                             {item.previousAmount > 0 && (
-                                                                                <span className="text-xs text-gray-500">
+                                                                                <span className="text-xs text-gray-500 hidden sm:inline">
                                                                                     Kỳ trước: {formatCurrency(item.previousAmount)}
                                                                                 </span>
                                                                             )}
@@ -1279,8 +1278,8 @@ const ReportsDashboard = () => {
                                                                     </div>
                                                                 </div>
                                                                 {/* Số tiền - Enhanced */}
-                                                                <div className="relative z-10 text-right ml-4">
-                                                                    <div className="font-bold text-gray-900 text-xl group-hover:text-blue-600 transition-colors">
+                                                                <div className="relative z-10 text-left sm:text-right ml-0 sm:ml-4 mt-2 sm:mt-0 w-full sm:w-auto">
+                                                                    <div className="font-bold text-gray-900 text-lg sm:text-xl group-hover:text-blue-600 transition-colors">
                                                                         {formatCurrency(item.value)}
                                                                     </div>
                                                                 </div>

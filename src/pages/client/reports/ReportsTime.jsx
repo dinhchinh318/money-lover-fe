@@ -139,14 +139,22 @@ const ReportsTime = () => {
             title: "Thời gian",
             dataIndex: "period",
             key: "period",
+            fixed: 'left',
+            width: 120,
             sorter: (a, b) => a.period.localeCompare(b.period),
+            render: (text) => (
+                <span className="text-xs sm:text-sm font-medium text-gray-900">
+                    {text}
+                </span>
+            ),
         },
         {
             title: "Thu nhập",
             dataIndex: "income",
             key: "income",
+            width: 140,
             render: (value) => (
-                <span className="text-[#10B981] font-semibold">
+                <span className="text-[#10B981] font-semibold text-xs sm:text-sm">
                     {formatCurrency(value)}
                 </span>
             ),
@@ -156,8 +164,9 @@ const ReportsTime = () => {
             title: "Chi tiêu",
             dataIndex: "expense",
             key: "expense",
+            width: 140,
             render: (value) => (
-                <span className="text-[#EF4444] font-semibold">
+                <span className="text-[#EF4444] font-semibold text-xs sm:text-sm">
                     {formatCurrency(value)}
                 </span>
             ),
@@ -167,8 +176,9 @@ const ReportsTime = () => {
             title: "Số dư",
             dataIndex: "balance",
             key: "balance",
+            width: 140,
             render: (value) => (
-                <span className="text-[#2563EB] font-semibold">
+                <span className="text-[#2563EB] font-semibold text-xs sm:text-sm">
                     {formatCurrency(value)}
                 </span>
             ),
@@ -232,13 +242,13 @@ const ReportsTime = () => {
                                     <div className="p-2 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg">
                                         <TrendingUp className="text-white" size={18} />
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-900">
+                                    <h3 className="text-base sm:text-lg font-bold text-gray-900">
                                         Biểu đồ đường - Thu chi theo thời gian
                                     </h3>
                                 </div>
                                 {timeData.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height={350}>
-                                        <LineChart data={timeData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <LineChart data={timeData} margin={{ top: 10, right: 10, left: 0, bottom: 50 }}>
                                             <CartesianGrid
                                                 strokeDasharray="3 3"
                                                 stroke="#E5E7EB"
@@ -247,13 +257,16 @@ const ReportsTime = () => {
                                             <XAxis
                                                 dataKey="period"
                                                 stroke="#6B7280"
-                                                tick={{ fill: "#6B7280", fontSize: 12 }}
+                                                tick={{ fill: "#6B7280", fontSize: 10 }}
                                                 tickLine={{ stroke: "#D1D5DB" }}
                                                 axisLine={{ stroke: "#D1D5DB" }}
+                                                angle={-45}
+                                                textAnchor="end"
+                                                height={60}
                                             />
                                             <YAxis
                                                 stroke="#6B7280"
-                                                tick={{ fill: "#6B7280", fontSize: 12 }}
+                                                tick={{ fill: "#6B7280", fontSize: 10 }}
                                                 tickLine={{ stroke: "#D1D5DB" }}
                                                 axisLine={{ stroke: "#D1D5DB" }}
                                                 tickFormatter={(value) => {
@@ -314,13 +327,13 @@ const ReportsTime = () => {
                                     <div className="p-2 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg">
                                         <BarChart3 className="text-white" size={18} />
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-900">
+                                    <h3 className="text-base sm:text-lg font-bold text-gray-900">
                                         Biểu đồ cột - So sánh thu chi
                                     </h3>
                                 </div>
                                 {timeData.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height={350}>
-                                        <BarChart data={timeData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <BarChart data={timeData} margin={{ top: 10, right: 10, left: 0, bottom: 50 }}>
                                             <CartesianGrid
                                                 strokeDasharray="3 3"
                                                 stroke="#E5E7EB"
@@ -329,13 +342,16 @@ const ReportsTime = () => {
                                             <XAxis
                                                 dataKey="period"
                                                 stroke="#6B7280"
-                                                tick={{ fill: "#6B7280", fontSize: 12 }}
+                                                tick={{ fill: "#6B7280", fontSize: 10 }}
                                                 tickLine={{ stroke: "#D1D5DB" }}
                                                 axisLine={{ stroke: "#D1D5DB" }}
+                                                angle={-45}
+                                                textAnchor="end"
+                                                height={60}
                                             />
                                             <YAxis
                                                 stroke="#6B7280"
-                                                tick={{ fill: "#6B7280", fontSize: 12 }}
+                                                tick={{ fill: "#6B7280", fontSize: 10 }}
                                                 tickLine={{ stroke: "#D1D5DB" }}
                                                 axisLine={{ stroke: "#D1D5DB" }}
                                                 tickFormatter={(value) => {
@@ -391,27 +407,35 @@ const ReportsTime = () => {
                                 <div className="p-2 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg">
                                     <FileText className="text-white" size={18} />
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900">
+                                <h3 className="text-base sm:text-lg font-bold text-gray-900">
                                     Bảng chi tiết
                                 </h3>
                             </div>
                             {timeData.length > 0 ? (
-                                <Table
-                                    columns={tableColumns}
-                                    dataSource={timeData}
-                                    rowKey="period"
-                                    pagination={{
-                                        pageSize: 10,
-                                        showSizeChanger: true,
-                                        showTotal: (total) =>
-                                            `Tổng ${total} bản ghi`,
-                                        pageSizeOptions: ['10', '20', '50', '100'],
-                                    }}
-                                    className="custom-table"
-                                    rowClassName={(record, index) =>
-                                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                                    }
-                                />
+                                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                                    <div className="min-w-[500px] sm:min-w-0 px-4 sm:px-0">
+                                        <Table
+                                            columns={tableColumns}
+                                            dataSource={timeData}
+                                            rowKey="period"
+                                            pagination={{
+                                                pageSize: 10,
+                                                showSizeChanger: true,
+                                                showTotal: (total) =>
+                                                    `Tổng ${total} bản ghi`,
+                                                pageSizeOptions: ['10', '20', '50', '100'],
+                                                responsive: true,
+                                                size: "small",
+                                            }}
+                                            scroll={{ x: 'max-content' }}
+                                            size="small"
+                                            className="custom-table"
+                                            rowClassName={(record, index) =>
+                                                index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                            }
+                                        />
+                                    </div>
+                                </div>
                             ) : (
                                 <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                                     <FileText className="text-gray-400 mb-2" size={32} />

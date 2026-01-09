@@ -180,13 +180,13 @@ const ReportsCategory = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
-      <div className="max-w-[95%] mx-auto p-6">
+      <div className="max-w-[98%] mx-auto p-4 sm:p-6">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Báo cáo theo Danh mục
           </h1>
-          <p className="text-gray-600 mt-1">Phân tích chi tiêu theo danh mục</p>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Phân tích chi tiêu theo danh mục</p>
         </div>
 
         {/* Filter Bar */}
@@ -204,14 +204,14 @@ const ReportsCategory = () => {
           <>
             {/* Summary Card */}
             {totalAmount > 0 && (
-              <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-sm">
+              <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Tổng chi tiêu</p>
-                    <p className="text-3xl font-bold text-gray-900">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">Tổng chi tiêu</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">
                       {formatCurrency(totalAmount)}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
                       {pieData.length} danh mục
                     </p>
                   </div>
@@ -221,13 +221,13 @@ const ReportsCategory = () => {
 
             {/* Charts Section */}
             {pieData.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 {/* Pie Chart */}
                 <Card className="shadow-sm">
-                  <h3 className="text-lg font-semibold mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
                     Phân bổ chi tiêu theo danh mục
                   </h3>
-                  <ResponsiveContainer width="100%" height={400}>
+                  <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
                         data={pieData}
@@ -237,8 +237,8 @@ const ReportsCategory = () => {
                         label={({ name, percent }) =>
                           `${name}: ${(percent * 100).toFixed(0)}%`
                         }
-                        outerRadius={120}
-                        innerRadius={60}
+                        outerRadius="70%"
+                        innerRadius="40%"
                         fill="#8884d8"
                         dataKey="amount"
                         paddingAngle={2}
@@ -268,22 +268,24 @@ const ReportsCategory = () => {
 
                 {/* Horizontal Bar Chart */}
                 <Card className="shadow-sm">
-                  <h3 className="text-lg font-semibold mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
                     Top danh mục chi tiêu
                   </h3>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={barData} layout="vertical">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={barData} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                       <XAxis
                         type="number"
                         stroke="#6B7280"
+                        tick={{ fontSize: 10 }}
                         tickFormatter={(value) => formatCurrency(value)}
                       />
                       <YAxis
                         dataKey="name"
                         type="category"
-                        width={150}
+                        width={120}
                         stroke="#6B7280"
+                        tick={{ fontSize: 10 }}
                       />
                       <Tooltip
                         formatter={(value) => formatCurrency(value)}
@@ -320,15 +322,15 @@ const ReportsCategory = () => {
             {/* Top Categories List */}
             {topCategories.length > 0 && (
               <Card className="shadow-sm border-0">
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">
+                <div className="mb-4 sm:mb-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
                     Top {topCategories.length} danh mục chi tiêu
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs sm:text-sm text-gray-500">
                     Danh sách các danh mục chi tiêu nhiều nhất
                   </p>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {topCategories.map((category, index) => {
                     const percentage = getPercentage(category.amount);
                     const isTop3 = index < 3;
@@ -359,69 +361,71 @@ const ReportsCategory = () => {
                     return (
                       <div
                         key={category.categoryId || category._id || index}
-                        className="group relative flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-xl hover:border-[#2563EB] hover:shadow-lg transition-all duration-300 cursor-pointer"
+                        className="group relative flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 bg-white border border-gray-200 rounded-xl hover:border-[#2563EB] hover:shadow-lg transition-all duration-300 cursor-pointer"
                       >
-                        {/* Rank Badge */}
-                        <div
-                          className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${rankColor.bg} ${rankColor.text} ${rankColor.shadow} transition-transform group-hover:scale-110`}
-                        >
-                          {index + 1}
-                        </div>
-
-                        {/* Icon */}
-                        <div
-                          className="flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-md transition-transform group-hover:scale-110 group-hover:shadow-lg"
-                          style={{
-                            backgroundColor: `${color}15`,
-                            border: `2px solid ${color}40`,
-                          }}
-                        >
-                          <span
-                            style={{
-                              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
-                            }}
+                        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 w-full sm:w-auto">
+                          {/* Rank Badge */}
+                          <div
+                            className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm ${rankColor.bg} ${rankColor.text} ${rankColor.shadow} transition-transform group-hover:scale-110`}
                           >
-                            {getIconEmoji(category.icon)}
-                          </span>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-bold text-gray-900 text-lg mb-1 truncate">
-                                {category.name}
-                              </h4>
-                              <div className="flex items-center gap-4 text-sm">
-                                <span className="text-gray-500 flex items-center gap-1">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                                  {percentage}% tổng chi tiêu
-                                </span>
-                                <span className="text-gray-500 flex items-center gap-1">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                                  {category.count || 0} giao dịch
-                                </span>
-                              </div>
-                            </div>
-                            <div className="ml-4 text-right">
-                              <p className="font-bold text-xl text-[#10B981] mb-1">
-                                {formatCurrency(category.amount)}
-                              </p>
-                            </div>
+                            {index + 1}
                           </div>
 
-                          {/* Progress Bar */}
-                          <div className="relative">
-                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden"
-                                style={{
-                                  width: `${percentage}%`,
-                                  backgroundColor: color,
-                                  boxShadow: `0 2px 8px ${color}40`,
-                                }}
-                              >
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+                          {/* Icon */}
+                          <div
+                            className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-xl sm:text-2xl shadow-md transition-transform group-hover:scale-110 group-hover:shadow-lg"
+                            style={{
+                              backgroundColor: `${color}15`,
+                              border: `2px solid ${color}40`,
+                            }}
+                          >
+                            <span
+                              style={{
+                                filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
+                              }}
+                            >
+                              {getIconEmoji(category.icon)}
+                            </span>
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-2 sm:mb-3">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-gray-900 text-base sm:text-lg mb-1 truncate">
+                                  {category.name}
+                                </h4>
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
+                                  <span className="text-gray-500 flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                    {percentage}% tổng chi tiêu
+                                  </span>
+                                  <span className="text-gray-500 flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                    {category.count || 0} giao dịch
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="text-left sm:text-right sm:ml-4">
+                                <p className="font-bold text-lg sm:text-xl text-[#10B981] mb-1">
+                                  {formatCurrency(category.amount)}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Progress Bar */}
+                            <div className="relative mt-2">
+                              <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden"
+                                  style={{
+                                    width: `${percentage}%`,
+                                    backgroundColor: color,
+                                    boxShadow: `0 2px 8px ${color}40`,
+                                  }}
+                                >
+                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+                                </div>
                               </div>
                             </div>
                           </div>

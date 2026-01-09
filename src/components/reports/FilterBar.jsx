@@ -135,12 +135,12 @@ const FilterBar = ({
     };
 
     return (
-        <div className="bg-gradient-to-r from-white to-gray-50 border-2 border-gray-200 p-5 rounded-xl shadow-sm">
-            <div className="flex flex-wrap items-center gap-4">
+        <div className="bg-gradient-to-r from-white to-gray-50 border-2 border-gray-200 p-3 sm:p-5 rounded-xl shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
                 {/* Date Range Picker with Quick Select */}
-                <div className="flex items-center gap-2">
-                    <div className="p-2 bg-blue-50 rounded-lg">
-                        <Calendar className="text-blue-600" size={18} />
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+                        <Calendar className="text-blue-600" size={16} />
                     </div>
                     <DateRangePicker
                         value={filters.dateRange}
@@ -171,7 +171,7 @@ const FilterBar = ({
                             }
                         }}
                         format="DD/MM/YYYY"
-                        className="w-[280px]"
+                        className="flex-1 sm:w-[280px]"
                         period={filters.period}
                         onPeriodChange={(period) => {
                             handleQuickSelect(period, true);
@@ -186,7 +186,7 @@ const FilterBar = ({
                         onChange={(value) => {
                             handleQuickSelect(value, true);
                         }}
-                        className="w-[120px]"
+                        className="w-full sm:w-[120px]"
                         placeholder="Chọn kỳ"
                     >
                         <Option value="week">Tuần</Option>
@@ -200,7 +200,7 @@ const FilterBar = ({
                     <Select
                         value={filters.type}
                         onChange={(value) => handleFilterChange("type", value)}
-                        className="w-[150px]"
+                        className="w-full sm:w-[150px]"
                         placeholder="Loại"
                     >
                         <Option value="all">Tất cả</Option>
@@ -216,7 +216,7 @@ const FilterBar = ({
                         onChange={(value) =>
                             handleFilterChange("walletId", value)
                         }
-                        className="w-[180px]"
+                        className="w-full sm:w-[180px]"
                         placeholder="Chọn ví"
                         showSearch
                         allowClear
@@ -241,7 +241,7 @@ const FilterBar = ({
                         onChange={(value) =>
                             handleFilterChange("categoryId", value)
                         }
-                        className="w-[180px]"
+                        className="w-full sm:w-[180px]"
                         placeholder="Chọn danh mục"
                         showSearch
                         allowClear
@@ -264,7 +264,7 @@ const FilterBar = ({
                     <Select
                         value={filters.limit}
                         onChange={(value) => handleFilterChange("limit", value)}
-                        className="w-[120px]"
+                        className="w-full sm:w-[120px]"
                         placeholder="Giới hạn"
                     >
                         <Option value="5">Top 5</Option>
@@ -274,23 +274,23 @@ const FilterBar = ({
                 )}
 
                 {/* Action Buttons */}
-                <Space className="ml-auto">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto sm:ml-auto">
                     <Button
                         type="primary"
                         onClick={handleApply}
                         icon={<Filter size={16} />}
-                        className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 border-0 shadow-md font-semibold"
+                        className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 border-0 shadow-md font-semibold"
                     >
                         Áp dụng
                     </Button>
                     <Button
                         onClick={handleReset}
                         icon={<X size={16} />}
-                        className="border-gray-300 hover:border-gray-400"
+                        className="w-full sm:w-auto border-gray-300 hover:border-gray-400"
                     >
                         Xóa bộ lọc
                     </Button>
-                </Space>
+                </div>
             </div>
         </div>
     );

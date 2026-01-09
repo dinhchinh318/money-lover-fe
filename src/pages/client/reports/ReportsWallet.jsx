@@ -216,19 +216,21 @@ const ReportsWallet = () => {
       title: "Ví",
       dataIndex: "walletName",
       key: "walletName",
+      fixed: 'left',
+      width: 180,
       render: (text, record, index) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white text-base sm:text-lg font-bold flex-shrink-0"
             style={{ backgroundColor: COLORS[index % COLORS.length] }}
           >
             {record.icon || "💰"}
           </div>
-          <div>
-            <div className="font-semibold text-gray-900">
+          <div className="min-w-0">
+            <div className="font-semibold text-gray-900 text-sm sm:text-base truncate">
               {text || "Chưa xác định"}
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-gray-500 truncate">
               {record.walletType || ""}
             </div>
           </div>
@@ -239,8 +241,9 @@ const ReportsWallet = () => {
       title: "Tổng thu",
       dataIndex: "income",
       key: "income",
+      width: 140,
       render: (value) => (
-        <span className="text-[#10B981] font-semibold">
+        <span className="text-[#10B981] font-semibold text-xs sm:text-sm">
           {formatCurrency(value || 0)}
         </span>
       ),
@@ -250,8 +253,9 @@ const ReportsWallet = () => {
       title: "Tổng chi",
       dataIndex: "amount",
       key: "expense",
+      width: 140,
       render: (value) => (
-        <span className="text-[#EF4444] font-semibold">
+        <span className="text-[#EF4444] font-semibold text-xs sm:text-sm">
           {formatCurrency(value || 0)}
         </span>
       ),
@@ -261,8 +265,9 @@ const ReportsWallet = () => {
       title: "Số dư",
       dataIndex: "balance",
       key: "balance",
+      width: 140,
       render: (value) => (
-        <span className="text-[#2563EB] font-semibold">
+        <span className="text-[#2563EB] font-semibold text-xs sm:text-sm">
           {formatCurrency(value || 0)}
         </span>
       ),
@@ -272,8 +277,9 @@ const ReportsWallet = () => {
       title: "Tỷ lệ",
       dataIndex: "percentage",
       key: "percentage",
+      width: 100,
       render: (value) => (
-        <span className="text-gray-600 font-medium">
+        <span className="text-gray-600 font-medium text-xs sm:text-sm">
           {Number(value || 0).toFixed(1)}%
         </span>
       ),
@@ -283,7 +289,8 @@ const ReportsWallet = () => {
       title: "Số giao dịch",
       dataIndex: "transactionCount",
       key: "transactionCount",
-      render: (value) => <span className="text-gray-600">{value || 0}</span>,
+      width: 120,
+      render: (value) => <span className="text-gray-600 text-xs sm:text-sm">{value || 0}</span>,
       sorter: (a, b) => (a.transactionCount || 0) - (b.transactionCount || 0),
     },
   ];
@@ -333,11 +340,11 @@ const ReportsWallet = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+      <div className="max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Báo cáo theo Ví</h1>
-          <p className="text-gray-600 mt-1">Phân tích chi tiêu theo ví</p>
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Báo cáo theo Ví</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Phân tích chi tiêu theo ví</p>
         </div>
 
         {/* Filter Bar */}
@@ -360,11 +367,11 @@ const ReportsWallet = () => {
           <>
             {/* Summary Card */}
             {pieData.length > 0 && (
-              <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Tổng thu nhập</p>
-                    <p className="text-2xl font-bold text-[#10B981]">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">Tổng thu nhập</p>
+                    <p className="text-xl sm:text-2xl font-bold text-[#10B981] break-words">
                       {formatCurrency(
                         pieData.reduce(
                           (sum, item) => sum + (item.income || 0),
@@ -374,14 +381,14 @@ const ReportsWallet = () => {
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Tổng chi tiêu</p>
-                    <p className="text-2xl font-bold text-[#EF4444]">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">Tổng chi tiêu</p>
+                    <p className="text-xl sm:text-2xl font-bold text-[#EF4444] break-words">
                       {formatCurrency(totalExpense)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Số dư</p>
-                    <p className="text-2xl font-bold text-[#2563EB]">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">Số dư</p>
+                    <p className="text-xl sm:text-2xl font-bold text-[#2563EB] break-words">
                       {formatCurrency(
                         pieData.reduce(
                           (sum, item) => sum + (item.balance || 0),
@@ -391,7 +398,7 @@ const ReportsWallet = () => {
                     </p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 mt-3">
+                <p className="text-xs sm:text-sm text-gray-500 mt-3">
                   Tổng {pieData.length} ví
                 </p>
               </Card>
@@ -399,14 +406,14 @@ const ReportsWallet = () => {
 
             {/* Charts Section */}
             {pieData.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 {/* Pie Chart */}
                 <Card className="shadow-sm">
-                  <h3 className="text-lg font-semibold mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
                     Phân bổ chi tiêu theo ví
                   </h3>
                   {pieData.some((item) => item.amount > 0) ? (
-                    <ResponsiveContainer width="100%" height={400}>
+                    <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
                         <Pie
                           data={pieData.filter((item) => item.amount > 0)}
@@ -414,8 +421,8 @@ const ReportsWallet = () => {
                           cy="50%"
                           labelLine={false}
                           label={false}
-                          outerRadius={120}
-                          innerRadius={60}
+                          outerRadius="70%"
+                          innerRadius="40%"
                           fill="#8884d8"
                           dataKey="amount"
                           nameKey="walletName"
@@ -483,16 +490,24 @@ const ReportsWallet = () => {
 
                 {/* Multi-line Chart */}
                 <Card className="shadow-sm">
-                  <h3 className="text-lg font-semibold mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
                     So sánh chi tiêu các ví theo thời gian
                   </h3>
                   {lineChartData.length > 0 && lineKeys.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={400}>
-                      <LineChart data={lineChartData}>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={lineChartData} margin={{ top: 10, right: 10, left: 0, bottom: 50 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                        <XAxis dataKey="period" stroke="#6B7280" />
+                        <XAxis 
+                          dataKey="period" 
+                          stroke="#6B7280" 
+                          tick={{ fontSize: 10 }}
+                          angle={-45}
+                          textAnchor="end"
+                          height={60}
+                        />
                         <YAxis
                           stroke="#6B7280"
+                          tick={{ fontSize: 10 }}
                           tickFormatter={(value) => formatCurrency(value)}
                         />
                         <Tooltip
@@ -547,19 +562,28 @@ const ReportsWallet = () => {
             {/* Wallets Table */}
             {pieData.length > 0 && (
               <Card className="shadow-sm">
-                <h3 className="text-lg font-semibold mb-4">Bảng thống kê ví</h3>
-                <Table
-                  columns={tableColumns}
-                  dataSource={pieData.map((item, index) => ({
-                    ...item,
-                    key: item.walletId || index,
-                  }))}
-                  pagination={{
-                    pageSize: 10,
-                    showSizeChanger: true,
-                    showTotal: (total) => `Tổng ${total} ví`,
-                  }}
-                />
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Bảng thống kê ví</h3>
+                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                  <div className="min-w-[600px] sm:min-w-0 px-4 sm:px-0">
+                    <Table
+                      columns={tableColumns}
+                      dataSource={pieData.map((item, index) => ({
+                        ...item,
+                        key: item.walletId || index,
+                      }))}
+                      pagination={{
+                        pageSize: 10,
+                        showSizeChanger: true,
+                        showTotal: (total) => `Tổng ${total} ví`,
+                        responsive: true,
+                        size: "small",
+                      }}
+                      scroll={{ x: 'max-content' }}
+                      size="small"
+                      className="custom-table"
+                    />
+                  </div>
+                </div>
               </Card>
             )}
           </>
