@@ -137,7 +137,7 @@ const BudgetDetail = () => {
                 <div className="space-y-6">
                     {/* Main Info Card */}
                     <div className="ds-card">
-                        <div className="flex items-start gap-6 mb-6">
+                        <div className="flex items-start gap-4 mb-6 flex-wrap sm:flex-nowrap">
                             <div className="w-20 h-20 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center flex-shrink-0">
                                 <Wallet className="text-[#3B82F6] w-10 h-10" />
                             </div>
@@ -161,7 +161,7 @@ const BudgetDetail = () => {
 
                         {/* Progress Overview */}
                         <div className="mb-6">
-                            <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
                                 <span className="ds-text-secondary">Tiến độ</span>
                                 <span className="text-2xl font-bold" style={{ color: budgetStatus.statusColor }}>
                                     {budgetStatus.percentage.toFixed(1)}%
@@ -180,7 +180,7 @@ const BudgetDetail = () => {
                         </div>
 
                         {/* Details */}
-                        <div className="grid grid-cols-2 gap-4 border-t border-[#E5E7EB] pt-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-[#E5E7EB] pt-6">
                             <div>
                                 <p className="ds-text-secondary mb-1">Danh mục</p>
                                 <p className="font-semibold">{budget.category?.name || "N/A"}</p>
@@ -191,7 +191,7 @@ const BudgetDetail = () => {
                             </div>
                             <div>
                                 <p className="ds-text-secondary mb-1">Hạn mức</p>
-                                <p className="font-bold text-[#3B82F6] text-lg">{formatCurrency(limit)}</p>
+                                <p className="font-bold text-[#3B82F6] text-lg break-words">{formatCurrency(limit)}</p>
                             </div>
                             <div>
                                 <p className="ds-text-secondary mb-1">Đã chi</p>
