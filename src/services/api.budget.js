@@ -26,10 +26,12 @@ const deleteBudgetAPI = (id) => {
 }
 
 const getBudgetStatsAPI = (id, params) => {
-    const urlBackend = `/v1/api/budget/${id}/stats`;
+    const urlBackend = `/v1/api/budget/${id}/statistics`;
     return axios.get(urlBackend, { params });
 }
-
+const getBudgetTransactionsAPI = (id, params) => {
+  return axios.get(`/v1/api/budget/${id}/transactions`, { params });
+};
 export {
     getAllBudgetsAPI,
     getBudgetByIdAPI,
@@ -37,6 +39,7 @@ export {
     updateBudgetAPI,
     deleteBudgetAPI,
     getBudgetStatsAPI,
+    getBudgetTransactionsAPI,
 };
 
 
