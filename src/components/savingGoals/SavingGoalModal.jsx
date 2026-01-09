@@ -25,10 +25,6 @@ const SavingGoalModal = ({ open, onClose, goal, onSuccess }) => {
                 });
             } else {
                 form.resetFields();
-                form.setFieldsValue({
-                    target_amount: 0,
-                    current_amount: 0,
-                });
             }
         }
     }, [open, goal, form]);
@@ -50,11 +46,7 @@ const SavingGoalModal = ({ open, onClose, goal, onSuccess }) => {
             const values = await form.validateFields();
             setLoading(true);
 
-            if (values.current_amount > values.target_amount) {
-                message.error("Số tiền hiện tại không được vượt quá số tiền mục tiêu!");
-                setLoading(false);
-                return;
-            }
+
 
             const goalData = {
                 name: values.name.trim(),

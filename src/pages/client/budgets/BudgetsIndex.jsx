@@ -162,7 +162,7 @@ const BudgetsIndex = () => {
     };
 
     const handleCopyBudget = (budget) => {
-        setEditingBudget({ ...budget, _id:undefined, name: `${budget.name || budget.category?.name} (Copy)` });
+        setEditingBudget({ ...budget, _id: undefined, name: `${budget.name || budget.category?.name} (Copy)` });
         setModalOpen(true);
     };
 
@@ -295,8 +295,8 @@ const BudgetsIndex = () => {
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 ${activeTab === tab.key
-                                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
-                                    : "text-gray-600 hover:bg-gray-50"
+                                ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
+                                : "text-gray-600 hover:bg-gray-50"
                                 }`}
                         >
                             {tab.label}
@@ -313,173 +313,21 @@ const BudgetsIndex = () => {
                     </div>
                 ) : filteredBudgets.length > 0 ? (
                     <div className="space-y-4">
-                        {filteredBudgets.map((budget) => {
-                            const budgetStatus = calculateBudgetStatus(budget);
-                            const spent = budget.spent_amount || 0;
-                            const limit = budget.limit_amount || 1;
-                            const remaining = limit - spent;
-                            const percentage = Math.min((spent / limit) * 100, 100);
-
-                            return (
-                                <div
-                                    key={budget._id}
-                                    className={`relative rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 ${budgetStatus.status === "danger"
-                                            ? "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-300"
-                                            : budgetStatus.status === "warning"
-                                                ? "bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300"
-                                                : budgetStatus.status === "notice"
-                                                    ? "bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300"
-                                                    : "bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200"
-                                        }`}
-                                >
-                                    {/* Actions Menu */}
-                                    <div className="absolute top-4 right-4 z-10">
-                                        <Dropdown
-                                            menu={{ items: getBudgetMenuItems(budget) }}
-                                            trigger={["click"]}
-                                            placement="bottomRight"
-                                        >
-                                            <button className="p-2 hover:bg-[#F9FAFB] rounded-lg transition-colors">
-                                                <svg
-                                                    className="w-5 h-5 text-[#6B7280]"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </Dropdown>
-                                    </div>
-
-                                    <div className="flex items-start gap-6">
-                                        {/* Icon */}
-                                        <div className={`w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${budgetStatus.status === "danger"
-                                                ? "bg-gradient-to-br from-red-400 to-rose-600"
-                                                : budgetStatus.status === "warning"
-                                                    ? "bg-gradient-to-br from-amber-400 to-orange-600"
-                                                    : budgetStatus.status === "notice"
-                                                        ? "bg-gradient-to-br from-blue-400 to-indigo-600"
-                                                        : "bg-gradient-to-br from-green-400 to-emerald-600"
-                                            }`}>
-                                            <BarChart3 className="text-white w-10 h-10" />
-                                        </div>
-
-                                        {/* Content */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <h3 className="ds-heading-3">
-                                                    {budget.name || budget.category?.name || "Ngân sách"}
-                                                </h3>
-                                                <Badge
-                                                    count={budgetStatus.statusLabel}
-                                                    style={{
-                                                        backgroundColor: budgetStatus.statusColor,
-                                                        color: "white",
-                                                        padding: "4px 12px",
-                                                        borderRadius: "8px",
-                                                        fontSize: "12px",
-                                                        fontWeight: "600",
-                                                    }}
-                                                />
-                                            </div>
-
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">Danh mục</p>
-                                                    <p className="font-semibold">{budget.category?.name || "N/A"}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">Ví</p>
-                                                    <p className="font-semibold">
-                                                        {budget.wallet?.name || "Tất cả ví"}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">Kỳ</p>
-                                                    <p className="font-semibold">
-                                                        {budget.period === "weekly"
-                                                            ? "Hàng tuần"
-                                                            : budget.period === "monthly"
-                                                                ? "Hàng tháng"
-                                                                : budget.period === "yearly"
-                                                                    ? "Hàng năm"
-                                                                    : "Tùy chỉnh"}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="ds-text-small text-[#6B7280] mb-1">Thời gian</p>
-                                                    <p className="font-semibold">
-                                                        {budget.start_date
-                                                            ? `${formatDate(budget.start_date)} - ${formatDate(budget.end_date)}`
-                                                            : formatDate(budget.end_date)}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            {/* Progress Section */}
-                                            <div className="space-y-2">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="ds-text-small text-[#6B7280]">
-                                                        Tiến độ: {percentage.toFixed(1)}%
-                                                    </span>
-                                                    <span
-                                                        className="text-lg font-bold"
-                                                        style={{ color: budgetStatus.statusColor }}
-                                                    >
-                                                        {percentage.toFixed(0)}%
-                                                    </span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
-                                                    <div
-                                                        className="h-full rounded-full transition-all duration-500 shadow-md"
-                                                        style={{
-                                                            width: `${percentage}%`,
-                                                            background:
-                                                                percentage >= 100
-                                                                    ? "linear-gradient(90deg, #EF4444, #DC2626)"
-                                                                    : percentage >= 80
-                                                                        ? "linear-gradient(90deg, #F59E0B, #D97706)"
-                                                                        : percentage >= 50
-                                                                            ? "linear-gradient(90deg, #3B82F6, #2563EB)"
-                                                                            : "linear-gradient(90deg, #10B981, #059669)",
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="grid grid-cols-3 gap-4 mt-3">
-                                                    <div>
-                                                        <p className="ds-text-small text-[#6B7280] mb-1">Hạn mức</p>
-                                                        <p className="font-bold text-[#3B82F6]">
-                                                            {formatCurrency(limit)}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="ds-text-small text-[#6B7280] mb-1">Đã chi</p>
-                                                        <p className={`font-bold ${spent > limit ? "text-[#EF4444]" : ""}`}>
-                                                            {formatCurrency(spent)}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="ds-text-small text-[#6B7280] mb-1">Còn lại</p>
-                                                        <p
-                                                            className={`font-bold ${remaining < 0 ? "text-[#EF4444]" : "text-[#10B981]"
-                                                                }`}
-                                                        >
-                                                            {formatCurrency(remaining)}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                            <div className="h-[70vh] overflow-y-auto">
+                                <div className="space-y-2 p-3 sm:p-4">
+                                    {filteredBudgets.map((budget) => (
+                                        <BudgetRow
+                                            key={budget._id}
+                                            budget={budget}
+                                            onClick={() => navigate(`/budgets/${budget._id}`)}
+                                            onEdit={() => handleEditBudget(budget)}
+                                            onDelete={() => handleDeleteBudget(budget)}
+                                        />
+                                    ))}
                                 </div>
-                            );
-                        })}
+                            </div>
+                        </div>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-300">
@@ -515,6 +363,94 @@ const BudgetsIndex = () => {
                 budget={editingBudget}
                 onSuccess={loadBudgets}
             />
+        </div>
+    );
+};
+const BudgetRow = ({ budget, onClick, onEdit, onDelete }) => {
+    const spent = budget.spent_amount || 0;
+    const limit = budget.limit_amount || 1;
+    const percent = Math.min((spent / limit) * 100, 100);
+
+    const getColor = () => {
+        if (percent >= 100) return "#EF4444";
+        if (percent >= 80) return "#F59E0B";
+        if (percent >= 50) return "#3B82F6";
+        return "#10B981";
+    };
+
+    const color = getColor();
+
+    return (
+        <div
+            onClick={onClick}
+            className="group flex items-center gap-3 sm:gap-4
+                 bg-white rounded-xl p-3 sm:p-4
+                 border border-gray-200
+                 hover:border-gray-300 hover:shadow-sm
+                 transition cursor-pointer"
+        >
+            {/* Icon */}
+            <div
+                className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${color}22` }}
+            >
+                <BarChart3 size={26} style={{ color }} />
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+                <p className="font-bold text-gray-900 text-sm sm:text-base truncate">
+                    {budget.name || budget.category?.name || "Ngân sách"}
+                </p>
+
+                <p className="text-xs sm:text-sm text-gray-500 truncate mt-0.5">
+                    {budget.start_date
+                        ? `${dayjs(budget.start_date).format("DD/MM")} – ${dayjs(
+                            budget.end_date
+                        ).format("DD/MM")}`
+                        : dayjs(budget.end_date).format("DD/MM")}
+                </p>
+
+                <div className="mt-1.5 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                        className="h-full rounded-full"
+                        style={{ width: `${percent}%`, backgroundColor: color }}
+                    />
+                </div>
+            </div>
+
+            {/* Right */}
+            <div className="flex flex-col items-end gap-1">
+                <span className="text-sm sm:text-lg font-extrabold tabular-nums" style={{ color }}>
+                    {percent.toFixed(0)}%
+                </span>
+
+                <span className="text-xs sm:text-sm font-semibold text-gray-700">
+                    {new Intl.NumberFormat("vi-VN").format(limit)}đ
+                </span>
+            </div>
+
+            {/* Actions desktop */}
+            <div className="hidden sm:flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit();
+                    }}
+                    className="p-2 rounded-lg hover:bg-blue-50"
+                >
+                    <Edit size={16} className="text-blue-600" />
+                </button>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                    }}
+                    className="p-2 rounded-lg hover:bg-red-50"
+                >
+                    <Trash2 size={16} className="text-red-600" />
+                </button>
+            </div>
         </div>
     );
 };

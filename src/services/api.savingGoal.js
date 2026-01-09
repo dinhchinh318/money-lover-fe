@@ -27,6 +27,13 @@ const deleteSavingGoalAPI = (id) => {
 const completeSavingGoalAPI = (id) => {
   return axios.patch(`/v1/api/saving-goal/${id}/complete`);
 };
+const depositSavingGoalAPI = (id, amount) => {
+  return axios.post(`/v1/api/saving-goal/${id}/deposit`, { amount });
+};
+
+const withdrawSavingGoalAPI = (id, amount) => {
+  return axios.post(`/v1/api/saving-goal/${id}/withdraw`, { amount });
+};
 
 
 
@@ -37,6 +44,8 @@ export {
     updateSavingGoalAPI,
     deleteSavingGoalAPI,
     completeSavingGoalAPI,
+    depositSavingGoalAPI,
+    withdrawSavingGoalAPI,
 };
 
 
