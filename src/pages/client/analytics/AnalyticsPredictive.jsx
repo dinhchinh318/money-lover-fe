@@ -631,9 +631,9 @@ const AnalyticsPredictive = () => {
                         <p className="mt-4 text-gray-500 text-sm sm:text-base">Đang tính toán dự đoán...</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
                         {/* Section A: Dự đoán chi tiêu cuối tháng */}
-                        <div className="lg:col-span-1 space-y-4">
+                        <div className="xl:col-span-5 space-y-4">
                             <Card
                                 className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50"
                                 title={
@@ -646,7 +646,7 @@ const AnalyticsPredictive = () => {
                                 }
                             >
                                 {/* A1: Forecast Cards */}
-                                <div className="space-y-4 mb-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                                     {/* Card 7 ngày */}
                                     <Card className="mb-3 border-2 border-blue-200 hover:shadow-lg transition-all duration-200 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50">
                                         <div className="flex items-center gap-2 mb-3">
@@ -869,7 +869,7 @@ const AnalyticsPredictive = () => {
                         </div>
 
                         {/* Section B: Dự đoán vượt ngân sách */}
-                        <div className="lg:col-span-1 space-y-4">
+                        <div className="xl:col-span-4 space-y-4">
                             <Card
                                 className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50"
                                 title={
@@ -901,7 +901,7 @@ const AnalyticsPredictive = () => {
                                 )}
 
                                 {/* Category Overrun Details */}
-                                <div className="space-y-3 mb-4">
+                                <div className="space-y-4 max-h-[520px] overflow-y-auto pr-2">
                                     {budgetOverruns && budgetOverruns.length > 0 ? (
                                         budgetOverruns.map((budget, index) => {
                                             const spent = budget.spent || budget.spentAmount || 0;
@@ -920,9 +920,9 @@ const AnalyticsPredictive = () => {
                                             return (
                                                 <Card
                                                     key={budgetId}
-                                                    className={`mb-3 border-2 rounded-xl transition-all duration-200 cursor-pointer hover:shadow-lg ${isAtRisk
-                                                            ? "bg-gradient-to-r from-red-50 to-pink-50 border-red-300"
-                                                            : "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200"
+                                                    className={`mb-3 border-2 rounded-xl transition-all duration-200 cursor-pointer hover:shadow-lg overflow-hidden ${isAtRisk
+                                                        ? "bg-gradient-to-r from-red-50 to-pink-50 border-red-300"
+                                                        : "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200"
                                                         }`}
                                                     onClick={() => handleBudgetAlertClick(budget)}
                                                     title="Click để xem chi tiết giao dịch"
@@ -953,11 +953,16 @@ const AnalyticsPredictive = () => {
                                                         className="mb-3"
                                                         strokeWidth={8}
                                                     />
-                                                    <div className="flex items-center justify-between text-xs">
-                                                        <span className="text-gray-600 font-medium">
-                                                            {formatCurrency(spent)} / {formatCurrency(limit)}
+                                                    <div className="flex items-start justify-between text-xs gap-2">
+                                                        <span className="text-gray-600 font-medium break-all leading-tight">
+                                                            {formatCurrency(spent)}
+                                                            <span className="mx-1">/</span>
+                                                            {formatCurrency(limit)}
                                                         </span>
-                                                        <span className={`font-semibold ${daysUntilOverrun !== null && daysUntilOverrun > 0 ? "text-orange-600" : "text-green-600"}`}>
+                                                        <span className={`font-semibold whitespace-nowrap ${daysUntilOverrun !== null && daysUntilOverrun > 0
+                                                            ? "text-orange-600"
+                                                            : "text-green-600"
+                                                            }`}>
                                                             {daysUntilOverrun !== null && daysUntilOverrun > 0
                                                                 ? `Còn ${daysUntilOverrun} ngày`
                                                                 : "An toàn"}
@@ -1055,7 +1060,7 @@ const AnalyticsPredictive = () => {
                         </div>
 
                         {/* Section C: Dự đoán theo danh mục */}
-                        <div className="lg:col-span-1 space-y-4">
+                        <div className="xl:col-span-3 space-y-4">
                             <Card
                                 className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50"
                                 title={
@@ -1120,7 +1125,7 @@ const AnalyticsPredictive = () => {
                                                 <Card
                                                     key={index}
                                                     size="small"
-                                                    className="border border-gray-200 hover:shadow-md transition-shadow"
+                                                    className="border border-gray-200 hover:shadow-md transition-shadow overflow-hidden"
                                                 >
                                                     <div className="flex items-center justify-between mb-2">
                                                         <span className="font-semibold text-sm text-gray-900">
@@ -1145,7 +1150,7 @@ const AnalyticsPredictive = () => {
                                                             />
                                                         )}
                                                     </div>
-                                                    <div className="text-xl font-bold text-gray-900 mb-3">
+                                                    <div className="text-lg font-bold text-gray-900 mb-2 break-all leading-tight max-w-full">
                                                         {predictedMonth > 0 ? formatCurrency(predictedMonth) : formatCurrency(0)}
                                                     </div>
                                                     {hasData ? (
