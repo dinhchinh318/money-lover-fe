@@ -145,23 +145,41 @@ const ReportsCategory = () => {
   // Map icon string hoặc emoji cũ thành emoji mới
   const getIconEmoji = (iconValue) => {
     if (!iconValue) return "💰";
-    
+
     const iconStr = String(iconValue).toLowerCase().trim();
-    
+
     // Map các icon string thành emoji
     const iconMap = {
+      // ăn uống
+      coffee: "☕",
       food: "🍽️",
-      "🍔": "🍽️", // Map emoji cũ thành mới
-      shopping: "🛒",
+      restaurant: "🍽️",
+
+      // di chuyển
+      car: "🚗",
       transport: "🚗",
+      taxi: "🚕",
+      bus: "🚌",
+      bike: "🚲",
+
+      // sinh hoạt
+      smartphone: "📱",
+      phone: "📱",
+      internet: "🌐",
+      wifi: "🌐",
+      electricity: "💡",
+      water: "🚿",
+
+      // khác
+      shopping: "🛒",
       bills: "💳",
       entertainment: "🎬",
       health: "🏥",
       education: "📚",
-      salary: "💰",
-      investment: "📈",
       gift: "🎁",
       other: "📦",
+      zap: "⚡",
+      more_horiz: "📦",
     };
 
     // Nếu là emoji cũ "🍔", map thành "🍽️"
@@ -179,8 +197,8 @@ const ReportsCategory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
-      <div className="max-w-[98%] mx-auto p-4 sm:p-6">
+    <div className="min-h-screen bg-[#F9FAFB]">
+      <div className="max-w-[1280px] mx-auto px-4 py-4 sm:py-6">
         {/* Header */}
         <div className="mb-4 sm:mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -227,43 +245,45 @@ const ReportsCategory = () => {
                   <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
                     Phân bổ chi tiêu theo danh mục
                   </h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) =>
-                          `${name}: ${(percent * 100).toFixed(0)}%`
-                        }
-                        outerRadius="70%"
-                        innerRadius="40%"
-                        fill="#8884d8"
-                        dataKey="amount"
-                        paddingAngle={2}
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                            stroke="#fff"
-                            strokeWidth={2}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        formatter={(value) => formatCurrency(value)}
-                        contentStyle={{
-                          backgroundColor: "#fff",
-                          border: "1px solid #E5E7EB",
-                          borderRadius: "8px",
-                          padding: "12px",
-                        }}
-                      />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <div className="h-[320px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) =>
+                            `${name}: ${(percent * 100).toFixed(0)}%`
+                          }
+                          outerRadius="70%"
+                          innerRadius="40%"
+                          fill="#8884d8"
+                          dataKey="amount"
+                          paddingAngle={2}
+                        >
+                          {pieData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                              stroke="#fff"
+                              strokeWidth={2}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={(value) => formatCurrency(value)}
+                          contentStyle={{
+                            backgroundColor: "#fff",
+                            border: "1px solid #E5E7EB",
+                            borderRadius: "8px",
+                            padding: "12px",
+                          }}
+                        />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
                 </Card>
 
                 {/* Horizontal Bar Chart */}
@@ -330,112 +350,80 @@ const ReportsCategory = () => {
                     Danh sách các danh mục chi tiêu nhiều nhất
                   </p>
                 </div>
-                <div className="space-y-2 sm:space-y-3">
-                  {topCategories.map((category, index) => {
-                    const percentage = getPercentage(category.amount);
-                    const isTop3 = index < 3;
-                    const color = COLORS[index % COLORS.length];
-                    const rankColors = {
-                      0: {
-                        bg: "bg-gradient-to-br from-yellow-400 to-yellow-600",
-                        text: "text-white",
-                        shadow: "shadow-lg shadow-yellow-500/30",
-                      },
-                      1: {
-                        bg: "bg-gradient-to-br from-gray-300 to-gray-500",
-                        text: "text-white",
-                        shadow: "shadow-lg shadow-gray-400/30",
-                      },
-                      2: {
-                        bg: "bg-gradient-to-br from-orange-400 to-orange-600",
-                        text: "text-white",
-                        shadow: "shadow-lg shadow-orange-500/30",
-                      },
-                    };
-                    const rankColor = rankColors[index] || {
-                      bg: "bg-gray-100",
-                      text: "text-gray-600",
-                      shadow: "",
-                    };
+                <div className="max-h-[360px] overflow-y-auto pr-2">
+                  <div className="space-y-2 sm:space-y-3">
+                    {topCategories.map((category, index) => {
+                      const percentage = getPercentage(category.amount);
+                      const isTop3 = index < 3;
+                      const color = COLORS[index % COLORS.length];
+                      const rankColors = {
+                        0: {
+                          bg: "bg-gradient-to-br from-yellow-400 to-yellow-600",
+                          text: "text-white",
+                          shadow: "shadow-lg shadow-yellow-500/30",
+                        },
+                        1: {
+                          bg: "bg-gradient-to-br from-gray-300 to-gray-500",
+                          text: "text-white",
+                          shadow: "shadow-lg shadow-gray-400/30",
+                        },
+                        2: {
+                          bg: "bg-gradient-to-br from-orange-400 to-orange-600",
+                          text: "text-white",
+                          shadow: "shadow-lg shadow-orange-500/30",
+                        },
+                      };
+                      const rankColor = rankColors[index] || {
+                        bg: "bg-gray-100",
+                        text: "text-gray-600",
+                        shadow: "",
+                      };
+                      const renderSafeIcon = (iconValue) => {
+                        const emoji = getIconEmoji(iconValue);
 
-                    return (
-                      <div
-                        key={category.categoryId || category._id || index}
-                        className="group relative flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 bg-white border border-gray-200 rounded-xl hover:border-[#2563EB] hover:shadow-lg transition-all duration-300 cursor-pointer"
-                      >
-                        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 w-full sm:w-auto">
-                          {/* Rank Badge */}
-                          <div
-                            className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm ${rankColor.bg} ${rankColor.text} ${rankColor.shadow} transition-transform group-hover:scale-110`}
-                          >
+                        // Nếu không phải emoji (string dài) → dùng fallback
+                        if (typeof emoji !== "string" || emoji.length > 2) {
+                          return "📦";
+                        }
+
+                        return emoji;
+                      };
+
+                      return (
+                        <div
+                          key={category.categoryId || index}
+                          className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-white"
+                        >
+                          {/* Rank */}
+                          <div className="w-7 h-7 flex-shrink-0 rounded-full bg-gray-100 text-gray-700 flex items-center justify-center text-xs font-bold">
                             {index + 1}
                           </div>
 
                           {/* Icon */}
-                          <div
-                            className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-xl sm:text-2xl shadow-md transition-transform group-hover:scale-110 group-hover:shadow-lg"
-                            style={{
-                              backgroundColor: `${color}15`,
-                              border: `2px solid ${color}40`,
-                            }}
-                          >
-                            <span
-                              style={{
-                                filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
-                              }}
-                            >
-                              {getIconEmoji(category.icon)}
-                            </span>
+                          <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-gray-100 flex items-center justify-center text-lg">
+                            {renderSafeIcon(category.icon)}
                           </div>
 
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-2 sm:mb-3">
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-gray-900 text-base sm:text-lg mb-1 truncate">
-                                  {category.name}
-                                </h4>
-                                <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                                  <span className="text-gray-500 flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                                    {percentage}% tổng chi tiêu
-                                  </span>
-                                  <span className="text-gray-500 flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                                    {category.count || 0} giao dịch
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="text-left sm:text-right sm:ml-4">
-                                <p className="font-bold text-lg sm:text-xl text-[#10B981] mb-1">
-                                  {formatCurrency(category.amount)}
-                                </p>
-                              </div>
-                            </div>
+                          {/* Text */}
+                          <div className="flex-1 min-w-[120px]">
+                            <p className="font-semibold text-sm text-gray-900 truncate">
+                              {category.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {percentage}% • {category.count || 0} giao dịch
+                            </p>
+                          </div>
 
-                            {/* Progress Bar */}
-                            <div className="relative mt-2">
-                              <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden"
-                                  style={{
-                                    width: `${percentage}%`,
-                                    backgroundColor: color,
-                                    boxShadow: `0 2px 8px ${color}40`,
-                                  }}
-                                >
-                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
-                                </div>
-                              </div>
-                            </div>
+                          {/* Amount */}
+                          <div className="flex-shrink-0 text-right">
+                            <p className="font-bold text-sm text-[#10B981] whitespace-nowrap">
+                              {formatCurrency(category.amount)}
+                            </p>
                           </div>
                         </div>
-
-                        {/* Hover Effect Border */}
-                        <div className="absolute inset-0 rounded-xl border-2 border-[#2563EB] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </Card>
             )}

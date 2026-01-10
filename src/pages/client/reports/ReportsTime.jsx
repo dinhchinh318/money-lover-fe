@@ -187,8 +187,8 @@ const ReportsTime = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
-            <div className="max-w-[98%] mx-auto p-4 sm:p-6">
+        <div className="min-h-screen bg-[#F9FAFB]">
+            <div className="max-w-[1280px] mx-auto px-4 py-4 sm:py-6">
                 {/* Header Section */}
                 <div className="mb-6 sm:mb-8">
                     <div className="flex items-center gap-2 sm:gap-3 mb-4">
@@ -196,7 +196,7 @@ const ReportsTime = () => {
                             <Calendar className="text-white w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-gray-900 bg-clip-text text-transparent">
+                            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
                                 Báo cáo theo Thời gian
                             </h1>
                             <p className="text-gray-600 mt-1 text-xs sm:text-sm">
@@ -207,7 +207,7 @@ const ReportsTime = () => {
                 </div>
 
                 {/* Filter Bar */}
-                <Card className="mb-4 sm:mb-6 shadow-lg border-0 rounded-2xl bg-gradient-to-br from-white to-gray-50">
+                <Card className="border border-gray-200 rounded-xl shadow-sm mb-6">
                     <div className="flex items-center gap-2 mb-4">
                         <Filter className="text-indigo-500" size={18} />
                         <h3 className="text-sm font-bold text-gray-800">Bộ lọc</h3>
@@ -247,72 +247,73 @@ const ReportsTime = () => {
                                     </h3>
                                 </div>
                                 {timeData.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height={300}>
-                                        <LineChart data={timeData} margin={{ top: 10, right: 10, left: 0, bottom: 50 }}>
-                                            <CartesianGrid
-                                                strokeDasharray="3 3"
-                                                stroke="#E5E7EB"
-                                                vertical={false}
-                                            />
-                                            <XAxis
-                                                dataKey="period"
-                                                stroke="#6B7280"
-                                                tick={{ fill: "#6B7280", fontSize: 10 }}
-                                                tickLine={{ stroke: "#D1D5DB" }}
-                                                axisLine={{ stroke: "#D1D5DB" }}
-                                                angle={-45}
-                                                textAnchor="end"
-                                                height={60}
-                                            />
-                                            <YAxis
-                                                stroke="#6B7280"
-                                                tick={{ fill: "#6B7280", fontSize: 10 }}
-                                                tickLine={{ stroke: "#D1D5DB" }}
-                                                axisLine={{ stroke: "#D1D5DB" }}
-                                                tickFormatter={(value) => {
-                                                    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
-                                                    if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
-                                                    return value.toString();
-                                                }}
-                                            />
-                                            <Tooltip
-                                                formatter={(value) => formatCurrency(value)}
-                                                contentStyle={{
-                                                    backgroundColor: "#fff",
-                                                    border: "1px solid #E5E7EB",
-                                                    borderRadius: "8px",
-                                                    padding: "12px",
-                                                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
-                                                }}
-                                                labelStyle={{ color: "#374151", fontWeight: "bold" }}
-                                            />
-                                            <Legend
-                                                wrapperStyle={{ paddingTop: "20px" }}
-                                                iconType="line"
-                                                formatter={(value) => (
-                                                    <span style={{ color: "#374151", fontSize: "12px" }}>{value}</span>
-                                                )}
-                                            />
-                                            <Line
-                                                type="monotone"
-                                                dataKey="income"
-                                                name="Thu nhập"
-                                                stroke="#10B981"
-                                                strokeWidth={3}
-                                                dot={{ r: 5, fill: "#10B981", strokeWidth: 2 }}
-                                                activeDot={{ r: 7, stroke: "#10B981", strokeWidth: 2 }}
-                                            />
-                                            <Line
-                                                type="monotone"
-                                                dataKey="expense"
-                                                name="Chi tiêu"
-                                                stroke="#EF4444"
-                                                strokeWidth={3}
-                                                dot={{ r: 5, fill: "#EF4444", strokeWidth: 2 }}
-                                                activeDot={{ r: 7, stroke: "#EF4444", strokeWidth: 2 }}
-                                            />
-                                        </LineChart>
-                                    </ResponsiveContainer>
+                                    <div className="h-[320px] w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={timeData} margin={{ top: 10, right: 10, left: 0, bottom: 50 }}>
+                                                <CartesianGrid
+                                                    strokeDasharray="3 3"
+                                                    stroke="#E5E7EB"
+                                                    vertical={false}
+                                                />
+                                                <XAxis
+                                                    dataKey="period"
+                                                    tick={{ fontSize: 10 }}
+                                                    interval="preserveStartEnd"
+                                                    minTickGap={16}
+                                                    angle={timeData.length > 8 ? -45 : 0}
+                                                    textAnchor={timeData.length > 8 ? "end" : "middle"}
+                                                    height={timeData.length > 8 ? 60 : 30}
+                                                />
+                                                <YAxis
+                                                    stroke="#6B7280"
+                                                    tick={{ fill: "#6B7280", fontSize: 10 }}
+                                                    tickLine={{ stroke: "#D1D5DB" }}
+                                                    axisLine={{ stroke: "#D1D5DB" }}
+                                                    tickFormatter={(value) => {
+                                                        if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                                                        if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                                                        return value.toString();
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    formatter={(value) => formatCurrency(value)}
+                                                    contentStyle={{
+                                                        backgroundColor: "#fff",
+                                                        border: "1px solid #E5E7EB",
+                                                        borderRadius: "8px",
+                                                        padding: "12px",
+                                                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
+                                                    }}
+                                                    labelStyle={{ color: "#374151", fontWeight: "bold" }}
+                                                />
+                                                <Legend
+                                                    wrapperStyle={{ paddingTop: "20px" }}
+                                                    iconType="line"
+                                                    formatter={(value) => (
+                                                        <span style={{ color: "#374151", fontSize: "12px" }}>{value}</span>
+                                                    )}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="income"
+                                                    name="Thu nhập"
+                                                    stroke="#10B981"
+                                                    strokeWidth={3}
+                                                    dot={{ r: 5, fill: "#10B981", strokeWidth: 2 }}
+                                                    activeDot={{ r: 7, stroke: "#10B981", strokeWidth: 2 }}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="expense"
+                                                    name="Chi tiêu"
+                                                    stroke="#EF4444"
+                                                    strokeWidth={3}
+                                                    dot={{ r: 5, fill: "#EF4444", strokeWidth: 2 }}
+                                                    activeDot={{ r: 7, stroke: "#EF4444", strokeWidth: 2 }}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center h-[250px] sm:h-[350px] bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                                         <BarChart3 className="text-gray-400 mb-2" size={32} />
@@ -341,13 +342,12 @@ const ReportsTime = () => {
                                             />
                                             <XAxis
                                                 dataKey="period"
-                                                stroke="#6B7280"
-                                                tick={{ fill: "#6B7280", fontSize: 10 }}
-                                                tickLine={{ stroke: "#D1D5DB" }}
-                                                axisLine={{ stroke: "#D1D5DB" }}
-                                                angle={-45}
-                                                textAnchor="end"
-                                                height={60}
+                                                tick={{ fontSize: 10 }}
+                                                interval="preserveStartEnd"
+                                                minTickGap={16}
+                                                angle={timeData.length > 8 ? -45 : 0}
+                                                textAnchor={timeData.length > 8 ? "end" : "middle"}
+                                                height={timeData.length > 8 ? 60 : 30}
                                             />
                                             <YAxis
                                                 stroke="#6B7280"
@@ -444,9 +444,10 @@ const ReportsTime = () => {
                             )}
                         </Card>
                     </>
-                )}
-            </div>
-        </div>
+                )
+                }
+            </div >
+        </div >
     );
 };
 
