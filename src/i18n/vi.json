@@ -1,0 +1,2151 @@
+{
+  "settings": {
+    "title": "Cấu hình ứng dụng",
+    "subtitle": "Tùy chỉnh trải nghiệm cá nhân và bảo mật của bạn",
+
+    "editBtn": "Thay đổi thiết lập",
+    "saveBtn": "Lưu cấu hình",
+    "cancelBtn": "Huỷ",
+
+    "reset": "Khôi phục mặc định",
+    "resetConfirm": "Xác nhận reset?",
+
+    "booleanHint": "Bật/tắt tuỳ chọn này",
+    "advancedConfig": "Cấu hình nâng cao",
+
+    "mode": {
+      "view": "Chế độ xem",
+      "editing": "Đang chỉnh sửa"
+    },
+
+    "groups": {
+      "security": "Bảo mật tài khoản",
+      "notification": "Thông báo & Nhắc nhở",
+      "display": "Giao diện & Ngôn ngữ",
+      "other": "Cấu hình khác"
+    },
+
+    "placeholders": {
+      "select": "Chọn giá trị...",
+      "input": "Nhập giá trị...",
+      "number": "Nhập số..."
+    },
+
+    "toast": {
+      "serverError": "Không thể kết nối máy chủ thiết lập",
+      "updated": "Thiết lập đã được cập nhật thành công",
+      "updateError": "Lỗi cập nhật"
+    },
+
+    "count": {
+      "options": "{{count}} tuỳ chọn",
+      "items": "{{count}} mục"
+    },
+
+    "options": {
+      "language": {
+        "vi": "Tiếng Việt",
+        "en": "Tiếng Anh"
+      },
+      "currency": {
+        "vnd": "VNĐ (₫)"
+      },
+      "theme": {
+        "light": "Sáng",
+        "dark": "Tối",
+        "system": "Hệ thống"
+      },
+      "notif": {
+        "instant": "Tức thì",
+        "daily": "Hàng ngày",
+        "weekly": "Hàng tuần"
+      }
+    },
+
+    "fieldLabels": {
+      "transactions": "Giao dịch",
+      "transaction": "Giao dịch",
+      "budgets": "Ngân sách",
+      "budget": "Ngân sách",
+      "wallets": "Ví",
+      "wallet": "Ví",
+      "categories": "Danh mục",
+      "category": "Danh mục",
+      "reports": "Báo cáo",
+      "analytics": "Phân tích",
+      "notifications": "Thông báo",
+      "profile": "Hồ sơ",
+      "groups": "Nhóm",
+      "savingGoals": "Mục tiêu tiết kiệm",
+      "recurringBills": "Hoá đơn định kỳ"
+    }
+  },
+
+  "footer": {
+    "logoAlt": "Money Lover Logo",
+    "about": "Ứng dụng quản lý chi tiêu và thu nhập hiện đại, giúp bạn kiểm soát tài chính một cách dễ dàng và hiệu quả.",
+
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "instagram": "Instagram"
+    },
+
+    "contact": {
+      "title": "Liên hệ",
+      "hotlineHint": "Hotline hỗ trợ",
+      "emailHint": "Email hỗ trợ",
+      "city": "Thành phố Hồ Chí Minh",
+      "country": "Việt Nam"
+    },
+
+    "support": {
+      "title": "Hỗ trợ khách hàng",
+      "faq": "Hỏi đáp thường gặp",
+      "faqHint": "Tìm câu trả lời nhanh",
+      "hours": "Giờ làm việc",
+      "hoursValue": "7:00 - 20:00 hàng ngày",
+      "more": "Xem thêm"
+    },
+
+    "quickLinks": {
+      "title": "Liên kết nhanh",
+      "home": "Trang chủ",
+      "transactions": "Giao dịch",
+      "reports": "Báo cáo",
+      "analytics": "Phân tích"
+    },
+
+    "copyright": "Copyright © {{year}} MoneyLover.",
+    "rights": "Tất cả quyền được bảo lưu.",
+    "madeWith": "Made with",
+    "inVietnam": "in Vietnam"
+  },
+  "header": {
+    "brandTagline": "Smart Finance",
+    "more": "Thêm",
+
+    "userFallbackName": "Người dùng",
+
+    "toast": {
+      "logoutSuccess": "Đăng xuất thành công",
+      "systemError": "Lỗi hệ thống"
+    },
+
+    "nav": {
+      "overview": "Tổng quan",
+      "transactions": "Giao dịch",
+      "wallets": "Ví của tôi",
+      "budgets": "Ngân sách",
+      "reports": "Báo cáo"
+    },
+
+    "tools": {
+      "categories": "Danh mục",
+      "recurringBills": "Hóa đơn định kỳ",
+      "savingGoals": "Tiết kiệm",
+      "analytics": "Phân tích",
+      "aiCenter": "AI Center",
+      "groups": "Nhóm"
+    },
+
+    "userMenu": {
+      "profile": "Hồ sơ",
+      "settings": "Cài đặt",
+      "logout": "Đăng xuất"
+    },
+
+    "auth": {
+      "login": "Đăng nhập",
+      "getStarted": "Bắt đầu"
+    },
+
+    "actions": {
+      "addTransaction": "Thêm giao dịch",
+      "notifications": "Thông báo"
+    },
+
+    "mobile": {
+      "mainMenu": "Menu chính",
+      "tools": "Công cụ bổ sung",
+      "logout": "Thoát ứng dụng",
+      "loginNow": "Đăng nhập ngay"
+    },
+
+    "aria": {
+      "goHome": "Về trang chủ",
+      "openUserMenu": "Mở menu người dùng",
+      "openMenu": "Mở menu",
+      "closeMenu": "Đóng menu"
+    }
+  },
+  "profile": {
+    "title": "Thông tin cá nhân",
+    "mode": { "view": "Chế độ xem", "editing": "Đang chỉnh sửa" },
+
+    "sections": {
+      "basic": "THÔNG TIN CƠ BẢN",
+      "contact": "LIÊN HỆ & CƯ TRÚ",
+      "bio": "GIỚI THIỆU"
+    },
+
+    "fields": {
+      "displayName": "Tên hiển thị",
+      "gender": "Giới tính",
+      "dateOfBirth": "Ngày sinh",
+      "email": "Địa chỉ Email",
+      "phone": "Số điện thoại",
+      "address": "Địa chỉ cư trú",
+      "bio": "Giới thiệu bản thân"
+    },
+
+    "gender": { "male": "Nam", "female": "Nữ" },
+
+    "placeholders": {
+      "date": "Chọn ngày sinh",
+      "bio": "Ví dụ: Tôi ưu tiên tiết kiệm 20% thu nhập hàng tháng...",
+      "input": "Nhập {{field}}..."
+    },
+
+    "hints": {
+      "emailLocked": "Email định danh không thể thay đổi"
+    },
+
+    "validation": {
+      "phoneInvalid": "Số điện thoại không hợp lệ"
+    },
+
+    "actions": {
+      "edit": "Chỉnh sửa",
+      "cancel": "Hủy",
+      "reload": "Tải lại",
+      "update": "Cập nhật hồ sơ"
+    },
+
+    "confirm": {
+      "cancelTitle": "Hủy chỉnh sửa?",
+      "cancelDesc": "Mọi thay đổi sẽ bị bỏ và quay lại dữ liệu trước đó.",
+      "cancelOk": "Hủy chỉnh sửa",
+      "cancelNo": "Tiếp tục sửa"
+    },
+
+    "toast": {
+      "serverError": "Không thể kết nối máy chủ tài chính",
+      "cancelled": "Đã hủy chỉnh sửa",
+      "updated": "Hồ sơ đã được cập nhật",
+      "updateFail": "Cập nhật thất bại, vui lòng kiểm tra đường truyền"
+    },
+
+    "avatar": {
+      "change": "Ảnh đại diện",
+      "tooLarge": "Ảnh phải nhỏ hơn 2MB",
+      "updated": "Cập nhật ảnh đại diện thành công",
+      "uploadError": "Không thể tải ảnh lên"
+    },
+
+    "badge": { "trusted": "Hồ sơ tin cậy" },
+
+    "completion": {
+      "title": "Mức độ hoàn thiện",
+      "hint": "Hoàn thiện hồ sơ để trải nghiệm tính năng cá nhân hóa tốt hơn."
+    },
+
+    "notFound": {
+      "title": "Không tìm thấy hồ sơ",
+      "subtitle": "Có lỗi khi tải dữ liệu người dùng.",
+      "retry": "Thử lại"
+    },
+
+    "fallback": {
+      "displayName": "Người Dùng"
+    }
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "subtitle": {
+      "before": "Bạn có",
+      "after": "thông báo mới chưa đọc"
+    },
+
+    "actions": {
+      "reload": "Tải lại",
+      "readAll": "Đọc tất cả"
+    },
+
+    "tabs": {
+      "all": "Tất cả ({{count}})",
+      "unread": "Chưa đọc",
+      "read": "Đã đọc",
+      "deleted": "Đã xóa"
+    },
+
+    "empty": "Không tìm thấy thông báo nào",
+    "systemTitle": "Thông báo hệ thống",
+    "justNow": "Vừa xong",
+
+    "tooltips": {
+      "detail": "Xem chi tiết",
+      "markRead": "Đánh dấu đã đọc",
+      "restore": "Khôi phục",
+      "delete": "Xóa"
+    },
+
+    "tags": {
+      "new": "Mới",
+      "deleted": "Đã xóa"
+    },
+
+    "confirm": {
+      "deleteTitle": "Xóa thông báo này?"
+    },
+
+    "detail": {
+      "title": "Chi tiết thông báo",
+      "close": "Đóng",
+      "sentAt": "Ngày gửi"
+    },
+
+    "toast": {
+      "fetchError": "Không thể tải danh sách thông báo",
+      "actionFail": "Thao tác thất bại",
+      "allRead": "Tất cả đã được đánh dấu là đã đọc",
+      "markedRead": "Đã đánh dấu là đã đọc",
+      "restored": "Đã khôi phục",
+      "movedToTrash": "Đã chuyển vào thùng rác"
+    }
+  },
+  "wallets": {
+    "title": "Quản lý Ví",
+    "subtitle": "Theo dõi và quản lý tất cả ví",
+    "resultSuffix": "kết quả",
+
+    "actions": {
+      "add": "Thêm ví",
+      "clearFilters": "Xóa lọc",
+      "setDefault": "Mặc định"
+    },
+
+    "summary": {
+      "totalWallets": "Tổng ví",
+      "totalBalance": "Tổng số dư",
+      "cashWallets": "Tiền mặt",
+      "bankWallets": "Ngân hàng"
+    },
+
+    "tabs": {
+      "all": "Tất cả",
+      "active": "Đang hoạt động",
+      "archived": "Đã lưu trữ"
+    },
+
+    "filters": {
+      "type": {
+        "all": "Tất cả loại",
+        "cash": "Tiền mặt",
+        "bank": "Ngân hàng"
+      }
+    },
+
+    "search": {
+      "placeholder": "Tìm theo tên ví / ngân hàng..."
+    },
+
+    "sort": {
+      "default_first": "Ưu tiên mặc định",
+      "balance_desc": "Số dư giảm dần",
+      "name_asc": "Tên A → Z",
+      "updated_desc": "Cập nhật mới nhất"
+    },
+
+    "pagination": {
+      "show": "Hiển thị",
+      "perPage": "{{n}}/trang"
+    },
+
+    "list": {
+      "summary": "{{total}} ví • Trang {{page}}"
+    },
+
+    "labels": {
+      "cash": "Tiền mặt",
+      "bank": "Ngân hàng",
+      "balance": "Số dư",
+      "isDefault": "Đang mặc định"
+    },
+
+    "badges": {
+      "default": "Default",
+      "archived": "Lưu trữ"
+    },
+
+    "tooltips": {
+      "setDefault": "Đặt làm mặc định",
+      "archive": "Lưu trữ ví",
+      "unarchive": "Khôi phục ví"
+    },
+
+    "menu": {
+      "edit": "Chỉnh sửa",
+      "setDefault": "Đặt làm mặc định",
+      "archive": "Lưu trữ",
+      "unarchive": "Khôi phục",
+      "delete": "Xóa"
+    },
+
+    "confirm": {
+      "delete": {
+        "title": "Xác nhận xóa ví",
+        "content": "Bạn có chắc chắn muốn xóa ví \"{{name}}\"? Hành động này không thể hoàn tác.",
+        "ok": "Xóa",
+        "cancel": "Hủy"
+      }
+    },
+
+    "empty": {
+      "all": {
+        "title": "Chưa có ví nào"
+      },
+      "active": {
+        "title": "Chưa có ví đang hoạt động"
+      },
+      "archived": {
+        "title": "Chưa có ví nào được lưu trữ",
+        "desc": "Các ví đã lưu trữ sẽ hiển thị ở đây"
+      },
+      "common": {
+        "desc": "Hãy bắt đầu bằng cách thêm ví đầu tiên của bạn"
+      }
+    },
+
+    "toast": {
+      "fetchFail": "Không thể tải danh sách ví!",
+      "fetchError": "Có lỗi xảy ra khi tải danh sách ví!",
+      "deleteSuccess": "Xóa ví thành công!",
+      "deleteFail": "Xóa ví thất bại!",
+      "setDefaultSuccess": "Đặt ví mặc định thành công!",
+      "archiveSuccess": "Lưu trữ ví thành công!",
+      "unarchiveSuccess": "Khôi phục ví thành công!",
+      "actionFail": "Thao tác thất bại!",
+      "genericError": "Có lỗi xảy ra!"
+    }
+  },
+  "walletDetail": {
+    "loading": "Đang tải...",
+    "tabs": {
+      "info": "Thông tin",
+      "transactions": "Giao dịch",
+      "statistics": "Thống kê"
+    },
+    "labels": {
+      "cash": "Tiền mặt",
+      "bank": "Ngân hàng",
+      "balance": "Số dư",
+      "updatedAt": "Cập nhật",
+      "cashWallet": "Ví tiền mặt",
+      "bankWallet": "Ví ngân hàng"
+    },
+    "badges": {
+      "default": "Mặc định",
+      "archived": "Đã lưu trữ"
+    },
+    "actions": {
+      "back": "Quay lại",
+      "edit": "Sửa ví",
+      "editShort": "Sửa",
+      "more": "Thao tác",
+      "setDefault": "Đặt làm mặc định",
+      "archive": "Lưu trữ",
+      "unarchive": "Khôi phục",
+      "delete": "Xóa ví",
+      "loadMore": "Tải thêm",
+      "loadingMore": "Đang tải..."
+    },
+    "filters": {
+      "allTime": "Tất cả thời gian",
+      "txTitle": "Lọc giao dịch",
+      "statsTitle": "Bộ lọc thống kê"
+    },
+    "summary": {
+      "income": "Tổng thu",
+      "expense": "Tổng chi",
+      "net": "Biến động",
+      "balance": "Số dư"
+    },
+    "txList": {
+      "title": "Danh sách giao dịch",
+      "subtitle": "Nhóm theo ngày để dễ theo dõi",
+      "count": "{{n}} mục"
+    },
+    "empty": {
+      "tx": {
+        "title": "Chưa có giao dịch nào",
+        "hint": "Hãy chọn khoảng thời gian khác hoặc thêm giao dịch để bắt đầu theo dõi dòng tiền."
+      },
+      "stats": {
+        "title": "Chưa có dữ liệu để thống kê",
+        "hint": "Hãy chọn khoảng thời gian khác hoặc thêm giao dịch để biểu đồ hiển thị."
+      },
+      "pie": {
+        "title": "Chưa có dữ liệu chi tiêu",
+        "hint": "Thêm giao dịch “Chi tiêu” để xem biểu đồ phân bổ."
+      }
+    },
+    "endOfList": "Đã tải hết giao dịch",
+    "mobileActions": {
+      "title": "Thao tác với ví",
+      "cannotDeleteDefault": "* Không thể xóa ví mặc định. Hãy đổi ví mặc định trước."
+    },
+    "charts": {
+      "cumulative": {
+        "title": "Biến động cộng dồn",
+        "subtitle": "Theo ngày (cộng dồn thay đổi số dư)",
+        "total": "Tổng biến động"
+      },
+      "inout": {
+        "title": "Thu / Chi theo ngày",
+        "subtitle": "So sánh dòng tiền vào và ra"
+      },
+      "pie": {
+        "title": "Phân bổ chi tiêu",
+        "subtitle": "Theo danh mục",
+        "totalExpense": "Tổng chi"
+      }
+    },
+    "legend": {
+      "cumulative": "Cộng dồn",
+      "income": "Thu",
+      "expense": "Chi"
+    },
+    "tx": {
+      "type": {
+        "transfer": "Chuyển tiền",
+        "adjust": "Điều chỉnh",
+        "other": "Khác"
+      },
+      "desc": {
+        "transferTo": "Sang ví: {{name}}",
+        "adjust": "Điều chỉnh: {{from}} → {{to}}"
+      }
+    },
+    "confirm": {
+      "delete": {
+        "title": "Xác nhận xóa ví",
+        "content": "Bạn có chắc chắn muốn xóa ví \"{{name}}\"? Hành động này không thể hoàn tác.",
+        "ok": "Xóa",
+        "cancel": "Hủy"
+      }
+    },
+    "toast": {
+      "notFound": "Không tìm thấy ví!",
+      "loadWalletError": "Có lỗi xảy ra khi tải thông tin ví!",
+      "loadTxFail": "Không thể tải giao dịch!",
+      "loadTxError": "Không thể tải giao dịch!",
+      "deleteSuccess": "Xóa ví thành công!",
+      "deleteFail": "Xóa ví thất bại!",
+      "setDefaultSuccess": "Đặt ví mặc định thành công!",
+      "archiveSuccess": "Lưu trữ ví thành công!",
+      "unarchiveSuccess": "Khôi phục ví thành công!",
+      "actionFail": "Thao tác thất bại!",
+      "genericError": "Có lỗi xảy ra!"
+    }
+  },
+  "transactions": {
+    "title": "Giao dịch",
+    "subtitle": "Quản lý và theo dõi tất cả giao dịch của bạn",
+
+    "tabs": {
+      "all": "Tất cả",
+      "income": "Thu nhập",
+      "expense": "Chi tiêu",
+      "transfer": "Chuyển tiền",
+      "debtLoan": "Nợ & Vay",
+      "recurring": "Định kỳ"
+    },
+
+    "type": {
+      "income": "Thu nhập",
+      "expense": "Chi tiêu",
+      "transfer": "Chuyển tiền",
+      "debt": "Nợ phải thu",
+      "loan": "Nợ phải trả",
+      "adjust": "Điều chỉnh"
+    },
+
+    "date": {
+      "today": "Hôm nay",
+      "yesterday": "Hôm qua"
+    },
+
+    "actions": {
+      "add": "Thêm giao dịch",
+      "filter": "Lọc",
+      "edit": "Chỉnh sửa",
+      "editShort": "Sửa",
+      "delete": "Xóa",
+      "clearFilters": "Xóa lọc",
+      "done": "Xong"
+    },
+
+    "filters": {
+      "dateRange": "Khoảng thời gian",
+      "type": "Loại giao dịch",
+      "wallet": "Ví",
+      "category": "Danh mục",
+      "all": "Tất cả",
+      "allWallets": "Tất cả ví",
+      "allCategories": "Tất cả danh mục",
+      "onlyRecurring": "Chỉ định kỳ"
+    },
+
+    "quick": {
+      "today": "Hôm nay",
+      "week": "Tuần này",
+      "month": "Tháng này",
+      "year": "Năm này"
+    },
+
+    "summary": {
+      "totalIncome": "Tổng thu",
+      "totalExpense": "Tổng chi",
+      "totalWalletBalance": "Số dư ví",
+      "transactionCount": "Số giao dịch"
+    },
+
+    "badges": {
+      "recurring": "Định kỳ",
+      "settledShort": "Đã TT"
+    },
+
+    "loaded": {
+      "prefix": "Đã tải",
+      "pullToLoad": "Kéo xuống để tải thêm",
+      "allLoaded": "Đã tải hết"
+    },
+
+    "pageSize": {
+      "20": "20 giao dịch/ trang",
+      "30": "30 giao dịch/ trang",
+      "50": "50 giao dịch/ trang"
+    },
+
+    "empty": {
+      "title": "Chưa có giao dịch",
+      "hint": "Hãy thêm giao dịch đầu tiên"
+    },
+
+    "footer": {
+      "loading": "Đang tải...",
+      "pullToLoad": "Kéo xuống để tải thêm",
+      "allLoaded": "Đã tải hết"
+    },
+
+    "drawer": {
+      "title": "Bộ lọc"
+    },
+
+    "confirm": {
+      "delete": {
+        "title": "Xác nhận xóa giao dịch",
+        "content": "Bạn có chắc chắn muốn xóa giao dịch này?",
+        "ok": "Xóa",
+        "cancel": "Hủy"
+      }
+    },
+
+    "toast": {
+      "loadListFail": "Không thể tải danh sách giao dịch!",
+      "loadListError": "Có lỗi xảy ra khi tải giao dịch!",
+      "deleteSuccess": "Xóa giao dịch thành công!",
+      "deleteFail": "Xóa giao dịch thất bại!",
+      "genericError": "Có lỗi xảy ra!"
+    }
+  },
+  "transactionDetail": {
+    "loading": "Đang tải...",
+    "back": "Quay lại danh sách giao dịch",
+
+    "fields": {
+      "wallet": "Ví:",
+      "category": "Danh mục:",
+      "toWallet": "Đến ví:",
+      "counterparty": "Đối tác:",
+      "contact": "Liên hệ:",
+      "dueDate": "Ngày đáo hạn:",
+      "note": "Ghi chú:",
+      "adjustReason": "Lý do điều chỉnh:",
+      "image": "Hình ảnh:"
+    },
+
+    "imageAlt": "Hóa đơn",
+
+    "badges": {
+      "recurring": "Định kỳ",
+      "settled": "Đã thanh toán"
+    },
+
+    "recurring": {
+      "title": "Giao dịch định kỳ",
+      "repeat": "Lập lại",
+      "daily": "Hàng ngày",
+      "weekly": "Hàng tuần",
+      "monthly": "Hàng tháng",
+      "yearly": "Hàng năm",
+      "endDate": "Ngày kết thúc",
+      "viewAll": "Xem tất cả giao dịch định kỳ"
+    },
+
+    "actions": {
+      "edit": "Sửa",
+      "settle": "Đánh dấu đã thanh toán",
+      "delete": "Xóa"
+    },
+
+    "related": {
+      "title": "Giao dịch liên quan"
+    },
+
+    "confirm": {
+      "delete": {
+        "title": "Xác nhận xóa giao dịch",
+        "content": "Bạn có chắc chắn muốn xóa giao dịch này?",
+        "ok": "Xóa",
+        "cancel": "Hủy"
+      }
+    },
+
+    "toast": {
+      "notFound": "Không tìm thấy giao dịch!",
+      "loadError": "Có lỗi xảy ra khi tải thông tin giao dịch!",
+      "deleteSuccess": "Xóa giao dịch thành công!",
+      "deleteFail": "Xóa giao dịch thất bại!",
+      "settleSuccess": "Đánh dấu đã thanh toán thành công!",
+      "actionFail": "Thao tác thất bại!",
+      "genericError": "Có lỗi xảy ra!"
+    }
+  },
+  "savingGoals": {
+    "title": "Mục tiêu Tiết kiệm",
+    "subtitle": "Theo dõi và đạt được các mục tiêu tài chính",
+
+    "tabs": {
+      "all": "Tất cả",
+      "active": "Đang theo dõi",
+      "completed": "Đã hoàn thành"
+    },
+
+    "summary": {
+      "totalGoals": "Tổng mục tiêu",
+      "totalTarget": "Tổng mục tiêu tiền",
+      "totalSaved": "Đã tiết kiệm",
+      "avgProgress": "Tiến độ TB"
+    },
+
+    "labels": {
+      "remaining": "Còn thiếu",
+      "progress": "Tiến độ",
+      "targetDate": "Mục tiêu:",
+      "timeRemaining": "Thời gian còn lại:"
+    },
+
+    "badges": {
+      "completed": "Đã hoàn thành",
+      "paused": "Đã tạm dừng",
+      "dueSoon": "Sắp đến hạn",
+      "overdue": "Quá hạn"
+    },
+
+    "date": {
+      "noDeadline": "Không có hạn"
+    },
+
+    "time": {
+      "overdue": "Đã quá hạn",
+      "daysLeft": "Còn {{days}} ngày"
+    },
+
+    "actions": {
+      "add": "Thêm mục tiêu",
+      "addFirst": "Thêm mục tiêu đầu tiên",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "markCompleted": "Đánh dấu đã hoàn thành",
+      "deposit": "+ Thêm tiền",
+      "withdraw": "− Rút tiền"
+    },
+
+    "confirm": {
+      "complete": {
+        "title": "Đánh dấu hoàn thành?",
+        "content": "Sau khi hoàn thành, tiến độ sẽ được giữ cố định 100%.",
+        "ok": "Hoàn thành",
+        "cancel": "Hủy"
+      },
+      "delete": {
+        "title": "Xác nhận xóa mục tiêu",
+        "content": "Bạn có chắc chắn muốn xóa mục tiêu \"{{name}}\"?",
+        "ok": "Xóa",
+        "cancel": "Hủy"
+      }
+    },
+
+    "empty": {
+      "allTitle": "Chưa có mục tiêu nào",
+      "activeTitle": "Chưa có mục tiêu đang theo dõi",
+      "completedTitle": "Chưa có mục tiêu nào hoàn thành",
+      "subtitle": "Tạo mục tiêu tiết kiệm để đạt được ước mơ của bạn"
+    },
+
+    "moneyModal": {
+      "depositTitle": "Thêm tiền vào mục tiêu",
+      "withdrawTitle": "Rút tiền về ví",
+      "amountPlaceholder": "Nhập số tiền",
+      "invalidAmount": "Vui lòng nhập số tiền hợp lệ",
+      "withdrawTooMuch": "Không thể rút nhiều hơn số tiền đã tiết kiệm",
+      "ok": "Xác nhận",
+      "cancel": "Hủy"
+    },
+
+    "toast": {
+      "loadFail": "Không thể tải danh sách mục tiêu!",
+      "loadError": "Có lỗi xảy ra khi tải danh sách mục tiêu!",
+      "deleteSuccess": "Xóa mục tiêu thành công!",
+      "deleteFail": "Xóa thất bại!",
+      "completeSuccess": "Đã đánh dấu hoàn thành!",
+      "depositSuccess": "Đã thêm tiền",
+      "withdrawSuccess": "Đã rút tiền",
+      "actionFail": "Thao tác thất bại",
+      "genericError": "Có lỗi xảy ra!"
+    }
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "na": "N/A"
+  },
+  "savingGoalDetail": {
+    "tabs": { "info": "Thông tin" },
+
+    "badges": {
+      "completed": "Đã hoàn thành",
+      "paused": "Đã tạm dừng",
+      "dueSoon": "Sắp đến hạn"
+    },
+
+    "labels": {
+      "progress": "Tiến độ",
+      "wallet": "Ví",
+      "target": "Mục tiêu",
+      "remaining": "Còn thiếu",
+      "deadline": "Hạn mục tiêu",
+      "timeRemaining": "Thời gian còn lại"
+    },
+
+    "date": {
+      "noDeadline": "Không có hạn"
+    },
+
+    "time": {
+      "overdue": "Đã quá hạn",
+      "daysLeft": "Còn {{days}} ngày"
+    },
+
+    "money": {
+      "placeholder": "Nhập số tiền",
+      "invalidAmount": "Số tiền phải lớn hơn 0"
+    },
+
+    "actions": {
+      "backToList": "Quay lại danh sách mục tiêu",
+      "deposit": "Thêm tiền",
+      "withdraw": "Rút về ví",
+      "markCompleted": "Đánh dấu hoàn thành",
+      "edit": "Sửa",
+      "delete": "Xóa"
+    },
+
+    "confirm": {
+      "complete": {
+        "title": "Đánh dấu hoàn thành mục tiêu?",
+        "content": "Sau khi hoàn thành, tiến độ sẽ được giữ cố định 100%.",
+        "ok": "Hoàn thành",
+        "cancel": "Hủy"
+      },
+      "delete": {
+        "title": "Xác nhận xóa mục tiêu",
+        "content": "Bạn có chắc chắn muốn xóa mục tiêu \"{{name}}\"?",
+        "ok": "Xóa",
+        "cancel": "Hủy"
+      }
+    },
+
+    "toast": {
+      "notFound": "Không tìm thấy mục tiêu!",
+      "loadError": "Có lỗi xảy ra khi tải thông tin mục tiêu!",
+      "completeSuccess": "Đã hoàn thành mục tiêu!",
+      "depositSuccess": "Đã thêm tiền vào mục tiêu",
+      "depositFail": "Thêm tiền thất bại",
+      "withdrawSuccess": "Đã rút tiền về ví",
+      "withdrawFail": "Rút tiền thất bại",
+      "deleteSuccess": "Xóa mục tiêu thành công!",
+      "deleteFail": "Xóa thất bại!",
+      "actionFail": "Thao tác thất bại",
+      "genericError": "Có lỗi xảy ra!"
+    }
+  },
+  "reportsDashboard": {
+    "title": "Tổng quan Tài chính",
+
+    "tabs": {
+      "week": "Tuần",
+      "month": "Tháng",
+      "year": "Năm"
+    },
+
+    "period": {
+      "monthDisplay": "Tháng {{value}}",
+      "backToThisMonth": "Về tháng này",
+      "monthThis": "Tháng này",
+      "monthPrev": "Tháng trước",
+      "yearThis": "Năm này",
+      "yearPrev": "Năm trước"
+    },
+
+    "overview": {
+      "totalIncome": "Tổng Thu nhập",
+      "totalExpense": "Tổng Chi tiêu",
+      "totalBalance": "Tổng số dư Ví",
+      "difference": "Chênh lệch",
+      "totalAllWallets": "Tổng tất cả ví",
+      "incomeMinusExpense": "Thu - Chi"
+    },
+
+    "comparison": {
+      "title": "So sánh với Kỳ trước",
+      "totalIncome": "Tổng thu",
+      "totalExpense": "Tổng chi",
+      "balance": "Số dư"
+    },
+
+    "walletFluct": {
+      "title": "Biến động Ví",
+      "overallRate": "Tỷ lệ thay đổi",
+      "noData": "Không có dữ liệu biến động ví",
+      "change": "Thay đổi",
+      "changeRate": "Tỷ lệ thay đổi",
+      "unnamed": "Ví không tên"
+    },
+
+    "chart": {
+      "title": "Biến động",
+      "testDataBadge": "📊 Dữ liệu TEST",
+      "expense": "Chi tiêu",
+      "income": "Thu nhập"
+    },
+
+    "empty": {
+      "title": "Chưa có dữ liệu",
+      "subtitle": "Vui lòng chọn khoảng thời gian khác hoặc thêm giao dịch"
+    },
+
+    "pie": {
+      "title": "Tình hình thu chi",
+      "uncategorized": "Chưa phân loại",
+      "prevPrefix": "Kỳ trước:",
+      "emptyTitle": "Chưa có dữ liệu chi tiêu",
+      "emptySubtitle": "Vui lòng thêm giao dịch chi tiêu",
+
+      "summary": {
+        "expense": "Chi tiêu",
+        "income": "Thu nhập",
+        "vsPrev": "so với tháng trước",
+        "incomeHint": "Tổng thu nhập trong tháng"
+      },
+
+      "detailsInline": "Chi tiết từng danh mục ({{count}})",
+      "detailsTitle": "Chi tiết từng danh mục ({{count}})",
+      "percentOfTotal": "{{percent}}% tổng chi tiêu"
+    },
+
+    "labels": {
+      "weekLabelShort": "Tuần {{date}}",
+      "weekFallback": "Tuần {{index}}",
+      "monthFallback": "Tháng {{index}}",
+      "yearFallback": "Năm {{index}}",
+      "itemFallback": "Mục {{index}}"
+    }
+  },
+  "reportsIndex": {
+    "title": "Báo cáo Tài chính",
+    "subtitle": "Chọn loại báo cáo bạn muốn xem",
+    "viewDetail": "Xem chi tiết",
+    "types": {
+      "time": {
+        "title": "Báo cáo theo Thời gian",
+        "description": "Phân tích thu chi theo thời gian với biểu đồ đường và cột"
+      },
+      "category": {
+        "title": "Báo cáo theo Danh mục",
+        "description": "Phân tích chi tiêu theo danh mục với biểu đồ tròn và cột ngang"
+      },
+      "wallet": {
+        "title": "Báo cáo theo Ví",
+        "description": "Phân tích chi tiêu theo ví với biểu đồ tròn và đường đa tuyến"
+      }
+    }
+  },
+  "reportsCategory": {
+    "title": "Báo cáo theo Danh mục",
+    "subtitle": "Phân tích chi tiêu theo danh mục",
+    "uncategorized": "Chưa phân loại",
+    "loadError": "Có lỗi xảy ra khi tải dữ liệu",
+    "summary": {
+      "totalExpense": "Tổng chi tiêu",
+      "categoryCount": "{{count}} danh mục"
+    },
+    "charts": {
+      "pieTitle": "Phân bổ chi tiêu theo danh mục",
+      "barTitle": "Top danh mục chi tiêu"
+    },
+    "empty": {
+      "title": "Chưa có dữ liệu chi tiêu",
+      "subtitle": "Vui lòng thêm giao dịch chi tiêu trong khoảng thời gian này"
+    },
+    "top": {
+      "title": "Top {{count}} danh mục chi tiêu",
+      "subtitle": "Danh sách các danh mục chi tiêu nhiều nhất",
+      "percentOfTotal": "{{percent}}% tổng chi tiêu",
+      "transactionCount": "{{count}} giao dịch"
+    }
+  },
+  "reportsTime": {
+    "title": "Báo cáo theo Thời gian",
+    "subtitle": "Phân tích thu chi theo thời gian với biểu đồ và bảng chi tiết",
+    "filter": {
+      "title": "Bộ lọc"
+    },
+    "loading": "Đang tải dữ liệu báo cáo...",
+    "empty": "Chưa có dữ liệu để hiển thị",
+    "na": "N/A",
+    "cannotLoad": "Không thể tải dữ liệu",
+    "loadError": "Có lỗi xảy ra khi tải dữ liệu",
+    "charts": {
+      "lineTitle": "Biểu đồ đường - Thu chi theo thời gian",
+      "barTitle": "Biểu đồ cột - So sánh thu chi"
+    },
+    "series": {
+      "income": "Thu nhập",
+      "expense": "Chi tiêu"
+    },
+    "table": {
+      "title": "Bảng chi tiết",
+      "time": "Thời gian",
+      "income": "Thu nhập",
+      "expense": "Chi tiêu",
+      "balance": "Số dư",
+      "totalRecords": "Tổng {{total}} bản ghi"
+    }
+  },
+  "reportsWallet": {
+    "title": "Báo cáo theo Ví",
+    "subtitle": "Phân tích chi tiêu theo ví",
+    "unknownWallet": "Chưa xác định",
+    "na": "N/A",
+    "loadError": "Có lỗi xảy ra khi tải dữ liệu",
+
+    "period": {
+      "month": "Tháng {{month}}/{{year}}",
+      "week": "Tuần {{week}}/{{year}}",
+      "year": "Năm {{year}}"
+    },
+
+    "summary": {
+      "totalIncome": "Tổng thu nhập",
+      "totalExpense": "Tổng chi tiêu",
+      "balance": "Số dư",
+      "totalWallets": "Tổng {{total}} ví"
+    },
+
+    "charts": {
+      "pieTitle": "Phân bổ chi tiêu theo ví",
+      "lineTitle": "So sánh chi tiêu các ví theo thời gian"
+    },
+
+    "tooltip": {
+      "walletLabel": "Ví: {{label}}"
+    },
+
+    "empty": {
+      "noExpenseTitle": "Chưa có chi tiêu",
+      "noExpenseDesc": "Tất cả ví đều chưa có giao dịch chi tiêu trong khoảng thời gian này",
+      "noDataTitle": "Chưa có dữ liệu",
+      "noDataDesc": "Không có chi tiêu trong khoảng thời gian này",
+      "noExpenseDataTitle": "Chưa có dữ liệu chi tiêu",
+      "noExpenseDataDesc": "Vui lòng thêm giao dịch chi tiêu trong khoảng thời gian này"
+    },
+
+    "table": {
+      "title": "Bảng thống kê ví",
+      "wallet": "Ví",
+      "totalIncome": "Tổng thu",
+      "totalExpense": "Tổng chi",
+      "balance": "Số dư",
+      "rate": "Tỷ lệ",
+      "transactions": "Số giao dịch",
+      "totalWallets": "Tổng {{total}} ví"
+    }
+  },
+  "common1": {
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "errorOccurred": "Có lỗi xảy ra!"
+  },
+  "recurringBills": {
+    "title": "Hóa đơn Định kỳ",
+    "subtitle": "Theo dõi và thanh toán hóa đơn tự động",
+
+    "tabs": {
+      "all": "Tất cả",
+      "active": "Đang hoạt động",
+      "paused": "Đã tạm dừng"
+    },
+
+    "actions": {
+      "add": "Thêm hóa đơn",
+      "addFirst": "Thêm hóa đơn đầu tiên",
+      "payNow": "Thanh toán ngay",
+      "paid": "Đã thanh toán",
+      "pause": "Tạm dừng",
+      "activate": "Kích hoạt"
+    },
+
+    "summary": {
+      "totalBills": "Tổng hóa đơn",
+      "totalAmountPerMonth": "Tổng tiền / tháng",
+      "upcoming": "Sắp đến hạn",
+      "paidThisMonth": "Đã thanh toán (tháng)"
+    },
+
+    "alert": {
+      "upcoming7days": "Bạn có {{count}} hóa đơn sắp đến hạn trong 7 ngày tới"
+    },
+
+    "empty": {
+      "allTitle": "Chưa có hóa đơn định kỳ nào",
+      "activeTitle": "Chưa có hóa đơn đang hoạt động",
+      "pausedTitle": "Chưa có hóa đơn nào bị tạm dừng",
+      "desc": "Tạo hóa đơn định kỳ để tự động quản lý chi tiêu"
+    },
+
+    "badges": {
+      "active": "Hoạt động",
+      "paused": "Tạm dừng",
+      "upcoming": "Sắp đến hạn",
+      "paid": "Đã thanh toán"
+    },
+
+    "frequency": {
+      "daily": "Hàng ngày",
+      "weekly": "Hàng tuần",
+      "biweekly": "2 tuần một lần",
+      "monthly": "Hàng tháng",
+      "yearly": "Hàng năm",
+      "custom": "Tùy chỉnh"
+    },
+
+    "confirm": {
+      "deleteTitle": "Xác nhận xóa hóa đơn",
+      "deleteContent": "Bạn có chắc chắn muốn xóa hóa đơn \"{{name}}\"?",
+      "pauseTitle": "Tạm dừng hóa đơn",
+      "pauseContent": "Bạn có chắc chắn muốn tạm dừng \"{{name}}\"?",
+      "resumeTitle": "Kích hoạt hóa đơn",
+      "resumeContent": "Bạn có chắc chắn muốn kích hoạt lại \"{{name}}\"?"
+    },
+
+    "toast": {
+      "deleteSuccess": "Xóa hóa đơn thành công!",
+      "deleteFail": "Xóa thất bại!",
+      "paySuccess": "Thanh toán thành công!",
+      "payFail": "Thanh toán thất bại!",
+      "pauseSuccess": "Đã tạm dừng hóa đơn!",
+      "resumeSuccess": "Đã kích hoạt hóa đơn!",
+      "actionFail": "Thao tác thất bại!"
+    },
+
+    "errors": {
+      "loadList": "Không thể tải danh sách hóa đơn!"
+    }
+  },
+  "common2": {
+    "edit": "Chỉnh sửa",
+    "cancel": "Hủy",
+    "reload": "Tải lại",
+    "retry": "Thử lại"
+  },
+  "profile1": {
+    "fallbackUser": "Người dùng",
+
+    "toast": {
+      "loadFail": "Không thể tải hồ sơ",
+      "cancelEdit": "Đã hủy chỉnh sửa",
+      "updateSuccess": "Hồ sơ đã được cập nhật",
+      "updateFail": "Cập nhật thất bại"
+    },
+
+    "result404": {
+      "title": "Không tìm thấy hồ sơ",
+      "subtitle": "Có lỗi khi tải dữ liệu người dùng."
+    },
+
+    "avatar": {
+      "change": "Đổi ảnh đại diện",
+      "tooLarge": "Ảnh phải nhỏ hơn 2MB",
+      "success": "Cập nhật ảnh đại diện thành công",
+      "fail": "Không thể tải ảnh lên"
+    },
+
+    "tags": {
+      "trusted": "Hồ sơ tin cậy"
+    },
+
+    "completion": {
+      "title": "Mức độ hoàn thiện",
+      "hint": "Hoàn thiện hồ sơ để trải nghiệm cá nhân hóa tốt hơn."
+    },
+
+    "section": {
+      "personalInfo": "Thông tin cá nhân"
+    },
+
+    "mode": {
+      "editing": "Đang chỉnh sửa",
+      "view": "Chế độ xem"
+    },
+
+    "actions": {
+      "update": "Cập nhật hồ sơ"
+    },
+
+    "confirm": {
+      "cancelTitle": "Hủy chỉnh sửa?",
+      "cancelDesc": "Mọi thay đổi sẽ bị bỏ và quay lại dữ liệu trước đó.",
+      "okCancelEdit": "Hủy chỉnh sửa",
+      "keepEditing": "Tiếp tục sửa"
+    },
+
+    "email": {
+      "lockedTooltip": "Email định danh không thể thay đổi"
+    },
+
+    "validation": {
+      "phoneInvalid": "Số điện thoại không hợp lệ"
+    },
+
+    "gender": {
+      "male": "Nam",
+      "female": "Nữ"
+    },
+
+    "placeholders": {
+      "default": "Nhập thông tin..."
+    },
+
+    "fields": {
+      "displayName": {
+        "label": "Tên hiển thị",
+        "placeholder": "Nhập tên hiển thị..."
+      },
+      "email": {
+        "label": "Địa chỉ Email",
+        "placeholder": "Email"
+      },
+      "phone": {
+        "label": "Số điện thoại",
+        "placeholder": "Nhập số điện thoại..."
+      },
+      "address": {
+        "label": "Địa chỉ cư trú",
+        "placeholder": "Nhập địa chỉ..."
+      },
+      "dateOfBirth": {
+        "label": "Ngày sinh",
+        "placeholder": "Chọn ngày sinh"
+      },
+      "bio": {
+        "label": "Giới thiệu bản thân",
+        "placeholder": "Ví dụ: Tôi ưu tiên tiết kiệm 20% thu nhập hàng tháng..."
+      },
+      "gender": {
+        "label": "Giới tính"
+      }
+    }
+  },
+  "common3": {
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "cancel": "Hủy",
+    "error": "Có lỗi xảy ra!"
+  },
+
+  "categories": {
+    "title": "Quản lý Danh mục",
+
+    "tabs": {
+      "all": "Tất cả",
+      "income": "Thu nhập",
+      "expense": "Chi tiêu"
+    },
+
+    "type": {
+      "income": "Thu nhập",
+      "expense": "Chi tiêu"
+    },
+
+    "badge": {
+      "default": "Mặc định",
+      "child": "Danh mục con"
+    },
+
+    "search": {
+      "placeholder": "Tìm danh mục theo tên..."
+    },
+
+    "actions": {
+      "add": "Thêm danh mục",
+      "addTitle": "Thêm danh mục",
+      "addAria": "Thêm danh mục",
+      "addFirst": "Thêm danh mục đầu tiên",
+      "setDefault": "Đặt làm mặc định"
+    },
+
+    "confirm": {
+      "deleteTitle": "Xác nhận xóa danh mục",
+      "deleteContent": "Bạn có chắc chắn muốn xóa danh mục \"{{name}}\"?"
+    },
+
+    "toast": {
+      "loadFail": "Không thể tải danh sách danh mục!",
+      "deleteSuccess": "Xóa danh mục thành công!",
+      "deleteFail": "Xóa danh mục thất bại!",
+      "setDefaultSuccess": "Đặt làm danh mục mặc định thành công!",
+      "setDefaultFail": "Thất bại!"
+    },
+
+    "pagination": {
+      "showing": "Hiển thị",
+      "items": "danh mục"
+    },
+
+    "empty": {
+      "all": "Chưa có danh mục nào",
+      "income": "Chưa có danh mục thu nhập nào",
+      "expense": "Chưa có danh mục chi tiêu nào"
+    }
+  },
+  "common4": {
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "cancel": "Hủy",
+    "copy": "Sao chép",
+    "error": "Có lỗi xảy ra!",
+    "loadingDots": "..."
+  },
+  "budgets": {
+    "title": "Quản lý Ngân sách",
+    "subtitle": "Đặt hạn mức chi tiêu và theo dõi ngân sách",
+
+    "actions": {
+      "add": "Thêm ngân sách",
+      "addFirst": "Thêm ngân sách đầu tiên"
+    },
+
+    "summary": {
+      "totalBudgets": "Tổng ngân sách",
+      "totalLimit": "Tổng hạn mức",
+      "totalSpent": "Tổng đã chi",
+      "warningBudgets": "Ngân sách cảnh báo"
+    },
+
+    "alert": {
+      "warning": "Bạn có {{count}} ngân sách đang ở mức cảnh báo (≥80%) hoặc đã vượt hạn mức"
+    },
+
+    "tabs": {
+      "all": "Tất cả",
+      "active": "Đang hoạt động",
+      "expired": "Đã hết hạn"
+    },
+
+    "empty": {
+      "all": "Chưa có ngân sách nào",
+      "active": "Chưa có ngân sách đang hoạt động",
+      "expired": "Chưa có ngân sách nào hết hạn",
+      "hint": "Bắt đầu tạo ngân sách để quản lý chi tiêu hiệu quả"
+    },
+
+    "confirm": {
+      "deleteTitle": "Xác nhận xóa ngân sách",
+      "deleteContent": "Bạn có chắc chắn muốn xóa ngân sách \"{{name}}\"?"
+    },
+
+    "toast": {
+      "loadFail": "Không thể tải danh sách ngân sách!",
+      "deleteSuccess": "Xóa ngân sách thành công!",
+      "deleteFail": "Xóa ngân sách thất bại!"
+    },
+
+    "defaultName": "Ngân sách",
+    "copyName": "{{name}} (Copy)",
+    "noEndDateShort": "Không có hạn"
+  },
+  "common5": {
+    "na": "N/A",
+    "loading": "Đang tải...",
+    "delete": "Xóa",
+    "cancel": "Hủy",
+    "edit": "Sửa",
+    "error": "Có lỗi xảy ra!"
+  },
+  "budgetDetail": {
+    "back": "Quay lại danh sách ngân sách",
+
+    "tabs": {
+      "info": "Thông tin",
+      "transactions": "Chi tiêu",
+      "statistics": "Thống kê"
+    },
+
+    "period": {
+      "weekly": "Hàng tuần",
+      "monthly": "Hàng tháng",
+      "yearly": "Hàng năm",
+      "custom": "Tùy chỉnh"
+    },
+
+    "defaultName": "Ngân sách",
+
+    "toast": {
+      "notFound": "Không tìm thấy ngân sách!",
+      "loadFail": "Có lỗi xảy ra khi tải thông tin ngân sách!",
+      "deleteSuccess": "Xóa ngân sách thành công!",
+      "deleteFail": "Xóa ngân sách thất bại!",
+      "txLoadFail": "Không thể tải giao dịch"
+    },
+
+    "confirm": {
+      "deleteTitle": "Xác nhận xóa ngân sách",
+      "deleteContent": "Bạn có chắc chắn muốn xóa ngân sách này?"
+    },
+
+    "info": {
+      "progress": "Tiến độ",
+      "category": "Danh mục",
+      "wallet": "Ví",
+      "allWallets": "Tất cả ví",
+      "limit": "Hạn mức",
+      "spent": "Đã chi",
+      "remaining": "Còn lại",
+      "timeRange": "Thời gian",
+      "description": "Mô tả"
+    },
+
+    "tx": {
+      "title": "Danh sách chi tiêu",
+      "count": "{{count}} mục",
+      "empty": "Chưa có chi tiêu nào trong ngân sách này",
+      "defaultCategory": "Chi tiêu"
+    },
+
+    "stats": {
+      "limit": "Hạn mức",
+      "spent": "Đã chi",
+      "remaining": "Còn lại",
+      "usageProgress": "Tiến độ sử dụng",
+      "breakdownTitle": "Phân bổ ngân sách",
+      "total": "Tổng",
+      "byTimeTitle": "Chi tiêu theo thời gian",
+      "noTimeData": "Chưa có dữ liệu chi tiêu theo thời gian",
+      "dayLabel": "Ngày {{day}}"
+    },
+
+    "pie": {
+      "spent": "Đã chi",
+      "remaining": "Còn lại"
+    }
+  },
+  "analyticsIndex": {
+    "header": {
+      "title": "Phân tích Thông minh",
+      "subtitle": "Chọn loại phân tích bạn muốn xem"
+    },
+    "cta": {
+      "viewDetail": "Xem chi tiết"
+    },
+    "types": {
+      "diagnostic": {
+        "title": "Phân tích Nguyên nhân",
+        "description": "Phân tích biến động, phát hiện bất thường và thói quen chi tiêu"
+      },
+      "predictive": {
+        "title": "Dự đoán Tài chính",
+        "description": "Dự đoán chi tiêu và nguy cơ vượt ngân sách"
+      },
+      "prescriptive": {
+        "title": "Khuyến nghị Hành động",
+        "description": "Gợi ý tối ưu, khuyến nghị và cảnh báo thông minh"
+      }
+    }
+  },
+  "analyticsDiagnostic": {
+    "header": {
+      "title": "Phân tích Nguyên nhân",
+      "subtitle": "Phân tích biến động, phát hiện bất thường và thói quen chi tiêu của bạn"
+    },
+    "filters": {
+      "rangeLabel": "Khoảng thời gian phân tích"
+    },
+    "loading": "Đang tải dữ liệu...",
+    "toast": {
+      "loadError": "Có lỗi xảy ra khi tải dữ liệu",
+      "categoryIdMissing": "Không tìm thấy ID danh mục"
+    },
+    "monthLabel": "Tháng {{month}}/{{year}}",
+    "days": {
+      "mon": "T2",
+      "tue": "T3",
+      "wed": "T4",
+      "thu": "T5",
+      "fri": "T6",
+      "sat": "T7",
+      "sun": "CN"
+    },
+    "badges": {
+      "growthPercent": "+{{percent}}%"
+    },
+    "wallet": {
+      "tooltip": "Chi tiêu tháng {{month}}/{{year}}: {{latest}} | Tháng trước: {{prev}}",
+      "increase": "Chi tiêu tăng",
+      "decrease": "Chi tiêu giảm",
+      "noChange": "Không đổi",
+      "percentPlus": "+{{percent}}%"
+    },
+    "tooltip": {
+      "amount": "Số tiền",
+      "aboveAvg": "Vượt trung bình {{percent}}%"
+    },
+    "empty": {
+      "noVariationData": "Chưa có dữ liệu biến động",
+      "noWalletData": "Chưa có dữ liệu ví",
+      "noMonthlyData": "Chưa có dữ liệu tháng",
+      "noCategoryData": "Chưa có dữ liệu danh mục",
+      "noData": "Chưa có dữ liệu"
+    },
+    "cards": {
+      "variations": {
+        "title": "Biến động chi tiêu",
+        "categorySpikesTitle": "Danh mục tăng mạnh bất thường",
+        "comparePrev": "So với kỳ trước",
+        "walletTitle": "Biến động theo từng Ví"
+      },
+      "anomalies": {
+        "title": "Phát hiện bất thường",
+        "largeTitle": "Khoản chi quá lớn",
+        "largeCount": "{{count}} giao dịch bất thường",
+        "timeTitle": "Chi vào thời điểm lạ",
+        "timeCount": "{{count}} giao dịch",
+        "monthlyTitle": "Tháng phát sinh Chi tiêu đột biến",
+        "thresholdLabel": "Ngưỡng",
+        "hourlyTitle": "Phân tích khung giờ chi tiêu",
+        "spike24hTitle": "Chi tăng đột biến 24h",
+        "spike24hDesc": "Tăng {{percent}}% so với 24h trước"
+      },
+      "habits": {
+        "title": "Thói quen Chi tiêu",
+        "mostSpendingDayTitle": "Ngày trong Tuần chi nhiều nhất",
+        "frequencyTitle": "Tần suất giao dịch",
+        "perDay": "Giao dịch/ngày",
+        "perWeek": "Giao dịch/tuần",
+        "perMonth": "Giao dịch/tháng",
+        "frequentCategoriesTitle": "Danh mục phát sinh nhiều nhất",
+        "transactions": "giao dịch",
+        "categoryHint": "Click để xem {{count}} giao dịch của {{name}}"
+      }
+    },
+    "drawer": {
+      "largeTitle": "Khoản chi quá lớn",
+      "timeTitle": "Chi vào thời điểm bất thường",
+      "viewAll": "Xem tất cả giao dịch",
+      "empty": "Không có giao dịch nào"
+    }
+  },
+  "home": {
+    "appName": "MoneyLover",
+    "greeting": "Xin chào",
+    "greetingWithName": "Xin chào, {{name}}",
+    "welcomeBack": "Chào mừng bạn trở lại với",
+    "uncategorized": "Chưa phân loại",
+    "other": "Khác",
+    "toast": {
+      "loadFail": "Không thể tải dữ liệu!"
+    },
+    "sync": {
+      "label": "Đồng bộ dữ liệu",
+      "loading": "Đang tải",
+      "ready": "Sẵn sàng"
+    },
+    "overview": {
+      "title": "Tình hình thu chi",
+      "subtitle": "Theo dõi thu nhập, chi tiêu và danh mục nổi bật theo tháng",
+      "expense": "Chi tiêu",
+      "income": "Thu nhập",
+      "inMonth": "Trong tháng",
+      "expenseHint": "Tổng chi tiêu trong tháng đã chọn",
+      "incomeHint": "Tổng thu nhập trong tháng đã chọn"
+    },
+    "month": {
+      "label": "Tháng",
+      "prev": "Tháng trước",
+      "next": "Tháng sau"
+    },
+    "pie": {
+      "title": "Phân bổ chi tiêu theo danh mục",
+      "subtitle": "Chạm vào lát cắt hoặc legend để ẩn/hiện & highlight",
+      "count": "{{count}} danh mục",
+      "noData": "Chưa có dữ liệu",
+      "emptyTitle": "Chưa có dữ liệu chi tiêu",
+      "emptyDesc": "Thử thêm giao dịch để xem báo cáo theo danh mục"
+    },
+    "breakdown": {
+      "title": "Chi tiết từng danh mục",
+      "subtitle": "Chạm vào 1 danh mục để highlight & xem tỉ trọng",
+      "txCount": "{{count}} giao dịch",
+      "hide": "Ẩn",
+      "show": "Hiện",
+      "onChart": "trên biểu đồ",
+      "tapToHighlight": "Chạm để highlight",
+      "emptyTitle": "Không có dữ liệu chi tiêu",
+      "emptyDesc": "Chọn tháng khác hoặc thêm giao dịch mới"
+    },
+    "stats": {
+      "totalBalance": "Tổng số dư",
+      "income": "Thu nhập",
+      "expense": "Chi tiêu",
+      "transactions": "Giao dịch",
+      "badgeNow": "Hiện tại",
+      "badgeThisMonth": "Tháng này"
+    },
+    "recent": {
+      "title": "Giao dịch gần đây",
+      "subtitle": "10 giao dịch mới nhất của bạn",
+      "viewAll": "Xem tất cả",
+      "emptyTitle": "Chưa có giao dịch nào",
+      "emptyDesc": "Bắt đầu ghi nhận thu chi để theo dõi tài chính",
+      "addFirst": "Thêm giao dịch đầu tiên",
+      "filters": {
+        "days7": "7 ngày",
+        "days30": "30 ngày",
+        "allWallets": "Tất cả ví"
+      }
+    },
+    "actions": {
+      "addTransaction": {
+        "title": "Thêm giao dịch",
+        "desc": "Ghi nhận thu chi mới"
+      },
+      "addWallet": {
+        "title": "Thêm ví",
+        "desc": "Quản lý nhiều ví"
+      },
+      "viewReports": {
+        "title": "Xem báo cáo",
+        "desc": "Phân tích tài chính"
+      }
+    }
+  },
+  "wallet": {
+    "modal": {
+      "title": {
+        "create": "Thêm ví mới",
+        "edit": "Chỉnh sửa ví"
+      },
+      "actions": {
+        "save": "Lưu thông tin",
+        "cancel": "Hủy"
+      },
+      "type": {
+        "cash": "Tiền mặt",
+        "bank": "Ngân hàng"
+      },
+      "fields": {
+        "name": {
+          "label": "Tên ví",
+          "placeholder": "Ví dụ: Chi tiêu hàng ngày, Quỹ tiết kiệm...",
+          "required": "Vui lòng nhập tên ví!"
+        },
+        "currency": {
+          "label": "Tiền tệ",
+          "placeholder": "Chọn tiền tệ",
+          "required": "Chọn đơn vị!",
+          "vnd": "VND - Việt Nam Đồng"
+        },
+        "balance": {
+          "label": "Số dư hiện tại",
+          "placeholder": "0",
+          "required": "Nhập số dư!"
+        },
+        "bankName": {
+          "label": "Tên ngân hàng",
+          "placeholder": "VD: Vietcombank",
+          "required": "Nhập tên ngân hàng!"
+        },
+        "bankCode": {
+          "label": "Mã ngân hàng (Swift)",
+          "placeholder": "VD: VCB"
+        },
+        "bankAccount": {
+          "label": "Số tài khoản",
+          "placeholder": "Nhập số tài khoản ngân hàng",
+          "required": "Nhập số tài khoản!"
+        },
+        "isDefault": {
+          "title": "Đặt làm mặc định",
+          "desc": "Tự động chọn ví này khi tạo giao dịch mới"
+        }
+      },
+      "bankSection": {
+        "title": "Thông tin tài khoản"
+      },
+      "toast": {
+        "createSuccess": "Tạo ví thành công!",
+        "updateSuccess": "Cập nhật ví thành công!",
+        "actionFail": "Thao tác thất bại!"
+      }
+    }
+  },
+  "transaction": {
+    "modal": {
+      "title": {
+        "create": "Giao dịch mới",
+        "edit": "Chỉnh sửa giao dịch"
+      },
+      "actions": {
+        "save": "Lưu giao dịch",
+        "cancel": "Hủy",
+        "processing": "Đang xử lý..."
+      },
+      "types": {
+        "expense": "Chi tiêu",
+        "income": "Thu nhập",
+        "transfer": "Chuyển tiền",
+        "debt": "Nợ phải thu",
+        "loan": "Nợ phải trả",
+        "adjust": "Điều chỉnh"
+      },
+      "fields": {
+        "currencyUnit": {
+          "vnd": "VND"
+        },
+        "amount": {
+          "label": "Số tiền",
+          "required": "Nhập số tiền"
+        },
+        "adjustTo": {
+          "label": "Số dư mới",
+          "required": "Nhập số dư mới",
+          "validatorMin0": "Số dư mới phải >= 0"
+        },
+        "walletSend": {
+          "label": "Ví gửi"
+        },
+        "walletPay": {
+          "label": "Ví thanh toán"
+        },
+        "walletId": {
+          "required": "Chọn ví",
+          "placeholder": "Chọn ví sử dụng"
+        },
+        "categoryId": {
+          "label": "Danh mục",
+          "required": "Chọn danh mục",
+          "placeholder": "Tìm danh mục..."
+        },
+        "toWalletId": {
+          "label": "Đến ví",
+          "required": "Chọn ví nhận",
+          "placeholder": "Chọn ví nhận"
+        },
+        "transferFee": {
+          "label": "Phí chuyển",
+          "placeholder": "0"
+        },
+        "counterpartyName": {
+          "label": "Đối tác",
+          "required": "Nhập tên đối tác",
+          "placeholder": "Tên người vay/nợ"
+        },
+        "isSettled": {
+          "label": "Đã tất toán"
+        },
+        "adjustReason": {
+          "label": "Lý do điều chỉnh",
+          "required": "Nhập lý do điều chỉnh",
+          "placeholder": "VD: Kiểm kê tiền mặt, cập nhật số dư ngân hàng..."
+        },
+        "date": {
+          "label": "Thời gian",
+          "required": "Chọn thời gian"
+        },
+        "receipt": {
+          "label": "Hóa đơn / Chứng từ"
+        },
+        "note": {
+          "label": "Ghi chú",
+          "placeholderNormal": "Ăn trưa, xăng xe, lương tháng...",
+          "placeholderAdjust": "VD: Kiểm kê thực tế khác hệ thống..."
+        }
+      },
+      "recurring": {
+        "title": "Thiết lập định kỳ",
+        "repeatBy": "Lặp lại theo",
+        "endDate": "Ngày kết thúc",
+        "noEnd": "Không có",
+        "daily": "Ngày",
+        "weekly": "Tuần",
+        "monthly": "Tháng",
+        "yearly": "Năm"
+      },
+      "upload": {
+        "uploading": "Đang tải ảnh...",
+        "clickToUpload": "Nhấn để tải ảnh hóa đơn",
+        "updating": "Đang cập nhật...",
+        "change": "ĐỔI ẢNH",
+        "delete": "XÓA"
+      },
+      "toast": {
+        "loadWalletFail": "Không load được ví",
+        "loadCategoryFail": "Không load được danh mục",
+        "imageOnly": "Chỉ cho phép file ảnh!",
+        "uploadSuccess": "Tải ảnh lên thành công",
+        "uploadFail": "Upload ảnh thất bại",
+        "deleteImageFail": "Không thể xóa ảnh trên server",
+        "createSuccess": "Thêm thành công",
+        "updateSuccess": "Cập nhật thành công",
+        "actionFail": "Thao tác thất bại"
+      }
+    }
+  },
+  "savingGoal": {
+    "modal": {
+      "title": {
+        "create": "Thêm mục tiêu tiết kiệm",
+        "edit": "Chỉnh sửa mục tiêu tiết kiệm"
+      },
+      "actions": {
+        "save": "Lưu",
+        "cancel": "Hủy"
+      },
+      "fields": {
+        "currencyUnit": {
+          "vnd": "VND"
+        },
+        "name": {
+          "label": "Tên mục tiêu",
+          "required": "Vui lòng nhập tên mục tiêu!",
+          "placeholder": "Ví dụ: Mua xe máy"
+        },
+        "wallet": {
+          "label": "Ví",
+          "required": "Vui lòng chọn ví!",
+          "placeholder": "Chọn ví"
+        },
+        "targetAmount": {
+          "label": "Số tiền mục tiêu",
+          "required": "Vui lòng nhập số tiền mục tiêu!",
+          "min": "Số tiền phải lớn hơn 0!",
+          "placeholder": "0"
+        },
+        "targetDate": {
+          "label": "Ngày đạt mục tiêu",
+          "tooltip": "Để trống nếu không có hạn"
+        },
+        "description": {
+          "label": "Mô tả",
+          "placeholder": "Nhập mô tả (tùy chọn)"
+        }
+      },
+      "toast": {
+        "loadWalletFail": "Không tải được danh sách ví",
+        "createSuccess": "Tạo mục tiêu thành công!",
+        "createFail": "Tạo thất bại!",
+        "updateSuccess": "Cập nhật mục tiêu thành công!",
+        "updateFail": "Cập nhật thất bại!",
+        "fillAll": "Vui lòng điền đầy đủ thông tin!",
+        "generalError": "Có lỗi xảy ra!"
+      }
+    }
+  },
+  "filterBar": {
+    "common": {
+      "notFound": "Không tìm thấy"
+    },
+    "actions": {
+      "apply": "Áp dụng",
+      "reset": "Xóa bộ lọc"
+    },
+    "period": {
+      "placeholder": "Chọn kỳ",
+      "week": "Tuần",
+      "month": "Tháng",
+      "year": "Năm"
+    },
+    "type": {
+      "placeholder": "Loại",
+      "all": "Tất cả",
+      "income": "Thu nhập",
+      "expense": "Chi tiêu"
+    },
+    "wallet": {
+      "placeholder": "Chọn ví",
+      "all": "Tất cả ví",
+      "empty": "Chưa có ví"
+    },
+    "category": {
+      "placeholder": "Chọn danh mục",
+      "all": "Tất cả danh mục",
+      "empty": "Chưa có danh mục"
+    },
+    "limit": {
+      "placeholder": "Giới hạn",
+      "top": "Top {{n}}",
+      "all": "Tất cả"
+    }
+  },
+  "reports": {
+    "title": "Báo cáo",
+    "drawerTitle": "Menu Báo cáo",
+    "actions": {
+      "openMenu": "Mở menu",
+      "closeMenu": "Đóng menu"
+    },
+    "nav": {
+      "overview": "Tổng quan",
+      "time": "Báo cáo theo thời gian",
+      "category": "Báo cáo theo danh mục",
+      "wallet": "Báo cáo theo ví"
+    }
+  },
+  "common6": {
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "optional": "Không bắt buộc",
+    "actionFailed": "Thao tác thất bại!",
+    "pleaseFillAll": "Vui lòng điền đầy đủ thông tin!",
+    "errorOccurred": "Có lỗi xảy ra!"
+  },
+  "recurringBill": {
+    "title": {
+      "create": "Thêm hóa đơn định kỳ",
+      "edit": "Chỉnh sửa hóa đơn định kỳ"
+    },
+    "actions": {
+      "payNow": "Thanh toán ngay"
+    },
+    "fields": {
+      "name": "Tên hóa đơn",
+      "type": "Loại",
+      "amount": "Số tiền",
+      "wallet": "Ví",
+      "category": "Danh mục",
+      "frequency": "Tần suất",
+      "cronRule": "Cron Rule",
+      "nextRun": "Lần thanh toán tiếp theo",
+      "endsAt": "Ngày kết thúc",
+      "description": "Mô tả",
+      "active": "Đang hoạt động",
+      "autoCreateTransaction": "Tự động tạo giao dịch"
+    },
+    "type": {
+      "expense": "Chi tiêu",
+      "income": "Thu nhập"
+    },
+    "frequency": {
+      "daily": "Hàng ngày",
+      "weekly": "Hàng tuần",
+      "biweekly": "2 tuần một lần",
+      "monthly": "Hàng tháng",
+      "yearly": "Hàng năm",
+      "custom": "Tùy chỉnh"
+    },
+    "placeholder": {
+      "name": "Ví dụ: Tiền điện hàng tháng",
+      "wallet": "Chọn ví",
+      "category": "Chọn danh mục",
+      "description": "Nhập mô tả (tùy chọn)"
+    },
+    "tooltip": {
+      "cronRule": "Ví dụ: 0 0 1 * * (chạy vào 00:00 ngày 1 mỗi tháng)"
+    },
+    "validate": {
+      "name": "Vui lòng nhập tên hóa đơn!",
+      "type": "Vui lòng chọn loại!",
+      "amountRequired": "Vui lòng nhập số tiền!",
+      "amountMin": "Số tiền phải lớn hơn 0!",
+      "wallet": "Vui lòng chọn ví!",
+      "category": "Vui lòng chọn danh mục!",
+      "frequency": "Vui lòng chọn tần suất!",
+      "cronRule": "Vui lòng nhập cron rule!",
+      "nextRun": "Vui lòng chọn ngày!"
+    },
+    "pay": {
+      "confirmTitle": "Xác nhận thanh toán",
+      "amount": "Số tiền:",
+      "ok": "Thanh toán"
+    },
+    "toast": {
+      "createSuccess": "Tạo hóa đơn định kỳ thành công!",
+      "updateSuccess": "Cập nhật hóa đơn định kỳ thành công!",
+      "paySuccess": "Thanh toán thành công!",
+      "payFailed": "Thanh toán thất bại!",
+      "loadWalletsFailed": "Không tải được danh sách ví",
+      "loadCategoriesFailed": "Không tải được danh sách danh mục"
+    }
+  },
+  "dateRangePicker": {
+    "quick": {
+      "week": "Tuần này",
+      "month": "Tháng này",
+      "year": "Năm này"
+    }
+  },
+  "common7": {
+    "button": {
+      "save": "Lưu thông tin",
+      "cancel": "Hủy"
+    },
+    "toast": {
+      "actionFailed": "Thao tác thất bại!",
+      "fillRequired": "Vui lòng điền đầy đủ thông tin!",
+      "genericError": "Có lỗi xảy ra!"
+    }
+  },
+  "category": {
+    "modal": {
+      "createTitle": "Thêm danh mục mới",
+      "editTitle": "Chỉnh sửa danh mục"
+    },
+    "type": {
+      "expense": "Chi tiêu",
+      "income": "Thu nhập"
+    },
+    "field": {
+      "name": {
+        "label": "Tên danh mục",
+        "placeholder": "Ví dụ: Ăn uống, Lương, Hóa đơn...",
+        "required": "Vui lòng nhập tên danh mục!",
+        "max40": "Tên danh mục tối đa 40 ký tự!"
+      },
+      "parent": {
+        "label": "Danh mục cha",
+        "placeholder": "Chọn danh mục cha (tùy chọn)"
+      },
+      "icon": {
+        "label": "Icon",
+        "searchPlaceholder": "Tìm icon...",
+        "selected": "Icon được chọn:"
+      },
+      "default": {
+        "title": "Đặt làm mặc định",
+        "desc": "Tự động ưu tiên danh mục này khi tạo giao dịch mới"
+      }
+    },
+    "toast": {
+      "createSuccess": "Tạo danh mục thành công!",
+      "updateSuccess": "Cập nhật danh mục thành công!"
+    },
+    "icon": {
+      "default": "Mặc định",
+      "food": "Ăn uống",
+      "shopping": "Mua sắm",
+      "transport": "Giao thông",
+      "bills": "Hóa đơn",
+      "entertainment": "Giải trí",
+      "health": "Sức khỏe",
+      "education": "Giáo dục",
+      "salary": "Lương",
+      "investment": "Đầu tư",
+      "gift": "Quà tặng",
+      "other": "Khác"
+    }
+  },
+  "common8": {
+    "currency": { "vnd": "VND" }
+  },
+  "budget": {
+    "modal": {
+      "createTitle": "Thêm ngân sách mới",
+      "editTitle": "Chỉnh sửa ngân sách"
+    },
+    "period": {
+      "weekly": "Hàng tuần",
+      "monthly": "Hàng tháng",
+      "yearly": "Hàng năm",
+      "custom": "Tùy chỉnh"
+    },
+    "field": {
+      "name": {
+        "label": "Tên ngân sách",
+        "tooltip": "Để trống sẽ dùng tên danh mục",
+        "placeholder": "Ví dụ: Ngân sách ăn uống tháng 12"
+      },
+      "category": {
+        "label": "Danh mục",
+        "placeholder": "Chọn danh mục chi tiêu"
+      },
+      "wallet": {
+        "label": "Ví",
+        "placeholder": "Tất cả ví (tùy chọn)"
+      },
+      "limit": {
+        "label": "Hạn mức"
+      },
+      "period": {
+        "label": "Kỳ ngân sách"
+      },
+      "startDate": { "label": "Ngày bắt đầu" },
+      "endDate": { "label": "Ngày kết thúc" },
+      "description": {
+        "label": "Mô tả",
+        "placeholder": "Nhập mô tả (tùy chọn)"
+      }
+    },
+    "validation": {
+      "categoryRequired": "Vui lòng chọn danh mục!",
+      "limitRequired": "Vui lòng nhập hạn mức!",
+      "limitMin": "Hạn mức phải lớn hơn 0!",
+      "periodRequired": "Vui lòng chọn kỳ ngân sách!",
+      "startDateRequired": "Vui lòng chọn ngày bắt đầu!",
+      "endDateRequired": "Vui lòng chọn ngày kết thúc!",
+      "customDateRequired": "Vui lòng chọn ngày bắt đầu và kết thúc!"
+    },
+    "toast": {
+      "createSuccess": "Tạo ngân sách thành công!",
+      "createFailed": "Tạo ngân sách thất bại!",
+      "updateSuccess": "Cập nhật ngân sách thành công!",
+      "updateFailed": "Cập nhật ngân sách thất bại!",
+      "loadCategoriesFailed": "Không tải được danh mục!",
+      "loadWalletsFailed": "Không tải được ví!"
+    }
+  },
+  "analytics": {
+    "title": "Phân tích",
+    "drawerTitle": "Menu Phân tích",
+    "a11y": {
+      "openMenu": "Mở menu",
+      "closeMenu": "Đóng menu"
+    },
+    "nav": {
+      "diagnostic": "Phân tích Nguyên nhân",
+      "predictive": "Dự đoán Tài chính",
+      "prescriptive": "Khuyến nghị Hành động"
+    }
+  }
+}

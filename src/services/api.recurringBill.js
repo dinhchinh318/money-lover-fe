@@ -29,6 +29,15 @@ const payRecurringBillAPI = (id) => {
     const urlBackend = `/v1/api/recurring-bill/${id}/pay`;
     return axios.post(urlBackend);
 }
+const pauseRecurringBillAPI = (id) => {
+    const urlBackend = `/v1/api/recurring-bill/${id}/pause`;
+    return axios.patch(urlBackend);
+};
+
+const resumeRecurringBillAPI = (id) => {
+    const urlBackend = `/v1/api/recurring-bill/${id}/resume`;
+    return axios.patch(urlBackend);
+};
 
 export {
     getAllRecurringBillsAPI,
@@ -37,6 +46,8 @@ export {
     updateRecurringBillAPI,
     deleteRecurringBillAPI,
     payRecurringBillAPI,
+    pauseRecurringBillAPI,
+    resumeRecurringBillAPI,
 };
 
 

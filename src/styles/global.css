@@ -648,3 +648,220 @@ a {
         transition-duration: 0.01ms !important;
     }
 }
+
+
+/* =========================================================
+   DARK THEME UNIFY v3 (MoneyLover) - paste at VERY END
+   Fix: inconsistent pages + missing text + too-dark palette
+   ========================================================= */
+
+/* 0) Make dark palette softer (less "black") */
+.dark {
+  --color-background: #0f172a;        /* slate-900 */
+  --color-background-alt: #111c2e;    /* card/container */
+  --color-border: #1f2a44;            /* border */
+  --color-text-primary: #e7eefc;      /* main text */
+  --color-text-secondary: #a8b3c7;    /* secondary text */
+}
+
+/* 1) Base app background/text always follow variables */
+html,
+body {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* Optional: subtle green glow (nhẹ thôi cho đỡ "bẩn") */
+.dark body {
+  background:
+    radial-gradient(1000px 520px at 15% 0%, rgba(16,185,129,0.10), transparent 60%),
+    radial-gradient(900px 480px at 90% 10%, rgba(34,197,94,0.06), transparent 55%),
+    var(--color-background);
+}
+
+/* 2) Fix places hard-coded WHITE in your file (dropdown/menu, etc.)
+   (Bạn đang có background: white ở menu dropdown) */
+.dark .account-dropdown .ant-dropdown-menu,
+.dark .account-dropdown-modern .ant-dropdown-menu,
+.dark .ant-dropdown .ant-dropdown-menu {
+  background: var(--color-background-alt) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.dark .account-dropdown .ant-dropdown-menu-item,
+.dark .account-dropdown-modern .ant-dropdown-menu-item,
+.dark .ant-dropdown .ant-dropdown-menu-item {
+  color: var(--color-text-primary) !important;
+}
+
+.dark .account-dropdown-modern .ant-dropdown-menu-item-divider,
+.dark .ant-dropdown .ant-dropdown-menu-item-divider {
+  border-color: var(--color-border) !important;
+}
+
+/* 3) Modal mask should NEVER be white in dark
+   (Bạn đang set mask trắng trong file) */
+.ant-modal-mask {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.dark .ant-modal-mask {
+  background-color: rgba(0, 0, 0, 0.60) !important;
+}
+
+/* 4) AntD surfaces unify (chặn cảnh "trang tối - component sáng") */
+.dark .ant-layout,
+.dark .ant-layout-content,
+.dark .ant-card,
+.dark .ant-table,
+.dark .ant-drawer-content,
+.dark .ant-modal-content,
+.dark .ant-popover .ant-popover-inner,
+.dark .ant-dropdown-menu {
+  background: var(--color-background-alt) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* 5) Inputs / Select / DatePicker: tránh mất chữ, mất placeholder */
+.dark .ant-input,
+.dark .ant-input-affix-wrapper,
+.dark .ant-input-number,
+.dark .ant-picker,
+.dark .ant-select-selector {
+  background: rgba(255,255,255,0.04) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.dark .ant-input::placeholder,
+.dark .ant-picker-input > input::placeholder,
+.dark .ant-select-selection-placeholder {
+  color: rgba(231,238,252,0.55) !important;
+}
+
+.dark .ant-picker-input > input,
+.dark .ant-select-selection-item,
+.dark .ant-input-affix-wrapper input {
+  color: var(--color-text-primary) !important;
+}
+
+/* Dropdown options */
+.dark .ant-select-dropdown {
+  background: var(--color-background-alt) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.dark .ant-select-item {
+  color: var(--color-text-primary) !important;
+}
+.dark .ant-select-item-option-active,
+.dark .ant-select-item-option-selected {
+  background: rgba(16,185,129,0.14) !important;
+}
+
+/* 6) Buttons / Segmented / Radio buttons (fix "mất chữ" ở nút filter) */
+.dark .ant-btn-default,
+.dark .ant-btn-ghost {
+  background: rgba(255,255,255,0.04) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.dark .ant-btn-default:hover,
+.dark .ant-btn-ghost:hover {
+  background: rgba(16,185,129,0.14) !important;
+  border-color: rgba(16,185,129,0.35) !important;
+}
+
+/* Disabled vẫn phải đọc được (đừng nhạt quá) */
+.dark .ant-btn:disabled,
+.dark .ant-btn[disabled],
+.dark .ant-radio-button-wrapper-disabled,
+.dark .ant-segmented-item-disabled {
+  color: rgba(231,238,252,0.55) !important;
+}
+
+/* Segmented pills */
+.dark .ant-segmented {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.dark .ant-segmented-item-label {
+  color: var(--color-text-primary) !important;
+}
+.dark .ant-segmented-item-selected {
+  background: rgba(16,185,129,0.16) !important;
+}
+
+/* 7) Tailwind light classes in dark (kéo các trang "sáng loá" về đúng dark)
+   - catch cả bg-white/60, bg-white/90... bằng contains selector */
+.dark [class*="bg-white"],
+.dark [class*="bg-gray-50"],
+.dark [class*="bg-gray-100"],
+.dark [class*="bg-slate-50"],
+.dark [class*="bg-slate-100"] {
+  background-color: var(--color-background-alt) !important;
+}
+
+.dark [class*="text-black"],
+.dark [class*="text-gray-900"],
+.dark [class*="text-slate-900"] {
+  color: var(--color-text-primary) !important;
+}
+.dark [class*="text-gray-600"],
+.dark [class*="text-gray-500"],
+.dark [class*="text-slate-500"] {
+  color: var(--color-text-secondary) !important;
+}
+
+.dark [class*="border-gray-200"],
+.dark [class*="border-slate-200"],
+.dark [class*="border-gray-100"] {
+  border-color: var(--color-border) !important;
+}
+
+/* 8) Tables (đỡ chói, đỡ mất chữ) */
+.dark .ant-table-thead > tr > th {
+  background: rgba(255,255,255,0.04) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+.dark .ant-table-tbody > tr > td {
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.dark .ant-table-tbody > tr:hover > td {
+  background: rgba(16,185,129,0.10) !important;
+}
+
+/* 9) Icons in dark (nhiều icon bị nhạt/mất) */
+.dark .anticon,
+.dark svg {
+  color: inherit;
+}
+
+
+/* ===== UNIFORM BACKGROUND FOR WHOLE APP ===== */
+.app-shell {
+  min-height: 100vh;
+  background: var(--app-bg, #f8fafc);
+  color: var(--app-text, #0f172a);
+}
+
+.dark .app-shell {
+  background: var(--app-bg, #0b1220);
+  color: var(--app-text, #e7eefc);
+}
+
+/* main content không tự set nền */
+.app-content {
+  min-height: calc(100vh - 64px); /* nếu header bạn ~64px; có thể bỏ cũng được */
+  background: transparent;
+}
+
+/* Nếu bạn có blur-effect thì để nó transparent để nền app-shell quyết định */
+#main-blur-area {
+  background: transparent !important;
+}
