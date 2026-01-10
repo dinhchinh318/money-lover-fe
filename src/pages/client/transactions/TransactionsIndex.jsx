@@ -1,8 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  Plus, Edit, Trash2, TrendingUp, TrendingDown, Wallet, BarChart3,
-  ChevronLeft, ChevronRight, SlidersHorizontal
+  Plus,
+  Edit,
+  Trash2,
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  BarChart3,
+  SlidersHorizontal,
 } from "lucide-react";
 import { message, Dropdown, Modal, Select, Drawer } from "antd";
 import { Virtuoso } from "react-virtuoso";
@@ -18,7 +24,12 @@ import { getCategoriesAPI } from "../../../services/api.category";
 import TransactionModal from "../../../components/transactions/TransactionModal";
 import DateRangePicker from "../../../components/common/DateRangePicker";
 
+// ✅ i18n
+import { useTranslation } from "react-i18next";
+
 const TransactionsIndex = () => {
+  const { t, i18n } = useTranslation();
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -58,7 +69,7 @@ const TransactionsIndex = () => {
 
   // infinite paging (append)
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(30); // mobile list mượt hơn với page nhỏ
+  const [limit, setLimit] = useState(30);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
@@ -66,27 +77,26 @@ const TransactionsIndex = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const listTopRef = useRef(null);
 
-  const tabs = [
-    { key: "all", label: "Tất cả" },
-    { key: "income", label: "Thu nhập" },
-    { key: "expense", label: "Chi tiêu" },
-    { key: "transfer", label: "Chuyển tiền" },
-    { key: "debt_loan", label: "Nợ & Vay" },
-    { key: "recurring", label: "Định kỳ" },
-  ];
-
-  const transactionMenuItems = [
-    { key: "income", label: "Thu nhập", onClick: () => handleAddTransaction("income") },
-    { key: "expense", label: "Chi tiêu", onClick: () => handleAddTransaction("expense") },
-    { key: "transfer", label: "Chuyển tiền", onClick: () => handleAddTransaction("transfer") },
-    { key: "debt", label: "Nợ phải thu", onClick: () => handleAddTransaction("debt") },
-    { key: "loan", label: "Nợ phải trả", onClick: () => handleAddTransaction("loan") },
-    { key: "adjust", label: "Điều chỉnh", onClick: () => handleAddTransaction("adjust") },
-  ];
+  const tabs = useMemo(
+    () => [
+      { key: "all", label: t("transactions.tabs.all") },
+      { key: "income", label: t("transactions.tabs.income") },
+      { key: "expense", label: t("transactions.tabs.expense") },
+      { key: "transfer", label: t("transactions.tabs.transfer") },
+      { key: "debt_loan", label: t("transactions.tabs.debtLoan") },
+      { key: "recurring", label: t("transactions.tabs.recurring") },
+    ],
+    [t]
+  );
 
   // ---------- helpers ----------
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
+  const formatCurrency = (amount) => {
+    const locale = i18n.language === "en" ? "en-US" : "vi-VN";
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
 
   const formatTime = (date) => dayjs(date).format("HH:mm");
 
@@ -104,12 +114,12 @@ const TransactionsIndex = () => {
 
   const getTransactionTypeLabel = (type) => {
     const labels = {
-      income: "Thu nhập",
-      expense: "Chi tiêu",
-      transfer: "Chuyển tiền",
-      debt: "Nợ phải thu",
-      loan: "Nợ phải trả",
-      adjust: "Điều chỉnh",
+      income: t("transactions.type.income"),
+      expense: t("transactions.type.expense"),
+      transfer: t("transactions.type.transfer"),
+      debt: t("transactions.type.debt"),
+      loan: t("transactions.type.loan"),
+      adjust: t("transactions.type.adjust"),
     };
     return labels[type] || type;
   };
@@ -118,14 +128,13 @@ const TransactionsIndex = () => {
     const date = dayjs(d);
     const today = dayjs();
     const yesterday = today.subtract(1, "day");
-    if (date.isSame(today, "day")) return "Hôm nay";
-    if (date.isSame(yesterday, "day")) return "Hôm qua";
+    if (date.isSame(today, "day")) return t("transactions.date.today");
+    if (date.isSame(yesterday, "day")) return t("transactions.date.yesterday");
     return date.format("DD/MM/YYYY");
   };
 
   // group + flatten (for virtuoso)
   const flatList = useMemo(() => {
-    // group by dateKey, keep order as incoming list order
     const grouped = new Map();
     for (const tx of transactions) {
       const key = getDateKey(tx.date);
@@ -133,14 +142,26 @@ const TransactionsIndex = () => {
       grouped.get(key).push(tx);
     }
 
-    // flatten => {type:'header', key} | {type:'item', tx}
     const out = [];
     for (const [key, arr] of grouped.entries()) {
       out.push({ type: "header", key });
       for (const tx of arr) out.push({ type: "item", tx });
     }
     return out;
-  }, [transactions]);
+  }, [transactions, t]); // ✅ include t (date label changes)
+
+  // menu items
+  const transactionMenuItems = useMemo(
+    () => [
+      { key: "income", label: t("transactions.type.income"), onClick: () => handleAddTransaction("income") },
+      { key: "expense", label: t("transactions.type.expense"), onClick: () => handleAddTransaction("expense") },
+      { key: "transfer", label: t("transactions.type.transfer"), onClick: () => handleAddTransaction("transfer") },
+      { key: "debt", label: t("transactions.type.debt"), onClick: () => handleAddTransaction("debt") },
+      { key: "loan", label: t("transactions.type.loan"), onClick: () => handleAddTransaction("loan") },
+      { key: "adjust", label: t("transactions.type.adjust"), onClick: () => handleAddTransaction("adjust") },
+    ],
+    [t]
+  );
 
   // ---------- load options ----------
   useEffect(() => {
@@ -177,7 +198,6 @@ const TransactionsIndex = () => {
       };
       setFilters(newFilters);
       if (type && type !== "all") setActiveTab(type);
-      // reset paging
       setPage(1);
       setTransactions([]);
       setHasMore(true);
@@ -200,7 +220,6 @@ const TransactionsIndex = () => {
       isRecurring: activeTab === "recurring" ? true : filters.isRecurring,
     };
 
-    // tab overrides
     if (activeTab !== "all" && activeTab !== "recurring") {
       params.type = activeTab === "debt_loan" ? "debt,loan" : activeTab;
     } else if (filters.type !== "all") {
@@ -220,7 +239,7 @@ const TransactionsIndex = () => {
       const res = await getAllTransactionsAPI(params);
 
       if (!(res?.status || res?.EC === 0)) {
-        message.error("Không thể tải danh sách giao dịch!");
+        message.error(t("transactions.toast.loadListFail"));
         return;
       }
 
@@ -231,10 +250,11 @@ const TransactionsIndex = () => {
 
       setTransactions((prev) => (mode === "append" ? [...prev, ...data] : data));
 
-      const loadedCount = (mode === "append" ? transactions.length : 0) + data.length;
+      const prevCount = mode === "append" ? transactions.length : 0;
+      const loadedCount = prevCount + data.length;
       setHasMore(loadedCount < totalCount);
     } catch (e) {
-      message.error("Có lỗi xảy ra khi tải giao dịch!");
+      message.error(t("transactions.toast.loadListError"));
     } finally {
       setLoading(false);
     }
@@ -299,27 +319,26 @@ const TransactionsIndex = () => {
 
   const handleDeleteTransaction = (transaction) => {
     Modal.confirm({
-      title: "Xác nhận xóa giao dịch",
-      content: "Bạn có chắc chắn muốn xóa giao dịch này?",
-      okText: "Xóa",
+      title: t("transactions.confirm.delete.title"),
+      content: t("transactions.confirm.delete.content"),
+      okText: t("transactions.confirm.delete.ok"),
       okType: "danger",
-      cancelText: "Hủy",
+      cancelText: t("transactions.confirm.delete.cancel"),
       onOk: async () => {
         try {
           const res = await deleteTransactionAPI(transaction._id);
           if (res?.status || res?.EC === 0) {
-            message.success("Xóa giao dịch thành công!");
-            // reload from scratch (an toàn khi đang infinite)
+            message.success(t("transactions.toast.deleteSuccess"));
             setPage(1);
             setTransactions([]);
             setHasMore(true);
             await loadPage(1, "replace");
             await loadStats();
           } else {
-            message.error(res?.message || "Xóa giao dịch thất bại!");
+            message.error(res?.message || t("transactions.toast.deleteFail"));
           }
         } catch (e) {
-          message.error("Có lỗi xảy ra!");
+          message.error(t("transactions.toast.genericError"));
         }
       },
     });
@@ -372,7 +391,7 @@ const TransactionsIndex = () => {
             <TrendingUp className="w-6 h-6 text-emerald-600" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs text-gray-500">Tổng thu</p>
+            <p className="text-xs text-gray-500">{t("transactions.summary.totalIncome")}</p>
             <p className="text-lg sm:text-xl font-extrabold text-emerald-600 truncate">
               {formatCurrency(stats.totalIncome)}
             </p>
@@ -386,7 +405,7 @@ const TransactionsIndex = () => {
             <TrendingDown className="w-6 h-6 text-rose-600" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs text-gray-500">Tổng chi</p>
+            <p className="text-xs text-gray-500">{t("transactions.summary.totalExpense")}</p>
             <p className="text-lg sm:text-xl font-extrabold text-rose-600 truncate">
               {formatCurrency(stats.totalExpense)}
             </p>
@@ -400,7 +419,7 @@ const TransactionsIndex = () => {
             <Wallet className="w-6 h-6 text-sky-600" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs text-gray-500">Số dư ví</p>
+            <p className="text-xs text-gray-500">{t("transactions.summary.totalWalletBalance")}</p>
             <p className="text-lg sm:text-xl font-extrabold text-sky-600 truncate">
               {formatCurrency(stats.totalWalletBalance)}
             </p>
@@ -414,7 +433,7 @@ const TransactionsIndex = () => {
             <BarChart3 className="w-6 h-6 text-gray-600" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs text-gray-500">Số giao dịch</p>
+            <p className="text-xs text-gray-500">{t("transactions.summary.transactionCount")}</p>
             <p className="text-lg sm:text-xl font-extrabold text-gray-800 truncate">
               {stats.transactionCount}
             </p>
@@ -428,7 +447,9 @@ const TransactionsIndex = () => {
     <div className={`${inDrawer ? "" : "bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 shadow-sm"} `}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Khoảng thời gian</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            {t("transactions.filters.dateRange")}
+          </label>
           <DateRangePicker
             value={[filters.startDate, filters.endDate]}
             onChange={(dates) => {
@@ -438,37 +459,56 @@ const TransactionsIndex = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Loại giao dịch</label>
-          <Select style={{ width: "100%" }} value={filters.type}
-            onChange={(value) => setFilters((p) => ({ ...p, type: value }))}>
-            <Select.Option value="all">Tất cả</Select.Option>
-            <Select.Option value="income">Thu nhập</Select.Option>
-            <Select.Option value="expense">Chi tiêu</Select.Option>
-            <Select.Option value="transfer">Chuyển tiền</Select.Option>
-            <Select.Option value="debt">Nợ phải thu</Select.Option>
-            <Select.Option value="loan">Nợ phải trả</Select.Option>
-            <Select.Option value="adjust">Điều chỉnh</Select.Option>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            {t("transactions.filters.type")}
+          </label>
+          <Select
+            style={{ width: "100%" }}
+            value={filters.type}
+            onChange={(value) => setFilters((p) => ({ ...p, type: value }))}
+          >
+            <Select.Option value="all">{t("transactions.filters.all")}</Select.Option>
+            <Select.Option value="income">{t("transactions.type.income")}</Select.Option>
+            <Select.Option value="expense">{t("transactions.type.expense")}</Select.Option>
+            <Select.Option value="transfer">{t("transactions.type.transfer")}</Select.Option>
+            <Select.Option value="debt">{t("transactions.type.debt")}</Select.Option>
+            <Select.Option value="loan">{t("transactions.type.loan")}</Select.Option>
+            <Select.Option value="adjust">{t("transactions.type.adjust")}</Select.Option>
           </Select>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Ví</label>
-          <Select style={{ width: "100%" }} value={filters.walletId}
-            onChange={(value) => setFilters((p) => ({ ...p, walletId: value }))}>
-            <Select.Option value="all">Tất cả ví</Select.Option>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            {t("transactions.filters.wallet")}
+          </label>
+          <Select
+            style={{ width: "100%" }}
+            value={filters.walletId}
+            onChange={(value) => setFilters((p) => ({ ...p, walletId: value }))}
+          >
+            <Select.Option value="all">{t("transactions.filters.allWallets")}</Select.Option>
             {wallets.map((w) => (
-              <Select.Option key={w._id} value={w._id}>{w.name}</Select.Option>
+              <Select.Option key={w._id} value={w._id}>
+                {w.name}
+              </Select.Option>
             ))}
           </Select>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Danh mục</label>
-          <Select style={{ width: "100%" }} value={filters.categoryId}
-            onChange={(value) => setFilters((p) => ({ ...p, categoryId: value }))}>
-            <Select.Option value="all">Tất cả danh mục</Select.Option>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            {t("transactions.filters.category")}
+          </label>
+          <Select
+            style={{ width: "100%" }}
+            value={filters.categoryId}
+            onChange={(value) => setFilters((p) => ({ ...p, categoryId: value }))}
+          >
+            <Select.Option value="all">{t("transactions.filters.allCategories")}</Select.Option>
             {categories.map((c) => (
-              <Select.Option key={c._id} value={c._id}>{c.name}</Select.Option>
+              <Select.Option key={c._id} value={c._id}>
+                {c.name}
+              </Select.Option>
             ))}
           </Select>
         </div>
@@ -476,10 +516,10 @@ const TransactionsIndex = () => {
 
       <div className="flex flex-wrap gap-2 mt-4">
         {[
-          { key: "today", label: "Hôm nay" },
-          { key: "week", label: "Tuần này" },
-          { key: "month", label: "Tháng này" },
-          { key: "year", label: "Năm này" },
+          { key: "today", label: t("transactions.quick.today") },
+          { key: "week", label: t("transactions.quick.week") },
+          { key: "month", label: t("transactions.quick.month") },
+          { key: "year", label: t("transactions.quick.year") },
         ].map((item) => (
           <button
             key={item.key}
@@ -499,7 +539,7 @@ const TransactionsIndex = () => {
             onChange={(e) => setFilters((p) => ({ ...p, isRecurring: e.target.checked }))}
             className="w-4 h-4 accent-emerald-600"
           />
-          Chỉ định kỳ
+          {t("transactions.filters.onlyRecurring")}
         </label>
 
         <div className="flex items-center gap-2">
@@ -507,13 +547,15 @@ const TransactionsIndex = () => {
             onClick={handleClearFilters}
             className="px-4 py-2 text-sm font-semibold rounded-xl border border-gray-200 bg-white hover:bg-gray-50"
           >
-            Xóa lọc
+            {t("transactions.actions.clearFilters")}
           </button>
           <button
             onClick={() => setFilterOpen(false)}
-            className={`px-4 py-2 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 ${inDrawer ? "" : "hidden"}`}
+            className={`px-4 py-2 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 ${
+              inDrawer ? "" : "hidden"
+            }`}
           >
-            Xong
+            {t("transactions.actions.done")}
           </button>
         </div>
       </div>
@@ -535,9 +577,7 @@ const TransactionsIndex = () => {
     const color = getTransactionTypeColor(transaction.type);
 
     return (
-      <div
-        className="bg-white rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all group"
-      >
+      <div className="bg-white rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all group">
         <div
           className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
           style={{ background: `linear-gradient(135deg, ${color}22 0%, ${color}10 100%)` }}
@@ -559,12 +599,12 @@ const TransactionsIndex = () => {
 
             {transaction.isRecurring && (
               <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200">
-                Định kỳ
+                {t("transactions.badges.recurring")}
               </span>
             )}
             {transaction.isSettled && (
               <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
-                Đã TT
+                {t("transactions.badges.settledShort")}
               </span>
             )}
           </div>
@@ -588,14 +628,14 @@ const TransactionsIndex = () => {
             <button
               onClick={() => handleEditTransaction(transaction)}
               className="p-2 rounded-xl hover:bg-sky-50"
-              title="Chỉnh sửa"
+              title={t("transactions.actions.edit")}
             >
               <Edit size={18} className="text-sky-600" />
             </button>
             <button
               onClick={() => handleDeleteTransaction(transaction)}
               className="p-2 rounded-xl hover:bg-rose-50"
-              title="Xóa"
+              title={t("transactions.actions.delete")}
             >
               <Trash2 size={18} className="text-rose-600" />
             </button>
@@ -606,14 +646,14 @@ const TransactionsIndex = () => {
             <button
               onClick={() => handleEditTransaction(transaction)}
               className="p-2 rounded-xl bg-sky-50"
-              title="Sửa"
+              title={t("transactions.actions.editShort")}
             >
               <Edit size={16} className="text-sky-600" />
             </button>
             <button
               onClick={() => handleDeleteTransaction(transaction)}
               className="p-2 rounded-xl bg-rose-50"
-              title="Xóa"
+              title={t("transactions.actions.delete")}
             >
               <Trash2 size={16} className="text-rose-600" />
             </button>
@@ -624,32 +664,37 @@ const TransactionsIndex = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
+    <div
+      className="
+        min-h-screen
+        bg-gradient-to-b from-emerald-50/70 via-white to-white
+        dark:bg-none dark:bg-[var(--color-background)]
+      "
+    >
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8" ref={listTopRef}>
-        {/* Header - sticky 느낌 */}
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div className="min-w-0">
-            <h1 className="text-xl sm:text-3xl font-black text-gray-900 truncate">Giao dịch</h1>
+            <h1 className="text-xl sm:text-3xl font-black text-gray-900 truncate">
+              {t("transactions.title")}
+            </h1>
             <p className="text-xs sm:text-sm text-gray-600 mt-1 truncate">
-              Quản lý và theo dõi tất cả giao dịch của bạn
+              {t("transactions.subtitle")}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Mobile filter button */}
             <button
               onClick={() => setFilterOpen(true)}
               className="sm:hidden inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white"
             >
               <SlidersHorizontal size={18} />
-              <span className="text-sm font-semibold">Lọc</span>
+              <span className="text-sm font-semibold">{t("transactions.actions.filter")}</span>
             </button>
 
-            {/* Add */}
             <Dropdown menu={{ items: transactionMenuItems }} trigger={["click"]} placement="bottomRight">
               <button className="hidden sm:flex px-5 py-3 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-700 shadow-md items-center gap-2">
                 <Plus size={20} />
-                Thêm giao dịch
+                {t("transactions.actions.add")}
               </button>
             </Dropdown>
           </div>
@@ -657,12 +702,10 @@ const TransactionsIndex = () => {
 
         <SummaryRow />
 
-        {/* Desktop filters */}
         <div className="hidden sm:block mb-5">
           <FilterPanel />
         </div>
 
-        {/* Tabs - horizontal scroll on mobile */}
         <div className="mb-4">
           <div className="flex gap-2 overflow-x-auto no-scrollbar bg-white p-1.5 rounded-2xl border border-gray-200">
             {tabs.map((tab) => (
@@ -681,77 +724,79 @@ const TransactionsIndex = () => {
           </div>
         </div>
 
-        {/* Virtualized list */}
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
           <div className="px-3 sm:px-4 py-3 border-b border-gray-100">
             <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
+              <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-extrabold">
-                    Đã tải
+                  <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-extrabold">
+                    {t("transactions.loaded.prefix")}
                     <span className="text-emerald-900">{transactions.length}</span>
                     <span className="text-emerald-400">/</span>
                     <span className="text-emerald-900">{total || transactions.length || "—"}</span>
-                    </span>
+                  </span>
 
-                    {hasMore ? (
-                    <span className="text-xs font-semibold text-gray-500">• Kéo xuống để tải thêm</span>
-                    ) : (
-                    <span className="text-xs font-semibold text-gray-500">• Đã tải hết</span>
-                    )}
+                  {hasMore ? (
+                    <span className="text-xs font-semibold text-gray-500">
+                      • {t("transactions.loaded.pullToLoad")}
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-gray-500">
+                      • {t("transactions.loaded.allLoaded")}
+                    </span>
+                  )}
                 </div>
 
-                {/* progress bar nhẹ */}
                 <div className="mt-2 h-1.5 w-full max-w-[360px] bg-gray-100 rounded-full overflow-hidden">
-                    <div
+                  <div
                     className="h-full bg-emerald-500 rounded-full transition-all"
                     style={{
-                        width: total ? `${Math.min(100, Math.round((transactions.length / total) * 100))}%` : "0%",
+                      width: total ? `${Math.min(100, Math.round((transactions.length / total) * 100))}%` : "0%",
                     }}
-                    />
+                  />
                 </div>
-                </div>
+              </div>
 
-                {/* Page size pill */}
-                <div className="shrink-0">
+              <div className="shrink-0">
                 <Select
-                    value={limit}
-                    onChange={(v) => setLimit(v)}
-                    size="middle"
-                    popupMatchSelectWidth={false}
-                    className="min-w-[132px]"
+                  value={limit}
+                  onChange={(v) => setLimit(v)}
+                  size="middle"
+                  popupMatchSelectWidth={false}
+                  className="min-w-[132px]"
                 >
-                    <Select.Option value={20}>20 giao dịch/ trang</Select.Option>
-                    <Select.Option value={30}>30 giao dịch/ trang</Select.Option>
-                    <Select.Option value={50}>50 giao dịch/ trang</Select.Option>
+                  <Select.Option value={20}>{t("transactions.pageSize.20")}</Select.Option>
+                  <Select.Option value={30}>{t("transactions.pageSize.30")}</Select.Option>
+                  <Select.Option value={50}>{t("transactions.pageSize.50")}</Select.Option>
                 </Select>
-
-                </div>
+              </div>
             </div>
-            </div>
+          </div>
 
           {flatList.length === 0 && !loading ? (
             <div className="flex flex-col items-center justify-center py-14">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
                 <BarChart3 className="text-gray-400" size={32} />
               </div>
-              <p className="text-base font-extrabold text-gray-700">Chưa có giao dịch</p>
-              <p className="text-sm text-gray-500 mt-1">Hãy thêm giao dịch đầu tiên</p>
+              <p className="text-base font-extrabold text-gray-700">{t("transactions.empty.title")}</p>
+              <p className="text-sm text-gray-500 mt-1">{t("transactions.empty.hint")}</p>
             </div>
           ) : (
             <div className="h-[70vh]">
               <Virtuoso
                 data={flatList}
-                itemContent={(index, row) => (
-                  <div className="px-2 sm:px-4 py-2">{renderRow(row)}</div>
-                )}
+                itemContent={(index, row) => <div className="px-2 sm:px-4 py-2">{renderRow(row)}</div>}
                 endReached={loadMore}
                 overscan={400}
                 increaseViewportBy={{ top: 400, bottom: 800 }}
                 components={{
                   Footer: () => (
                     <div className="py-4 text-center text-sm text-gray-500">
-                      {loading ? "Đang tải..." : hasMore ? "Kéo xuống để tải thêm" : "Đã tải hết"}
+                      {loading
+                        ? t("transactions.footer.loading")
+                        : hasMore
+                        ? t("transactions.footer.pullToLoad")
+                        : t("transactions.footer.allLoaded")}
                     </div>
                   ),
                 }}
@@ -761,7 +806,6 @@ const TransactionsIndex = () => {
         </div>
       </div>
 
-      {/* Mobile floating add button */}
       <div className="sm:hidden fixed bottom-5 right-5 z-50">
         <Dropdown menu={{ items: transactionMenuItems }} trigger={["click"]} placement="topRight">
           <button className="w-14 h-14 rounded-2xl bg-emerald-600 text-white shadow-lg flex items-center justify-center active:scale-95">
@@ -770,9 +814,8 @@ const TransactionsIndex = () => {
         </Dropdown>
       </div>
 
-      {/* Mobile filter drawer */}
       <Drawer
-        title={<span className="font-extrabold">Bộ lọc</span>}
+        title={<span className="font-extrabold">{t("transactions.drawer.title")}</span>}
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
         placement="bottom"
@@ -781,7 +824,6 @@ const TransactionsIndex = () => {
         <FilterPanel inDrawer />
       </Drawer>
 
-      {/* Modal */}
       <TransactionModal
         open={modalOpen}
         initialType={initialType}
@@ -791,7 +833,6 @@ const TransactionsIndex = () => {
         }}
         transaction={editingTransaction}
         onSuccess={async () => {
-          // reload to reflect changes
           setPage(1);
           setTransactions([]);
           setHasMore(true);
