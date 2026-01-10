@@ -19,27 +19,37 @@ import { getCategoriesAPI } from "../../services/api.category";
 import { uploadImageAPI, deleteImageAPI } from "../../services/api.upload";
 import dayjs from "dayjs";
 
+// ✅ i18n
+import { useTranslation } from "react-i18next";
+
 const { Option } = Select;
 const { TextArea } = Input;
 
-const TRANSACTION_TYPES = [
-  { value: "expense", label: "Chi tiêu", color: "#EF4444" },
-  { value: "income", label: "Thu nhập", color: "#10B981" },
-  { value: "transfer", label: "Chuyển tiền", color: "#3B82F6" },
-  { value: "debt", label: "Nợ phải thu", color: "#F59E0B" },
-  { value: "loan", label: "Nợ phải trả", color: "#F97316" },
-  { value: "adjust", label: "Điều chỉnh", color: "#6B7280" },
-];
-
-const RECURRING_TYPES = [
-  { value: "daily", label: "Ngày" },
-  { value: "weekly", label: "Tuần" },
-  { value: "monthly", label: "Tháng" },
-  { value: "yearly", label: "Năm" },
-];
-
 const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType = "expense" }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
+
+  const TRANSACTION_TYPES = useMemo(
+    () => [
+      { value: "expense", label: t("transaction.modal.types.expense"), color: "#EF4444" },
+      { value: "income", label: t("transaction.modal.types.income"), color: "#10B981" },
+      { value: "transfer", label: t("transaction.modal.types.transfer"), color: "#3B82F6" },
+      { value: "debt", label: t("transaction.modal.types.debt"), color: "#F59E0B" },
+      { value: "loan", label: t("transaction.modal.types.loan"), color: "#F97316" },
+      { value: "adjust", label: t("transaction.modal.types.adjust"), color: "#6B7280" },
+    ],
+    [t]
+  );
+
+  const RECURRING_TYPES = useMemo(
+    () => [
+      { value: "daily", label: t("transaction.modal.recurring.daily") },
+      { value: "weekly", label: t("transaction.modal.recurring.weekly") },
+      { value: "monthly", label: t("transaction.modal.recurring.monthly") },
+      { value: "yearly", label: t("transaction.modal.recurring.yearly") },
+    ],
+    [t]
+  );
 
   const [loading, setLoading] = useState(false);
   const [transactionType, setTransactionType] = useState("expense");
@@ -57,10 +67,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
   const isIncomeExpense = transactionType === "income" || transactionType === "expense";
   const isDebtLoan = transactionType === "debt" || transactionType === "loan";
 
-  const activeWallets = useMemo(
-    () => wallets.filter((w) => !w.is_archived),
-    [wallets]
-  );
+  const activeWallets = useMemo(() => wallets.filter((w) => !w.is_archived), [wallets]);
 
   useEffect(() => {
     if (!open) return;
@@ -110,7 +117,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
       const res = await getWalletsAPI();
       if (res?.EC === 0) setWallets(res.data || []);
     } catch (e) {
-      message.error("Không load được ví");
+      message.error(t("transaction.modal.toast.loadWalletFail"));
     }
   };
 
@@ -119,7 +126,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
       const res = await getCategoriesAPI();
       if (res?.EC === 0) setCategories(res.data || []);
     } catch (e) {
-      message.error("Không load được danh mục");
+      message.error(t("transaction.modal.toast.loadCategoryFail"));
     }
   };
 
@@ -127,7 +134,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
   const handleImageUpload = async (file) => {
     const isImg = file.type?.startsWith("image/");
     if (!isImg) {
-      message.error("Chỉ cho phép file ảnh!");
+      message.error(t("transaction.modal.toast.imageOnly"));
       return Upload.LIST_IGNORE;
     }
 
@@ -144,12 +151,12 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
         if (oldPublicId) {
           deleteImageAPI(oldPublicId).catch(console.error);
         }
-        message.success("Tải ảnh lên thành công");
+        message.success(t("transaction.modal.toast.uploadSuccess"));
       } else {
-        message.error("Upload ảnh thất bại");
+        message.error(t("transaction.modal.toast.uploadFail"));
       }
     } catch (err) {
-      message.error("Upload ảnh thất bại");
+      message.error(t("transaction.modal.toast.uploadFail"));
     } finally {
       setUploadingImage(false);
     }
@@ -162,7 +169,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
       if (imagePublicId) {
         setUploadingImage(true);
         await deleteImageAPI(imagePublicId).catch(() =>
-          message.error("Không thể xóa ảnh trên server")
+          message.error(t("transaction.modal.toast.deleteImageFail"))
         );
       }
     } finally {
@@ -212,17 +219,13 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
 
       // ✅ Payload theo type
       if (data.type === "adjust") {
-        // backend mới dùng adjustTo + adjustReason, amount không cần
         data.amount = 0;
         delete data.categoryId;
         delete data.toWalletId;
-        delete data.transferFee; // BE chưa xử lý fee
+        delete data.transferFee;
       } else {
-        // các type khác
         delete data.adjustTo;
         delete data.adjustReason;
-
-        // transferFee BE chưa xử lý => không gửi để tránh rác
         delete data.transferFee;
       }
 
@@ -231,14 +234,13 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
         : await createTransactionAPI(data);
 
       if (res?.EC === 0 || res?.status) {
-        message.success(`${transaction ? "Cập nhật" : "Thêm"} thành công`);
+        message.success(transaction ? t("transaction.modal.toast.updateSuccess") : t("transaction.modal.toast.createSuccess"));
         onSuccess?.();
         onClose?.();
       } else {
-        message.error(res?.message || "Thao tác thất bại");
+        message.error(res?.message || t("transaction.modal.toast.actionFail"));
       }
     } catch (error) {
-      // validateFields sẽ throw, không cần toast
       console.error(error);
     } finally {
       setLoading(false);
@@ -249,7 +251,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
     <Modal
       title={
         <span className="text-xl font-bold text-slate-800">
-          {transaction ? "Chỉnh sửa giao dịch" : "Giao dịch mới"}
+          {transaction ? t("transaction.modal.title.edit") : t("transaction.modal.title.create")}
         </span>
       }
       open={open}
@@ -263,7 +265,8 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
       cancelButtonProps={{ className: "rounded-lg h-10" }}
       width={720}
       centered
-      okText={uploadingImage ? "Đang xử lý..." : "Lưu giao dịch"}
+      okText={uploadingImage ? t("transaction.modal.actions.processing") : t("transaction.modal.actions.save")}
+      cancelText={t("transaction.modal.actions.cancel")}
     >
       <Form form={form} layout="vertical" className="mt-4">
         {/* 1. Type tabs */}
@@ -297,29 +300,29 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
             {/* ✅ Amount OR AdjustTo */}
             {!isAdjust ? (
               <Form.Item
-                label="Số tiền"
+                label={t("transaction.modal.fields.amount.label")}
                 name="amount"
-                rules={[{ required: true, message: "Nhập số tiền" }]}
+                rules={[{ required: true, message: t("transaction.modal.fields.amount.required") }]}
               >
                 <InputNumber
                   className="w-full !rounded-lg h-11 flex items-center border-emerald-100 focus:border-emerald-500"
                   min={1}
                   formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                  parser={(v) => v.replace(/\$\s?|(,*)/g, "")}
-                  addonAfter={<span className="font-bold text-emerald-600">VND</span>}
+                  parser={(v) => (v || "").replace(/\$\s?|(,*)/g, "")}
+                  addonAfter={<span className="font-bold text-emerald-600">{t("transaction.modal.fields.currencyUnit.vnd")}</span>}
                 />
               </Form.Item>
             ) : (
               <Form.Item
-                label="Số dư mới"
+                label={t("transaction.modal.fields.adjustTo.label")}
                 name="adjustTo"
                 rules={[
-                  { required: true, message: "Nhập số dư mới" },
+                  { required: true, message: t("transaction.modal.fields.adjustTo.required") },
                   {
                     validator: (_, v) => {
                       if (v === undefined || v === null) return Promise.resolve();
                       if (Number.isFinite(v) && v >= 0) return Promise.resolve();
-                      return Promise.reject(new Error("Số dư mới phải >= 0"));
+                      return Promise.reject(new Error(t("transaction.modal.fields.adjustTo.validatorMin0")));
                     },
                   },
                 ]}
@@ -328,18 +331,18 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
                   className="w-full !rounded-lg h-11 flex items-center border-slate-200 focus:border-slate-500"
                   min={0}
                   formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                  parser={(v) => v.replace(/\$\s?|(,*)/g, "")}
-                  addonAfter={<span className="font-bold text-slate-600">VND</span>}
+                  parser={(v) => (v || "").replace(/\$\s?|(,*)/g, "")}
+                  addonAfter={<span className="font-bold text-slate-600">{t("transaction.modal.fields.currencyUnit.vnd")}</span>}
                 />
               </Form.Item>
             )}
 
             <Form.Item
-              label={isTransfer ? "Ví gửi" : "Ví thanh toán"}
+              label={isTransfer ? t("transaction.modal.fields.walletSend.label") : t("transaction.modal.fields.walletPay.label")}
               name="walletId"
-              rules={[{ required: true, message: "Chọn ví" }]}
+              rules={[{ required: true, message: t("transaction.modal.fields.walletId.required") }]}
             >
-              <Select className="h-10" placeholder="Chọn ví sử dụng">
+              <Select className="h-10" placeholder={t("transaction.modal.fields.walletId.placeholder")}>
                 {activeWallets.map((w) => (
                   <Option key={w._id} value={w._id}>
                     <div className="flex justify-between w-full">
@@ -355,11 +358,11 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
 
             {isIncomeExpense && (
               <Form.Item
-                label="Danh mục"
+                label={t("transaction.modal.fields.categoryId.label")}
                 name="categoryId"
-                rules={[{ required: true, message: "Chọn danh mục" }]}
+                rules={[{ required: true, message: t("transaction.modal.fields.categoryId.required") }]}
               >
-                <Select className="h-10" showSearch placeholder="Tìm danh mục...">
+                <Select className="h-10" showSearch placeholder={t("transaction.modal.fields.categoryId.placeholder")}>
                   {categories
                     .filter((c) => c.type === transactionType)
                     .map((c) => (
@@ -373,17 +376,26 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
 
             {isTransfer && (
               <>
-                <Form.Item label="Đến ví" name="toWalletId" rules={[{ required: true, message: "Chọn ví nhận" }]}>
+                <Form.Item
+                  label={t("transaction.modal.fields.toWalletId.label")}
+                  name="toWalletId"
+                  rules={[{ required: true, message: t("transaction.modal.fields.toWalletId.required") }]}
+                >
                   <Select
                     className="h-10"
-                    placeholder="Chọn ví nhận"
+                    placeholder={t("transaction.modal.fields.toWalletId.placeholder")}
                     options={activeWallets.map((w) => ({ label: w.name, value: w._id }))}
                   />
                 </Form.Item>
 
                 {/* UI giữ lại, nhưng submit không gửi vì BE chưa xử lý */}
-                <Form.Item label="Phí chuyển" name="transferFee">
-                  <InputNumber className="w-full h-10" placeholder="0" addonAfter="VND" min={0} />
+                <Form.Item label={t("transaction.modal.fields.transferFee.label")} name="transferFee">
+                  <InputNumber
+                    className="w-full h-10"
+                    placeholder={t("transaction.modal.fields.transferFee.placeholder")}
+                    addonAfter={t("transaction.modal.fields.currencyUnit.vnd")}
+                    min={0}
+                  />
                 </Form.Item>
               </>
             )}
@@ -391,17 +403,17 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
             {isDebtLoan && (
               <div className="p-3 bg-orange-50/50 rounded-xl border border-orange-100 space-y-3">
                 <Form.Item
-                  label="Đối tác"
+                  label={t("transaction.modal.fields.counterpartyName.label")}
                   name="counterpartyName"
-                  rules={[{ required: true, message: "Nhập tên đối tác" }]}
+                  rules={[{ required: true, message: t("transaction.modal.fields.counterpartyName.required") }]}
                   className="mb-2"
                 >
-                  <Input placeholder="Tên người vay/nợ" />
+                  <Input placeholder={t("transaction.modal.fields.counterpartyName.placeholder")} />
                 </Form.Item>
 
                 <Form.Item name="isSettled" valuePropName="checked" className="mb-0">
                   <Switch size="small" />{" "}
-                  <span className="ml-2 text-sm text-slate-600">Đã tất toán</span>
+                  <span className="ml-2 text-sm text-slate-600">{t("transaction.modal.fields.isSettled.label")}</span>
                 </Form.Item>
               </div>
             )}
@@ -409,23 +421,27 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
             {/* ✅ Adjust reason */}
             {isAdjust && (
               <Form.Item
-                label="Lý do điều chỉnh"
+                label={t("transaction.modal.fields.adjustReason.label")}
                 name="adjustReason"
-                rules={[{ required: true, message: "Nhập lý do điều chỉnh" }]}
+                rules={[{ required: true, message: t("transaction.modal.fields.adjustReason.required") }]}
               >
-                <Input placeholder="VD: Kiểm kê tiền mặt, cập nhật số dư ngân hàng..." />
+                <Input placeholder={t("transaction.modal.fields.adjustReason.placeholder")} />
               </Form.Item>
             )}
           </div>
 
           {/* Right */}
           <div className="space-y-1">
-            <Form.Item label="Thời gian" name="date" rules={[{ required: true, message: "Chọn thời gian" }]}>
+            <Form.Item
+              label={t("transaction.modal.fields.date.label")}
+              name="date"
+              rules={[{ required: true, message: t("transaction.modal.fields.date.required") }]}
+            >
               <DatePicker className="w-full h-10" format="DD/MM/YYYY" showToday />
             </Form.Item>
 
             {/* Upload */}
-            <Form.Item label="Hóa đơn / Chứng từ">
+            <Form.Item label={t("transaction.modal.fields.receipt.label")}>
               <div className="relative group">
                 {!imageUrl ? (
                   <Upload
@@ -440,14 +456,14 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
                           <Spin
                             indicator={<RefreshCw className="animate-spin text-emerald-500 mb-2" size={24} />}
                           />
-                          <p className="text-emerald-600 font-medium">Đang tải ảnh...</p>
+                          <p className="text-emerald-600 font-medium">{t("transaction.modal.upload.uploading")}</p>
                         </div>
                       ) : (
                         <>
                           <div className="p-3 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
                             <UploadIcon className="text-emerald-500" size={24} />
                           </div>
-                          <p className="mt-2 text-slate-500 text-sm">Nhấn để tải ảnh hóa đơn</p>
+                          <p className="mt-2 text-slate-500 text-sm">{t("transaction.modal.upload.clickToUpload")}</p>
                         </>
                       )}
                     </div>
@@ -464,7 +480,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
                       {uploadingImage ? (
                         <div className="text-white text-center">
                           <RefreshCw className="animate-spin mx-auto mb-1" size={20} />
-                          <span className="text-xs">Đang cập nhật...</span>
+                          <span className="text-xs">{t("transaction.modal.upload.updating")}</span>
                         </div>
                       ) : (
                         <>
@@ -473,7 +489,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
                               type="button"
                               className="p-2 bg-white rounded-lg hover:bg-emerald-50 text-emerald-600 flex items-center gap-1 text-xs font-bold transition-transform hover:scale-105"
                             >
-                              <RefreshCw size={14} /> ĐỔI ẢNH
+                              <RefreshCw size={14} /> {t("transaction.modal.upload.change")}
                             </button>
                           </Upload>
                           <button
@@ -481,7 +497,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
                             onClick={handleRemoveImage}
                             className="p-2 bg-white rounded-lg hover:bg-red-50 text-red-600 flex items-center gap-1 text-xs font-bold transition-transform hover:scale-105"
                           >
-                            <Trash2 size={14} /> XÓA
+                            <Trash2 size={14} /> {t("transaction.modal.upload.delete")}
                           </button>
                         </>
                       )}
@@ -491,22 +507,26 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
               </div>
             </Form.Item>
 
-            <Form.Item label="Ghi chú" name="note">
+            <Form.Item label={t("transaction.modal.fields.note.label")} name="note">
               <TextArea
                 rows={2}
-                placeholder={isAdjust ? "VD: Kiểm kê thực tế khác hệ thống..." : "Ăn trưa, xăng xe, lương tháng..."}
+                placeholder={
+                  isAdjust
+                    ? t("transaction.modal.fields.note.placeholderAdjust")
+                    : t("transaction.modal.fields.note.placeholderNormal")
+                }
                 className="!rounded-lg"
               />
             </Form.Item>
           </div>
         </div>
 
-        {/* Recurring (giữ nguyên) */}
+        {/* Recurring */}
         <div className="mt-4 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <RefreshCw size={18} className="text-emerald-600" />
-              <span className="font-semibold text-emerald-900">Thiết lập định kỳ</span>
+              <span className="font-semibold text-emerald-900">{t("transaction.modal.recurring.title")}</span>
             </div>
             <Form.Item name="isRecurring" valuePropName="checked" noStyle>
               <Switch onChange={setIsRecurring} className={isRecurring ? "bg-emerald-500" : ""} />
@@ -515,7 +535,7 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
 
           {isRecurring && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-              <Form.Item label="Lặp lại theo" name="recurringType" className="mb-0">
+              <Form.Item label={t("transaction.modal.recurring.repeatBy")} name="recurringType" className="mb-0">
                 <Radio.Group className="flex flex-wrap gap-2">
                   {RECURRING_TYPES.map((r) => (
                     <Radio.Button
@@ -529,8 +549,8 @@ const TransactionModal = ({ open, onClose, transaction, onSuccess, initialType =
                 </Radio.Group>
               </Form.Item>
 
-              <Form.Item label="Ngày kết thúc" name="endDate" className="mb-0">
-                <DatePicker className="w-full h-9" placeholder="Không có" />
+              <Form.Item label={t("transaction.modal.recurring.endDate")} name="endDate" className="mb-0">
+                <DatePicker className="w-full h-9" placeholder={t("transaction.modal.recurring.noEnd")} />
               </Form.Item>
             </div>
           )}

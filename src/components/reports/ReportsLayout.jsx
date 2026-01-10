@@ -1,9 +1,12 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link, useLocation, Outlet } from "react-router-dom";
 import { Home, Clock3, List, Wallet, Menu as MenuIcon, X } from "lucide-react";
-import { useForm } from "react-hook-form";
+
+// ✅ i18n
+import { useTranslation } from "react-i18next";
 
 const ReportsLayout = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -16,12 +19,12 @@ const ReportsLayout = () => {
 
   const navItems = useMemo(
     () => [
-      { path: "/reports", label: "Tổng quan", icon: Home },
-      { path: "/reports/time", label: "Báo cáo theo thời gian", icon: Clock3 },
-      { path: "/reports/category", label: "Báo cáo theo danh mục", icon: List },
-      { path: "/reports/wallet", label: "Báo cáo theo ví", icon: Wallet },
+      { path: "/reports", label: t("reports.nav.overview"), icon: Home },
+      { path: "/reports/time", label: t("reports.nav.time"), icon: Clock3 },
+      { path: "/reports/category", label: t("reports.nav.category"), icon: List },
+      { path: "/reports/wallet", label: t("reports.nav.wallet"), icon: Wallet },
     ],
-    []
+    [t]
   );
 
   // Khi route đổi trên mobile -> đóng drawer
@@ -40,7 +43,7 @@ const ReportsLayout = () => {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [mobileMenuOpen]);
 
-  const SidebarContent = ({ onNavigate }) => (
+  const SidebarContent = ({ onNavigate = () => {} }) => (
     <div className="p-4 space-y-2">
       {navItems.map((item) => (
         <Link
@@ -75,12 +78,15 @@ const ReportsLayout = () => {
       <div className="flex-1 overflow-auto w-full flex flex-col">
         {/* Mobile top bar */}
         <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
-          <h2 className="text-lg font-bold text-gray-800">Báo cáo</h2>
+          <h2 className="text-lg font-bold text-gray-800">
+            {t("reports.title")}
+          </h2>
+
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
             className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 active:scale-95 transition-transform"
-            aria-label="Mở menu"
+            aria-label={t("reports.actions.openMenu")}
           >
             <MenuIcon size={24} />
           </button>
@@ -114,12 +120,13 @@ const ReportsLayout = () => {
           ].join(" ")}
         >
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h3 className="font-bold text-gray-900">Menu Báo cáo</h3>
+            <h3 className="font-bold text-gray-900">{t("reports.drawerTitle")}</h3>
+
             <button
               type="button"
               onClick={closeMobileMenu}
               className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-              aria-label="Đóng menu"
+              aria-label={t("reports.actions.closeMenu")}
             >
               <X size={20} />
             </button>

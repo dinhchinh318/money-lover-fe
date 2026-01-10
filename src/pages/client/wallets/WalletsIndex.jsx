@@ -24,9 +24,13 @@ import {
 } from "../../../services/api.wallet";
 import WalletModal from "../../../components/wallets/WalletModal";
 
+// ✅ i18n
+import { useTranslation } from "react-i18next";
+
 const { Option } = Select;
 
 const WalletsIndex = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const [wallets, setWallets] = useState([]);
@@ -74,10 +78,10 @@ const WalletsIndex = () => {
         const walletsData = res?.data?.wallets || res?.data || [];
         setWallets(Array.isArray(walletsData) ? walletsData : []);
       } else {
-        message.error("Không thể tải danh sách ví!");
+        message.error(t("wallets.toast.fetchFail"));
       }
     } catch (error) {
-      message.error("Có lỗi xảy ra khi tải danh sách ví!");
+      message.error(t("wallets.toast.fetchError"));
     } finally {
       setLoading(false);
     }
@@ -92,8 +96,11 @@ const WalletsIndex = () => {
     setSummary({ totalWallets: total, totalBalance, cashWallets, bankWallets });
   };
 
-  const formatCurrency = (amount, currency = "VND") =>
-    new Intl.NumberFormat("vi-VN", { style: "currency", currency }).format(amount || 0);
+  const formatCurrency = (amount, currency = "VND") => {
+    // ưu tiên theo setting language nếu bạn muốn
+    const locale = i18n.language === "en" ? "en-US" : "vi-VN";
+    return new Intl.NumberFormat(locale, { style: "currency", currency }).format(amount || 0);
+  };
 
   const handleAddWallet = () => {
     setEditingWallet(null);
@@ -107,22 +114,22 @@ const WalletsIndex = () => {
 
   const handleDeleteWallet = (wallet) => {
     Modal.confirm({
-      title: "Xác nhận xóa ví",
-      content: `Bạn có chắc chắn muốn xóa ví "${wallet.name}"? Hành động này không thể hoàn tác.`,
-      okText: "Xóa",
+      title: t("wallets.confirm.delete.title"),
+      content: t("wallets.confirm.delete.content", { name: wallet.name }),
+      okText: t("wallets.confirm.delete.ok"),
       okType: "danger",
-      cancelText: "Hủy",
+      cancelText: t("wallets.confirm.delete.cancel"),
       onOk: async () => {
         try {
           const res = await deleteWalletAPI(wallet._id);
           if (res?.status || res?.EC === 0) {
-            message.success("Xóa ví thành công!");
+            message.success(t("wallets.toast.deleteSuccess"));
             loadWallets();
           } else {
-            message.error(res?.message || "Xóa ví thất bại!");
+            message.error(res?.message || t("wallets.toast.deleteFail"));
           }
         } catch {
-          message.error("Có lỗi xảy ra!");
+          message.error(t("wallets.toast.genericError"));
         }
       },
     });
@@ -132,13 +139,13 @@ const WalletsIndex = () => {
     try {
       const res = await setDefaultWalletAPI(wallet._id);
       if (res?.status || res?.EC === 0) {
-        message.success("Đặt ví mặc định thành công!");
+        message.success(t("wallets.toast.setDefaultSuccess"));
         loadWallets();
       } else {
-        message.error(res?.message || "Thao tác thất bại!");
+        message.error(res?.message || t("wallets.toast.actionFail"));
       }
     } catch {
-      message.error("Có lỗi xảy ra!");
+      message.error(t("wallets.toast.genericError"));
     }
   };
 
@@ -146,13 +153,13 @@ const WalletsIndex = () => {
     try {
       const res = await archiveWalletAPI(wallet._id);
       if (res?.status || res?.EC === 0) {
-        message.success("Lưu trữ ví thành công!");
+        message.success(t("wallets.toast.archiveSuccess"));
         loadWallets();
       } else {
-        message.error(res?.message || "Thao tác thất bại!");
+        message.error(res?.message || t("wallets.toast.actionFail"));
       }
     } catch {
-      message.error("Có lỗi xảy ra!");
+      message.error(t("wallets.toast.genericError"));
     }
   };
 
@@ -160,13 +167,13 @@ const WalletsIndex = () => {
     try {
       const res = await unarchiveWalletAPI(wallet._id);
       if (res?.status || res?.EC === 0) {
-        message.success("Khôi phục ví thành công!");
+        message.success(t("wallets.toast.unarchiveSuccess"));
         loadWallets();
       } else {
-        message.error(res?.message || "Thao tác thất bại!");
+        message.error(res?.message || t("wallets.toast.actionFail"));
       }
     } catch {
-      message.error("Có lỗi xảy ra!");
+      message.error(t("wallets.toast.genericError"));
     }
   };
 
@@ -174,7 +181,7 @@ const WalletsIndex = () => {
     const items = [
       {
         key: "edit",
-        label: "Chỉnh sửa",
+        label: t("wallets.menu.edit"),
         icon: <Edit size={16} />,
         onClick: () => handleEditWallet(wallet),
       },
@@ -183,7 +190,7 @@ const WalletsIndex = () => {
     if (!wallet.is_default) {
       items.push({
         key: "setDefault",
-        label: "Đặt làm mặc định",
+        label: t("wallets.menu.setDefault"),
         icon: <Star size={16} />,
         onClick: () => handleSetDefault(wallet),
       });
@@ -194,14 +201,14 @@ const WalletsIndex = () => {
     if (!wallet.is_archived) {
       items.push({
         key: "archive",
-        label: "Lưu trữ",
+        label: t("wallets.menu.archive"),
         icon: <Archive size={16} />,
         onClick: () => handleArchive(wallet),
       });
     } else {
       items.push({
         key: "unarchive",
-        label: "Khôi phục",
+        label: t("wallets.menu.unarchive"),
         icon: <Archive size={16} />,
         onClick: () => handleUnarchive(wallet),
       });
@@ -210,7 +217,7 @@ const WalletsIndex = () => {
     if (!wallet.is_default) {
       items.push({
         key: "delete",
-        label: "Xóa",
+        label: t("wallets.menu.delete"),
         icon: <Trash2 size={16} />,
         danger: true,
         onClick: () => handleDeleteWallet(wallet),
@@ -221,9 +228,9 @@ const WalletsIndex = () => {
   };
 
   const tabs = [
-    { key: "all", label: "Tất cả" },
-    { key: "active", label: "Đang hoạt động" },
-    { key: "archived", label: "Đã lưu trữ" },
+    { key: "all", label: t("wallets.tabs.all") },
+    { key: "active", label: t("wallets.tabs.active") },
+    { key: "archived", label: t("wallets.tabs.archived") },
   ];
 
   const filteredWallets = useMemo(() => {
@@ -295,15 +302,21 @@ const WalletsIndex = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
+    <div
+      className="
+        min-h-screen
+        bg-gradient-to-b from-emerald-50/70 via-white to-white
+        dark:bg-none dark:bg-[var(--color-background)]
+      "
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
         <div className="flex items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
           <div className="min-w-0">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 truncate">
-              Quản lý Ví
+              {t("wallets.title")}
             </h1>
-            <p className="text-gray-600 mt-1 text-sm">Theo dõi và quản lý tất cả ví</p>
+            <p className="text-gray-600 mt-1 text-sm">{t("wallets.subtitle")}</p>
           </div>
 
           <button
@@ -311,7 +324,7 @@ const WalletsIndex = () => {
             className="shrink-0 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-green-700 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
           >
             <Plus size={18} />
-            <span className="hidden sm:inline">Thêm ví</span>
+            <span className="hidden sm:inline">{t("wallets.actions.add")}</span>
           </button>
         </div>
 
@@ -319,7 +332,7 @@ const WalletsIndex = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-500">Tổng ví</span>
+              <span className="text-xs font-semibold text-gray-500">{t("wallets.summary.totalWallets")}</span>
               <div className="h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center">
                 <Wallet className="text-blue-600" size={18} />
               </div>
@@ -331,7 +344,7 @@ const WalletsIndex = () => {
 
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-500">Tổng số dư</span>
+              <span className="text-xs font-semibold text-gray-500">{t("wallets.summary.totalBalance")}</span>
               <div className="h-9 w-9 rounded-xl bg-emerald-50 flex items-center justify-center">
                 <TrendingUp className="text-emerald-600" size={18} />
               </div>
@@ -343,7 +356,7 @@ const WalletsIndex = () => {
 
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-500">Tiền mặt</span>
+              <span className="text-xs font-semibold text-gray-500">{t("wallets.summary.cashWallets")}</span>
               <div className="h-9 w-9 rounded-xl bg-amber-50 flex items-center justify-center">
                 <Wallet className="text-amber-600" size={18} />
               </div>
@@ -355,7 +368,7 @@ const WalletsIndex = () => {
 
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-500">Ngân hàng</span>
+              <span className="text-xs font-semibold text-gray-500">{t("wallets.summary.bankWallets")}</span>
               <div className="h-9 w-9 rounded-xl bg-violet-50 flex items-center justify-center">
                 <Building2 className="text-violet-600" size={18} />
               </div>
@@ -366,7 +379,7 @@ const WalletsIndex = () => {
           </div>
         </div>
 
-        {/* Toolbar (Search + Tabs + Type filter + Sort + Page size) */}
+        {/* Toolbar */}
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-3 sm:p-4 mb-4">
           {/* Search row */}
           <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
@@ -374,7 +387,7 @@ const WalletsIndex = () => {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Tìm theo tên ví / ngân hàng..."
+              placeholder={t("wallets.search.placeholder")}
               borderless={false}
               allowClear
               className="bg-transparent"
@@ -385,7 +398,7 @@ const WalletsIndex = () => {
                 onClick={clearFilters}
                 className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 px-2 py-1 rounded-lg hover:bg-emerald-100/60 transition"
               >
-                Xóa lọc
+                {t("wallets.actions.clearFilters")}
               </button>
             )}
           </div>
@@ -409,33 +422,33 @@ const WalletsIndex = () => {
               ))}
             </div>
 
-            {/* Divider */}
             <div className="hidden sm:block h-6 w-px bg-gray-200 mx-1" />
 
             {/* Type filter */}
             <div className="inline-flex max-w-full overflow-x-auto gap-2">
               {[
-                { key: "all", label: "Tất cả loại" },
-                { key: "cash", label: "Tiền mặt" },
-                { key: "bank", label: "Ngân hàng" },
-              ].map((t) => (
+                { key: "all", label: t("wallets.filters.type.all") },
+                { key: "cash", label: t("wallets.filters.type.cash") },
+                { key: "bank", label: t("wallets.filters.type.bank") },
+              ].map((x) => (
                 <button
-                  key={t.key}
-                  onClick={() => setTypeFilter(t.key)}
+                  key={x.key}
+                  onClick={() => setTypeFilter(x.key)}
                   className={`px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition ${
-                    typeFilter === t.key
+                    typeFilter === x.key
                       ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200"
                       : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
                   }`}
                 >
-                  {t.label}
+                  {x.label}
                 </button>
               ))}
             </div>
 
             {/* Count */}
             <div className="ml-auto text-xs sm:text-sm text-gray-500">
-              <span className="font-semibold text-gray-800">{totalItems}</span> kết quả
+              <span className="font-semibold text-gray-800">{totalItems}</span>{" "}
+              {t("wallets.resultSuffix")}
             </div>
           </div>
 
@@ -443,20 +456,22 @@ const WalletsIndex = () => {
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
             <div className="col-span-2 sm:col-span-2 flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2 border border-gray-200">
               <ArrowUpDown className="text-gray-400" size={18} />
-              <Select value={sortKey} onChange={setSortKey} borderless={false} style={{ width: "100%" }}>
-                <Option value="default_first">Ưu tiên mặc định</Option>
-                <Option value="balance_desc">Số dư giảm dần</Option>
-                <Option value="name_asc">Tên A → Z</Option>
-                <Option value="updated_desc">Cập nhật mới nhất</Option>
+              <Select value={sortKey} onChange={setSortKey} style={{ width: "100%" }}>
+                <Option value="default_first">{t("wallets.sort.default_first")}</Option>
+                <Option value="balance_desc">{t("wallets.sort.balance_desc")}</Option>
+                <Option value="name_asc">{t("wallets.sort.name_asc")}</Option>
+                <Option value="updated_desc">{t("wallets.sort.updated_desc")}</Option>
               </Select>
             </div>
 
             <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2 border border-gray-200">
-              <span className="text-xs font-semibold text-gray-500 whitespace-nowrap">Hiển thị</span>
-              <Select value={pageSize} onChange={setPageSize} borderless={false} style={{ width: "100%" }}>
+              <span className="text-xs font-semibold text-gray-500 whitespace-nowrap">
+                {t("wallets.pagination.show")}
+              </span>
+              <Select value={pageSize} onChange={setPageSize} style={{ width: "100%" }}>
                 {[6, 8, 10, 12, 18, 24].map((n) => (
                   <Option key={n} value={n}>
-                    {n}/trang
+                    {t("wallets.pagination.perPage", { n })}
                   </Option>
                 ))}
               </Select>
@@ -475,14 +490,16 @@ const WalletsIndex = () => {
           <>
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm text-gray-600">
-                {totalItems} ví • Trang {page}
+                {t("wallets.list.summary", { total: totalItems, page })}
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {pagedWallets.map((wallet) => {
                 const isBank = wallet.type === "bank";
-                const gradientFrom = isBank ? "from-blue-500 to-indigo-600" : "from-emerald-500 to-green-600";
+                const gradientFrom = isBank
+                  ? "from-blue-500 to-indigo-600"
+                  : "from-emerald-500 to-green-600";
 
                 return (
                   <div
@@ -510,15 +527,21 @@ const WalletsIndex = () => {
                       <div className="absolute top-3 left-3 z-20 pointer-events-none">
                         <div className="px-2 py-1 rounded-xl bg-emerald-600 text-white text-xs font-bold inline-flex items-center gap-1 shadow-sm">
                           <Star className="w-4 h-4 fill-white" />
-                          Default
+                          {t("wallets.badges.default")}
                         </div>
                       </div>
                     )}
 
                     {/* header row */}
                     <div className="flex items-center gap-3">
-                      <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${gradientFrom} flex items-center justify-center shadow-sm`}>
-                        {isBank ? <Building2 className="text-white" size={22} /> : <Wallet className="text-white" size={22} />}
+                      <div
+                        className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${gradientFrom} flex items-center justify-center shadow-sm`}
+                      >
+                        {isBank ? (
+                          <Building2 className="text-white" size={22} />
+                        ) : (
+                          <Wallet className="text-white" size={22} />
+                        )}
                       </div>
 
                       <div className="min-w-0 flex-1 pr-10">
@@ -529,12 +552,12 @@ const WalletsIndex = () => {
                               isBank ? "bg-blue-50 text-blue-700" : "bg-emerald-50 text-emerald-700"
                             }`}
                           >
-                            {isBank ? "Ngân hàng" : "Tiền mặt"}
+                            {isBank ? t("wallets.labels.bank") : t("wallets.labels.cash")}
                           </span>
 
                           {wallet.is_archived && (
                             <span className="px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-amber-50 text-amber-700">
-                              Lưu trữ
+                              {t("wallets.badges.archived")}
                             </span>
                           )}
                         </div>
@@ -543,7 +566,7 @@ const WalletsIndex = () => {
 
                     {/* balance */}
                     <div className="mt-3">
-                      <p className="text-sm text-gray-500">Số dư</p>
+                      <p className="text-sm text-gray-500">{t("wallets.labels.balance")}</p>
                       <p className="text-xl font-extrabold text-emerald-700 truncate">
                         {formatCurrency(wallet.balance || 0, wallet.currency)}
                       </p>
@@ -558,24 +581,24 @@ const WalletsIndex = () => {
                       onClick={(e) => e.stopPropagation()}
                     >
                       {!wallet.is_default ? (
-                        <Tooltip title="Đặt làm mặc định">
+                        <Tooltip title={t("wallets.tooltips.setDefault")}>
                           <button
                             onClick={() => handleSetDefault(wallet)}
                             className="flex-1 h-10 rounded-xl bg-emerald-50 text-emerald-700 font-semibold text-sm hover:bg-emerald-100 transition inline-flex items-center justify-center gap-2"
                           >
                             <Pin size={16} />
-                            Mặc định
+                            {t("wallets.actions.setDefault")}
                           </button>
                         </Tooltip>
                       ) : (
                         <div className="flex-1 h-10 rounded-xl bg-gray-50 text-gray-500 font-semibold text-sm inline-flex items-center justify-center gap-2">
                           <Star className="w-4 h-4 fill-gray-400 text-gray-400" />
-                          Đang mặc định
+                          {t("wallets.labels.isDefault")}
                         </div>
                       )}
 
                       {!wallet.is_archived ? (
-                        <Tooltip title="Lưu trữ ví">
+                        <Tooltip title={t("wallets.tooltips.archive")}>
                           <button
                             onClick={() => handleArchive(wallet)}
                             className="h-10 w-10 rounded-xl border border-gray-200 hover:bg-gray-50 transition inline-flex items-center justify-center"
@@ -584,7 +607,7 @@ const WalletsIndex = () => {
                           </button>
                         </Tooltip>
                       ) : (
-                        <Tooltip title="Khôi phục ví">
+                        <Tooltip title={t("wallets.tooltips.unarchive")}>
                           <button
                             onClick={() => handleUnarchive(wallet)}
                             className="h-10 w-10 rounded-xl border border-gray-200 hover:bg-gray-50 transition inline-flex items-center justify-center"
@@ -617,24 +640,27 @@ const WalletsIndex = () => {
             <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
               <Wallet className="text-gray-400" size={34} />
             </div>
+
             <p className="text-lg font-semibold text-gray-700 mb-1">
               {activeTab === "archived"
-                ? "Chưa có ví nào được lưu trữ"
+                ? t("wallets.empty.archived.title")
                 : activeTab === "active"
-                ? "Chưa có ví đang hoạt động"
-                : "Chưa có ví nào"}
+                ? t("wallets.empty.active.title")
+                : t("wallets.empty.all.title")}
             </p>
+
             <p className="text-sm text-gray-500 mb-5 text-center px-6">
               {activeTab === "archived"
-                ? "Các ví đã lưu trữ sẽ hiển thị ở đây"
-                : "Hãy bắt đầu bằng cách thêm ví đầu tiên của bạn"}
+                ? t("wallets.empty.archived.desc")
+                : t("wallets.empty.common.desc")}
             </p>
+
             <button
               onClick={handleAddWallet}
               className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-green-700 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
             >
               <Plus size={18} />
-              Thêm ví
+              {t("wallets.actions.add")}
             </button>
           </div>
         )}
