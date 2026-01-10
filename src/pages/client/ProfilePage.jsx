@@ -48,22 +48,16 @@ import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
-// --- CONFIGURATION & STYLES ---
-const COLORS = {
-  primary: "#10b981",
-  primaryHover: "#059669",
-  accent: "#34d399",
-  cyan: "#22d3ee",
-  ink: "#0f172a",
-  muted: "#64748b",
-  bgGradient: "linear-gradient(135deg, #ecfeff 0%, #f0fdf4 35%, #ffffff 100%)",
-  cardShadow:
-    "0 12px 30px -10px rgba(16, 185, 129, 0.18), 0 10px 18px -14px rgba(0,0,0,0.08)",
-  softBorder: "1px solid rgba(16,185,129,0.14)",
-};
-
 // ✅ Field names đúng theo schema BE
-const FIELD_ORDER = ["displayName", "gender", "dateOfBirth", "email", "phone", "address", "bio"];
+const FIELD_ORDER = [
+  "displayName",
+  "gender",
+  "dateOfBirth",
+  "email",
+  "phone",
+  "address",
+  "bio",
+];
 
 const ProfilePage = () => {
   const { t } = useTranslation();
@@ -219,13 +213,11 @@ const ProfilePage = () => {
       }
     } catch (err) {
       console.error("Upload avatar error:", err);
-
       message.error(err?.response?.data?.message || t("profile.avatar.uploadError"));
 
       if (initialFormValues?.avatarUrl) {
         form.setFieldsValue({ avatarUrl: initialFormValues.avatarUrl });
       }
-
       onError?.();
     } finally {
       setAvatarLoading(false);
@@ -346,7 +338,7 @@ const ProfilePage = () => {
           suffix={
             isEmail ? (
               <Tooltip title={t("profile.hints.emailLocked")}>
-                <LockOutlined style={{ color: "#94a3b8" }} />
+                <LockOutlined className="text-slate-400" />
               </Tooltip>
             ) : null
           }
@@ -373,33 +365,40 @@ const ProfilePage = () => {
   }
 
   const uiValues = form.getFieldsValue();
-  const displayName = uiValues.displayName || rawProfile?.displayName || t("profile.fallback.displayName");
+  const displayName =
+    uiValues.displayName || rawProfile?.displayName || t("profile.fallback.displayName");
   const email = uiValues.email || rawProfile?.email || rawProfile?.user?.email || "";
   const avatarSrc = uiValues.avatarUrl || rawProfile?.avatarUrl || rawProfile?.avatar || null;
 
   return (
-    <div style={{ background: COLORS.bgGradient, minHeight: "100vh", padding: "44px 20px" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+    <div
+      className="
+        min-h-screen
+        bg-gradient-to-b from-emerald-50/70 via-white to-white
+        dark:bg-none dark:bg-[var(--color-background)]
+        py-10 px-4
+      "
+    >
+      <div className="max-w-5xl mx-auto">
         {loading ? (
           <Skeleton active avatar paragraph={{ rows: 12 }} />
         ) : (
           <>
             <div className="top-glow" />
 
-            <Row gutter={[32, 32]}>
+            <Row gutter={[24, 24]}>
               {/* LEFT */}
               <Col xs={24} lg={8}>
-                <Space direction="vertical" size={24} style={{ width: "100%" }}>
+                <Space direction="vertical" size={18} style={{ width: "100%" }}>
                   <Card
                     bordered={false}
-                    className="profile-card"
-                    style={{
-                      borderRadius: 26,
-                      textAlign: "center",
-                      boxShadow: COLORS.cardShadow,
-                      border: COLORS.softBorder,
-                      overflow: "hidden",
-                    }}
+                    className="
+                      profile-card
+                      !rounded-3xl overflow-hidden text-center
+                      !bg-white border border-emerald-100 shadow-sm
+                      dark:!bg-[var(--color-background-alt)]
+                      dark:!border-[var(--color-border)]
+                    "
                   >
                     <div className="card-ribbon" />
 
@@ -408,10 +407,7 @@ const ProfilePage = () => {
                         size={132}
                         src={avatarSrc || undefined}
                         icon={<UserOutlined />}
-                        style={{
-                          border: "4px solid #fff",
-                          boxShadow: "0 12px 26px rgba(0,0,0,0.10)",
-                        }}
+                        className="profile-avatar"
                       />
                       <Upload showUploadList={false} customRequest={handleUploadAvatar} accept="image/*">
                         <div className="avatar-overlay">
@@ -424,56 +420,42 @@ const ProfilePage = () => {
                       {avatarLoading ? <div className="avatar-loading" /> : null}
                     </div>
 
-                    <Title level={3} style={{ marginTop: 16, marginBottom: 4, fontWeight: 800, color: COLORS.ink }}>
+                    <Title
+                      level={3}
+                      className="!mt-4 !mb-1 !font-extrabold !text-slate-900 dark:!text-[var(--color-text-primary)]"
+                    >
                       {displayName}
-                      <CheckCircleFilled style={{ color: COLORS.primary, marginLeft: 8, fontSize: 18 }} />
+                      <CheckCircleFilled className="ml-2 text-emerald-500" style={{ fontSize: 18 }} />
                     </Title>
 
-                    <Text type="secondary">
+                    <Text className="!text-slate-600 dark:!text-[var(--color-text-secondary)]">
                       <MailOutlined /> {email || "—"}
                     </Text>
 
-                    <div style={{ marginTop: 18 }}>
-                      <Tag
-                        color="success"
-                        style={{
-                          borderRadius: 999,
-                          padding: "4px 12px",
-                          background: "rgba(16,185,129,0.12)",
-                          border: "1px solid rgba(16,185,129,0.20)",
-                          color: COLORS.primaryHover,
-                          fontWeight: 600,
-                        }}
-                      >
+                    <div className="mt-4">
+                      <Tag className="trusted-tag">
                         {t("profile.badge.trusted")}
                       </Tag>
                     </div>
 
-                    <div
-                      style={{
-                        marginTop: 22,
-                        padding: "16px",
-                        background: "linear-gradient(180deg, rgba(16,185,129,0.08), rgba(34,211,238,0.06))",
-                        borderRadius: 18,
-                        textAlign: "left",
-                        border: "1px solid rgba(2,132,199,0.10)",
-                      }}
-                    >
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                        <Text strong style={{ color: "#0f766e" }}>
+                    <div className="mt-5 rounded-2xl p-4 text-left completion-box">
+                      <div className="flex items-center justify-between mb-2">
+                        <Text strong className="completion-title">
                           {t("profile.completion.title")}
                         </Text>
-                        <Text strong style={{ color: COLORS.primary }}>
+                        <Text strong className="text-emerald-600 dark:text-emerald-400">
                           {profileCompletion}%
                         </Text>
                       </div>
+
                       <Progress
                         percent={profileCompletion}
                         showInfo={false}
-                        strokeColor={`linear-gradient(90deg, ${COLORS.primary} 0%, ${COLORS.cyan} 100%)`}
+                        strokeColor="linear-gradient(90deg, #10b981 0%, #22d3ee 100%)"
                         trailColor="#e2e8f0"
                       />
-                      <Text style={{ fontSize: 12, color: COLORS.muted, marginTop: 8, display: "block" }}>
+
+                      <Text className="block mt-2 text-xs text-slate-500 dark:text-[var(--color-text-secondary)]">
                         {t("profile.completion.hint")}
                       </Text>
                     </div>
@@ -494,24 +476,17 @@ const ProfilePage = () => {
                 >
                   <Card
                     bordered={false}
-                    style={{
-                      borderRadius: 26,
-                      boxShadow: COLORS.cardShadow,
-                      border: COLORS.softBorder,
-                      padding: "8px",
-                    }}
+                    className="
+                      profile-form-card
+                      !rounded-3xl
+                      !bg-white border border-emerald-100 shadow-sm
+                      dark:!bg-[var(--color-background-alt)]
+                      dark:!border-[var(--color-border)]
+                    "
                     title={
                       <Space>
-                        <div
-                          style={{
-                            width: 10,
-                            height: 10,
-                            borderRadius: 999,
-                            background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.cyan} 100%)`,
-                            boxShadow: "0 10px 18px rgba(16,185,129,0.25)",
-                          }}
-                        />
-                        <span style={{ fontWeight: 900, fontSize: 18, color: COLORS.ink }}>
+                        <div className="dot-gradient" />
+                        <span className="card-title">
                           {t("profile.title")}
                         </span>
                       </Space>
@@ -540,7 +515,8 @@ const ProfilePage = () => {
                     <Title level={5} className="form-section-title">
                       {t("profile.sections.basic")}
                     </Title>
-                    <Row gutter={20}>
+
+                    <Row gutter={16}>
                       {["displayName", "gender", "dateOfBirth"].map((key) => (
                         <Col xs={24} md={key === "displayName" ? 24 : 12} key={key}>
                           {renderField(key)}
@@ -548,12 +524,13 @@ const ProfilePage = () => {
                       ))}
                     </Row>
 
-                    <Divider style={{ margin: "24px 0" }} />
+                    <Divider className="profile-divider" />
 
                     <Title level={5} className="form-section-title">
                       {t("profile.sections.contact")}
                     </Title>
-                    <Row gutter={20}>
+
+                    <Row gutter={16}>
                       {["email", "phone", "address"].map((key) => (
                         <Col xs={24} md={12} key={key}>
                           {renderField(key)}
@@ -561,25 +538,14 @@ const ProfilePage = () => {
                       ))}
                     </Row>
 
-                    <Divider style={{ margin: "24px 0" }} />
+                    <Divider className="profile-divider" />
 
                     <Title level={5} className="form-section-title">
                       {t("profile.sections.bio")}
                     </Title>
                     {renderField("bio")}
 
-                    <div
-                      style={{
-                        marginTop: 40,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        borderTop: "1px solid rgba(2,132,199,0.10)",
-                        paddingTop: 22,
-                        gap: 12,
-                        flexWrap: "wrap",
-                      }}
-                    >
+                    <div className="action-bar">
                       <Popconfirm
                         title={t("profile.confirm.cancelTitle")}
                         description={t("profile.confirm.cancelDesc")}
@@ -624,6 +590,7 @@ const ProfilePage = () => {
         )}
       </div>
 
+      {/* ✅ Dark overrides giống style bạn làm cho Noti */}
       <style jsx="true">{`
         .top-glow {
           width: 100%;
@@ -638,17 +605,29 @@ const ProfilePage = () => {
             radial-gradient(circle at 70% 40%, rgba(16, 185, 129, 0.22) 0%, transparent 60%);
           filter: blur(2px);
         }
+        .dark .top-glow {
+          opacity: 0.7;
+          filter: blur(6px);
+        }
 
         .profile-card .ant-card-body {
-          padding: 32px 24px;
+          padding: 28px 20px;
           position: relative;
         }
+
         .card-ribbon {
           position: absolute;
           inset: 0;
           height: 120px;
           background: linear-gradient(90deg, rgba(16, 185, 129, 0.16), rgba(34, 211, 238, 0.12));
           pointer-events: none;
+        }
+        .dark .card-ribbon {
+          background: linear-gradient(
+            90deg,
+            rgba(16, 185, 129, 0.14),
+            rgba(34, 211, 238, 0.10)
+          );
         }
 
         .avatar-wrapper {
@@ -658,12 +637,18 @@ const ProfilePage = () => {
           margin-top: 6px;
         }
 
+        .profile-avatar {
+          border: 4px solid #fff;
+          box-shadow: 0 12px 26px rgba(0, 0, 0, 0.10);
+        }
+        .dark .profile-avatar {
+          border-color: rgba(255, 255, 255, 0.10);
+          box-shadow: 0 16px 34px rgba(0, 0, 0, 0.45);
+        }
+
         .avatar-overlay {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           background: linear-gradient(135deg, rgba(16, 185, 129, 0.65), rgba(34, 211, 238, 0.55));
           border-radius: 50%;
           display: flex;
@@ -692,44 +677,122 @@ const ProfilePage = () => {
           }
         }
 
+        .trusted-tag {
+          border-radius: 999px !important;
+          padding: 4px 12px !important;
+          background: rgba(16, 185, 129, 0.12) !important;
+          border: 1px solid rgba(16, 185, 129, 0.20) !important;
+          color: #059669 !important;
+          font-weight: 700 !important;
+        }
+        .dark .trusted-tag {
+          background: rgba(16, 185, 129, 0.14) !important;
+          border-color: rgba(16, 185, 129, 0.25) !important;
+          color: rgba(110, 231, 183, 0.95) !important;
+        }
+
+        .completion-box {
+          background: linear-gradient(180deg, rgba(16, 185, 129, 0.08), rgba(34, 211, 238, 0.06));
+          border: 1px solid rgba(2, 132, 199, 0.10);
+        }
+        .dark .completion-box {
+          background: rgba(255, 255, 255, 0.04);
+          border-color: var(--color-border);
+        }
+
+        .completion-title {
+          color: #0f766e !important;
+        }
+        .dark .completion-title {
+          color: var(--color-text-primary) !important;
+        }
+
+        .dot-gradient {
+          width: 10px;
+          height: 10px;
+          border-radius: 999px;
+          background: linear-gradient(135deg, #10b981 0%, #22d3ee 100%);
+          box-shadow: 0 10px 18px rgba(16, 185, 129, 0.25);
+        }
+
+        .card-title {
+          font-weight: 900;
+          font-size: 18px;
+          color: #0f172a;
+        }
+        .dark .card-title {
+          color: var(--color-text-primary);
+        }
+
+        .profile-divider {
+          margin: 22px 0 !important;
+          border-color: rgba(2, 132, 199, 0.10) !important;
+        }
+        .dark .profile-divider {
+          border-color: var(--color-border) !important;
+        }
+
         .form-section-title {
           font-size: 12px !important;
           letter-spacing: 1px;
           color: #0f766e !important;
-          margin-bottom: 18px !important;
-          font-weight: 800 !important;
+          margin-bottom: 14px !important;
+          font-weight: 900 !important;
+        }
+        .dark .form-section-title {
+          color: var(--color-text-secondary) !important;
         }
 
+        /* Inputs / DatePicker */
         .fintech-input {
           border-radius: 12px !important;
           padding: 8px 12px;
         }
 
-        .fintech-btn-primary {
-          min-width: 190px;
-          height: 48px !important;
-          border-radius: 14px !important;
-          background: linear-gradient(90deg, ${COLORS.primary} 0%, ${COLORS.cyan} 100%) !important;
-          border: none !important;
-          font-weight: 800 !important;
-          box-shadow: 0 10px 20px rgba(16, 185, 129, 0.22) !important;
-        }
-        .fintech-btn-primary:hover {
-          opacity: 0.95;
-          transform: translateY(-1px);
-        }
-        .fintech-btn-primary:disabled {
-          background: #e2e8f0 !important;
-          color: #94a3b8 !important;
-          box-shadow: none !important;
+        .dark .fintech-input.ant-input,
+        .dark .fintech-input .ant-input,
+        .dark .fintech-input.ant-input-affix-wrapper,
+        .dark .fintech-input.ant-picker,
+        .dark .fintech-input.ant-input-textarea .ant-input {
+          background: var(--color-background) !important;
+          border-color: var(--color-border) !important;
+          color: var(--color-text-primary) !important;
         }
 
+        .dark .fintech-input.ant-input-affix-wrapper .ant-input-prefix,
+        .dark .fintech-input.ant-input-affix-wrapper .ant-input-suffix,
+        .dark .fintech-input.ant-picker .ant-picker-suffix {
+          color: var(--color-text-secondary) !important;
+        }
+
+        .dark .fintech-input.ant-picker .ant-picker-input > input {
+          color: var(--color-text-primary) !important;
+        }
+
+        /* Radio */
+        .dark .fintech-radio .ant-radio-button-wrapper {
+          background: var(--color-background) !important;
+          border-color: var(--color-border) !important;
+          color: var(--color-text-secondary) !important;
+        }
+        .dark .fintech-radio .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+          background: rgba(16, 185, 129, 0.18) !important;
+          border-color: rgba(16, 185, 129, 0.35) !important;
+          color: var(--color-text-primary) !important;
+        }
+
+        /* Buttons */
         .btn-edit {
           border-radius: 12px !important;
           border: 1px solid rgba(16, 185, 129, 0.25) !important;
           color: #0f766e !important;
           background: rgba(16, 185, 129, 0.06) !important;
-          font-weight: 700 !important;
+          font-weight: 800 !important;
+        }
+        .dark .btn-edit {
+          background: rgba(255, 255, 255, 0.06) !important;
+          border-color: var(--color-border) !important;
+          color: var(--color-text-primary) !important;
         }
 
         .btn-soft {
@@ -737,7 +800,45 @@ const ProfilePage = () => {
           border: 1px solid rgba(2, 132, 199, 0.18) !important;
           background: rgba(34, 211, 238, 0.06) !important;
           color: #075985 !important;
-          font-weight: 700 !important;
+          font-weight: 800 !important;
+        }
+        .dark .btn-soft {
+          background: rgba(255, 255, 255, 0.06) !important;
+          border-color: var(--color-border) !important;
+          color: var(--color-text-primary) !important;
+        }
+
+        .fintech-btn-primary {
+          min-width: 190px;
+          height: 48px !important;
+          border-radius: 14px !important;
+          background: linear-gradient(90deg, #10b981 0%, #22d3ee 100%) !important;
+          border: none !important;
+          font-weight: 900 !important;
+          box-shadow: 0 10px 20px rgba(16, 185, 129, 0.22) !important;
+        }
+        .fintech-btn-primary:hover {
+          opacity: 0.96;
+          transform: translateY(-1px);
+        }
+        .fintech-btn-primary:disabled {
+          background: rgba(255, 255, 255, 0.10) !important;
+          color: rgba(255, 255, 255, 0.45) !important;
+          box-shadow: none !important;
+        }
+
+        .action-bar {
+          margin-top: 34px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-top: 1px solid rgba(2, 132, 199, 0.10);
+          padding-top: 18px;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        .dark .action-bar {
+          border-top-color: var(--color-border);
         }
 
         @media (max-width: 576px) {
