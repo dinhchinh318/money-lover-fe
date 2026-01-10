@@ -109,7 +109,6 @@ const AnalyticsDiagnostic = () => {
         loadHabitsData(weeks, days),
       ]);
     } catch (error) {
-      console.error("Error loading diagnostic data:", error);
       message.error(t("analyticsDiagnostic.toast.loadError"));
     } finally {
       setLoading(false);
@@ -145,7 +144,6 @@ const AnalyticsDiagnostic = () => {
         setWalletVariations([]);
       }
     } catch (error) {
-      console.error("Error loading variations data:", error);
       setCategorySpikes([]);
       setWalletVariations([]);
     }
@@ -237,7 +235,6 @@ const AnalyticsDiagnostic = () => {
       else if (spikeRes?.EC === 0 && spikeRes?.data) setSpike24h(spikeRes.data);
       else setSpike24h(null);
     } catch (error) {
-      console.error("Error loading anomalies data:", error);
       setMonthlySpikes([]);
       setMonthlyStats({ mean: 0, threshold: 0 });
       setUnusualLarge([]);
@@ -290,7 +287,6 @@ const AnalyticsDiagnostic = () => {
       else if (freqRes?.EC === 0 && freqRes?.data) setTransactionFreq(freqRes.data);
       else setTransactionFreq(null);
     } catch (error) {
-      console.error("Error loading habits data:", error);
       setSpendingDays([]);
       setFrequentCategories([]);
       setTransactionFreq(null);
