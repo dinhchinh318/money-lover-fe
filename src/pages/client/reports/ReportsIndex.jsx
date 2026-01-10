@@ -31,14 +31,14 @@ const ReportsIndex = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white p-4 sm:p-6">
-            <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen bg-[#F9FAFB]">
+            <div className="max-w-[1280px] mx-auto px-4 py-4 sm:py-6">
                 {/* Header */}
-                <div className="mb-6 sm:mb-8">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                <div className="mb-6">
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
                         Báo cáo Tài chính
                     </h1>
-                    <p className="text-gray-600 text-base sm:text-lg">
+                    <p className="text-sm sm:text-base text-gray-500 mt-1">
                         Chọn loại báo cáo bạn muốn xem
                     </p>
                 </div>
@@ -51,30 +51,32 @@ const ReportsIndex = () => {
                             <Col xs={24} sm={12} lg={8} key={report.key}>
                                 <Link to={report.path}>
                                     <Card
-                                        className="h-full shadow-sm hover:shadow-lg transition-all duration-300 border-l-4"
-                                        style={{ borderLeftColor: report.color }}
                                         hoverable
+                                        className="h-full border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition"
                                     >
-                                        <div className="flex flex-col h-full">
+                                        <div className="flex items-start gap-4">
+                                            {/* Icon */}
                                             <div
-                                                className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center mb-3 sm:mb-4"
+                                                className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                                                 style={{ backgroundColor: `${report.color}20` }}
                                             >
-                                                <Icon
-                                                    size={24}
-                                                    className="sm:w-8 sm:h-8"
-                                                    style={{ color: report.color }}
-                                                />
+                                                <Icon size={20} style={{ color: report.color }} />
                                             </div>
-                                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
-                                                {report.title}
-                                            </h3>
-                                            <p className="text-sm sm:text-base text-gray-600 mb-4 flex-grow">
-                                                {report.description}
-                                            </p>
-                                            <div className="flex items-center text-[#10B981] font-semibold text-sm sm:text-base">
-                                                Xem chi tiết
-                                                <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px] ml-2" />
+
+                                            {/* Content */}
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-semibold text-gray-900 text-base truncate">
+                                                    {report.title}
+                                                </h3>
+
+                                                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                                    {report.description}
+                                                </p>
+
+                                                <div className="mt-3 inline-flex items-center text-sm font-medium text-[#10B981]">
+                                                    Xem chi tiết
+                                                    <ArrowRight size={14} className="ml-1" />
+                                                </div>
                                             </div>
                                         </div>
                                     </Card>
