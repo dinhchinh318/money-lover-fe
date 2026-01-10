@@ -406,7 +406,7 @@ const AnalyticsPrescriptive = () => {
                         <p className="mt-6 text-gray-600 font-medium text-sm sm:text-lg">Đang tải khuyến nghị thông minh...</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                         {/* Section A: Gợi ý Tối ưu */}
                         <div className="lg:col-span-1 space-y-6">
                             <Card
@@ -455,59 +455,69 @@ const AnalyticsPrescriptive = () => {
                                             return (
                                                 <Card
                                                     key={index}
-                                                    className="mb-3 border-2 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 rounded-2xl overflow-hidden cursor-pointer group"
+                                                    className="mb-3 border-2 rounded-2xl bg-white p-3"
                                                     style={{
                                                         borderColor: getPriorityColor(priority) + "50",
-                                                        backgroundColor: "white",
                                                     }}
                                                     onClick={() => handleViewDetails(suggestion)}
                                                 >
-                                                    <div className="flex items-start gap-4">
-                                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 flex items-center justify-center flex-shrink-0 shadow-md group-hover:shadow-lg transition-shadow">
-                                                            <span className="text-3xl transform group-hover:scale-110 transition-transform">{getCategoryIcon(suggestion.categoryName)}</span>
+                                                    <div className="flex flex-col items-center text-center gap-3 py-2">
+
+                                                        {/* Icon */}
+                                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 border border-amber-200 flex items-center justify-center shadow-sm">
+                                                            <span className="text-2xl">
+                                                                {getCategoryIcon(suggestion.categoryName)}
+                                                            </span>
                                                         </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="flex items-center justify-between mb-3">
-                                                                <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                                    <TrendingDown className="text-red-500 flex-shrink-0" size={18} />
-                                                                    <span className="font-bold text-base text-gray-900 truncate">
-                                                                        Giảm {reductionPercent}% {suggestion.categoryName}
-                                                                    </span>
-                                                                </div>
-                                                                <Badge
-                                                                    count={getPriorityText(priority)}
-                                                                    className="ml-2 flex-shrink-0"
-                                                                    style={{
-                                                                        backgroundColor: getPriorityColor(priority),
-                                                                        fontSize: '11px',
-                                                                        fontWeight: 'bold',
-                                                                        padding: '2px 8px'
-                                                                    }}
-                                                                />
+
+                                                        {/* Reduction */}
+                                                        <div className="flex flex-col items-center gap-1">
+                                                            <div className="text-xs text-gray-500 font-medium">
+                                                                Giảm
                                                             </div>
-                                                            <div className="space-y-2 mb-4">
-                                                                <div className="flex items-center justify-between text-sm">
-                                                                    <span className="text-gray-600">Chi tiêu hiện tại:</span>
-                                                                    <span className="font-bold text-gray-900">{formatCurrency(currentSpending)}</span>
-                                                                </div>
-                                                                <div className="flex items-center justify-between text-sm bg-green-50 p-2 rounded-lg border border-green-200">
-                                                                    <span className="text-gray-700 font-semibold">Có thể tiết kiệm:</span>
-                                                                    <span className="font-extrabold text-green-600 text-base">{formatCurrency(potentialSavings)}</span>
-                                                                </div>
+                                                            <div className="text-lg font-extrabold text-red-600 leading-none">
+                                                                {reductionPercent}%
                                                             </div>
-                                                            <Button
-                                                                type="link"
-                                                                size="small"
-                                                                icon={<Eye size={16} />}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleViewDetails(suggestion);
-                                                                }}
-                                                                className="p-0 h-auto text-purple-600 hover:text-purple-700 font-semibold flex items-center gap-1"
-                                                            >
-                                                                Xem chi tiết
-                                                            </Button>
+                                                            <div className="text-sm font-semibold text-gray-900 leading-tight">
+                                                                {suggestion.categoryName}
+                                                            </div>
                                                         </div>
+
+                                                        {/* Priority badge */}
+                                                        <Badge
+                                                            count={getPriorityText(priority)}
+                                                            style={{
+                                                                backgroundColor: getPriorityColor(priority),
+                                                                fontSize: "11px",
+                                                                fontWeight: "bold",
+                                                                padding: "2px 10px",
+                                                                borderRadius: "999px",
+                                                            }}
+                                                        />
+
+                                                        {/* Saving box */}
+                                                        <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 p-2 rounded-xl border border-green-200">
+                                                            <div className="text-[11px] text-gray-600 font-semibold">
+                                                                Có thể tiết kiệm
+                                                            </div>
+                                                            <div className="text-sm font-extrabold text-green-700 break-all">
+                                                                {formatCurrency(potentialSavings)}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Action */}
+                                                        <Button
+                                                            type="link"
+                                                            size="small"
+                                                            icon={<Eye size={14} />}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleViewDetails(suggestion);
+                                                            }}
+                                                            className="p-0 text-blue-600 font-semibold text-xs"
+                                                        >
+                                                            Xem chi tiết
+                                                        </Button>
                                                     </div>
                                                 </Card>
                                             );
@@ -543,45 +553,54 @@ const AnalyticsPrescriptive = () => {
                                                 return (
                                                     <Card
                                                         key={index}
-                                                        className="border-2 border-yellow-200/60 hover:border-yellow-300 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 rounded-2xl bg-gradient-to-br from-yellow-50/80 to-amber-50/80 backdrop-blur-sm"
+                                                        className="border-2 border-yellow-200/60 rounded-2xl bg-gradient-to-br from-yellow-50/80 to-amber-50/80"
                                                     >
-                                                        <div className="mb-4">
-                                                            <div className="flex items-center gap-3 mb-4">
-                                                                <span className="text-2xl">{getCategoryIcon(budget.category?.name || budget.budgetName)}</span>
-                                                                <div className="font-bold text-base text-gray-900">
+                                                        <div className="flex flex-col gap-3">
+
+                                                            {/* Header */}
+                                                            <div className="flex flex-col items-center gap-1 text-center">
+                                                                <span className="text-xl shrink-0">
+                                                                    {getCategoryIcon(budget.category?.name || budget.budgetName)}
+                                                                </span>
+                                                                <span className="font-bold text-sm text-gray-900 truncate">
                                                                     {budget.category?.name || budget.budgetName}
+                                                                </span>
+                                                            </div>
+
+                                                            {/* Percent */}
+                                                            <div className="text-xs font-bold text-red-600">
+                                                                {differencePercent > 0 ? "Tăng" : "Giảm"} {Math.abs(differencePercent)}%
+                                                            </div>
+
+                                                            {/* Numbers – STACK DỌC (KHÔNG grid-cols-2) */}
+                                                            <div className="flex flex-col gap-1 text-xs min-w-0">
+                                                                <div className="text-gray-500">Hiện tại</div>
+                                                                <div className="font-bold break-all">
+                                                                    {formatCurrency(currentLimit)}
+                                                                </div>
+
+                                                                <div className="text-green-700 font-semibold mt-1">
+                                                                    Đề xuất
+                                                                </div>
+                                                                <div className="font-extrabold text-green-700 break-all">
+                                                                    {formatCurrency(suggestedLimit)}
                                                                 </div>
                                                             </div>
-                                                            <div className="space-y-3 mb-4">
-                                                                <div className="flex items-center gap-2 p-2 bg-white/60 rounded-lg">
-                                                                    <TrendingDown className="text-red-500" size={16} />
-                                                                    <span className="text-sm font-bold text-gray-700">
-                                                                        {differencePercent > 0 ? 'Tăng' : 'Giảm'} {Math.abs(differencePercent)}%
-                                                                    </span>
-                                                                </div>
-                                                                <div className="grid grid-cols-2 gap-3">
-                                                                    <div className="p-2 bg-white/60 rounded-lg">
-                                                                        <div className="text-xs text-gray-500 mb-1">Hiện tại</div>
-                                                                        <div className="text-sm font-bold text-gray-900">{formatCurrency(currentLimit)}</div>
-                                                                    </div>
-                                                                    <div className="p-2 bg-green-50 border border-green-200 rounded-lg">
-                                                                        <div className="text-xs text-gray-600 mb-1">Đề xuất</div>
-                                                                        <div className="text-sm font-extrabold text-green-600">{formatCurrency(suggestedLimit)}</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="text-xs text-gray-600 italic bg-white/40 p-2 rounded-lg border border-gray-200">
-                                                                    {reason}
-                                                                </div>
+                                                            {/* Reason – clamp */}
+                                                            <div className="text-[11px] text-gray-600 italic line-clamp-2">
+                                                                {reason}
                                                             </div>
+
+                                                            {/* Button */}
+                                                            <Button
+                                                                type="primary"
+                                                                size="small"
+                                                                className="w-full h-9 text-sm bg-gradient-to-r from-green-500 to-emerald-600 border-0"
+                                                                onClick={() => handleApplyBudget(budget)}
+                                                            >
+                                                                Áp dụng
+                                                            </Button>
                                                         </div>
-                                                        <Button
-                                                            type="primary"
-                                                            size="middle"
-                                                            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 border-0 shadow-lg hover:shadow-xl font-semibold h-10"
-                                                            onClick={() => handleApplyBudget(budget)}
-                                                        >
-                                                            Áp dụng ngay
-                                                        </Button>
                                                     </Card>
                                                 );
                                             })
@@ -669,7 +688,7 @@ const AnalyticsPrescriptive = () => {
                                                                 />
                                                             </div>
                                                         </div>
-                                                        <div className="flex items-center gap-3 mb-4">
+                                                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
                                                             <div className="flex-1 p-3 bg-white rounded-xl border-2 border-gray-200 shadow-sm">
                                                                 <div className="text-xs text-gray-500 mb-1 font-medium">Từ</div>
                                                                 <div className="font-bold text-sm text-gray-900 truncate">{fromWallet}</div>
@@ -683,10 +702,10 @@ const AnalyticsPrescriptive = () => {
                                                             </div>
                                                         </div>
                                                         <div className="mb-4 p-4 bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl border border-purple-200">
-                                                            <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 mb-2">
+                                                            <div className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 mb-2 break-all sm:break-words">
                                                                 {formatCurrency(amount)}
                                                             </div>
-                                                            <div className="text-sm text-gray-700 italic font-medium">
+                                                            <div className="text-sm text-gray-700 italic font-medium line-clamp-2">
                                                                 {reason}
                                                             </div>
                                                         </div>
@@ -730,50 +749,65 @@ const AnalyticsPrescriptive = () => {
                                 }
                             >
                                 {/* Summary và Mark all as read */}
-                                <div className="flex items-center justify-between mb-6 p-4 bg-gradient-to-r from-red-50 via-orange-50 to-amber-50 border-2 border-red-200/60 rounded-xl shadow-sm">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-red-100 rounded-lg">
+                                <div className="mb-6 p-3 bg-gradient-to-r from-red-50 via-orange-50 to-amber-50 border border-red-200 rounded-xl">
+                                    <div className="flex flex-col items-center text-center gap-2">
+
+                                        {/* Icon */}
+                                        <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
                                             <BellOutlined className="text-red-600 text-lg" />
                                         </div>
-                                        <div>
-                                            <div className="text-sm font-bold text-gray-800">
-                                                {unreadCount} cảnh báo chưa đọc
-                                            </div>
+
+                                        {/* Text */}
+                                        <div className="text-sm font-bold text-gray-800 leading-tight">
+                                            {unreadCount} cảnh báo<br />chưa đọc
                                         </div>
+
+                                        {/* Action */}
+                                        {unreadCount > 0 && (
+                                            <Button
+                                                type="link"
+                                                size="small"
+                                                onClick={handleMarkAllAsRead}
+                                                loading={markingAllRead}
+                                                className="p-0 text-xs text-red-600 font-semibold"
+                                            >
+                                                Đánh dấu tất cả
+                                            </Button>
+                                        )}
                                     </div>
-                                    {unreadCount > 0 && (
-                                        <Button
-                                            type="link"
-                                            size="small"
-                                            onClick={handleMarkAllAsRead}
-                                            loading={markingAllRead}
-                                            className="text-red-600 hover:text-red-700 font-bold text-sm"
-                                        >
-                                            Đánh dấu tất cả
-                                        </Button>
-                                    )}
                                 </div>
 
                                 {/* Filters */}
-                                <Tabs
-                                    activeKey={alertFilter}
-                                    onChange={setAlertFilter}
-                                    items={[
-                                        {
-                                            key: "all",
-                                            label: <span className="font-semibold">Tất cả</span>,
-                                        },
-                                        {
-                                            key: "unread",
-                                            label: <span className="font-semibold">Chưa đọc</span>,
-                                        },
-                                        {
-                                            key: "read",
-                                            label: <span className="font-semibold">Đã đọc</span>,
-                                        },
-                                    ]}
-                                    className="mb-6"
-                                />
+                                <div className="hidden sm:block">
+                                    <Tabs
+                                        activeKey={alertFilter}
+                                        onChange={setAlertFilter}
+                                        items={[
+                                            {
+                                                key: "all",
+                                                label: <span className="font-semibold">Tất cả</span>,
+                                            },
+                                            {
+                                                key: "unread",
+                                                label: <span className="font-semibold">Chưa đọc</span>,
+                                            },
+                                            {
+                                                key: "read",
+                                                label: <span className="font-semibold">Đã đọc</span>,
+                                            },
+                                        ]}
+                                        className="mb-6"
+                                    />
+                                </div>
+                                <select
+                                    className="sm:hidden w-full mb-4 p-2 border rounded-lg"
+                                    value={alertFilter}
+                                    onChange={(e) => setAlertFilter(e.target.value)}
+                                >
+                                    <option value="all">Tất cả</option>
+                                    <option value="unread">Chưa đọc</option>
+                                    <option value="read">Đã đọc</option>
+                                </select>
 
                                 {/* Danh sách cảnh báo */}
                                 <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
@@ -813,7 +847,7 @@ const AnalyticsPrescriptive = () => {
                                                                 }}
                                                             />
                                                         </div>
-                                                        <div className="text-sm text-gray-700 mb-3 leading-relaxed bg-white/60 p-3 rounded-lg border border-gray-200">
+                                                        <div className="text-sm text-gray-700 mb-3 leading-relaxed bg-white/60 p-3 rounded-lg border border-gray-200 line-clamp-3">
                                                             {alert.message || alert.content || ""}
                                                         </div>
                                                         <div className="flex items-center justify-between">
@@ -863,7 +897,7 @@ const AnalyticsPrescriptive = () => {
                     open={detailModalVisible}
                     onCancel={() => setDetailModalVisible(false)}
                     footer={null}
-                    width={600}
+                    width="90%"
                     className="custom-modal"
                 >
                     {selectedSuggestion && (
