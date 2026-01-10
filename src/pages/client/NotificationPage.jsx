@@ -1,11 +1,30 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Card, List, Typography, Space, Button, Tag, message, 
-  Popconfirm, Empty, Tabs, Badge, Modal, Tooltip, Row, Col
+  Card,
+  List,
+  Typography,
+  Space,
+  Button,
+  Tag,
+  message,
+  Popconfirm,
+  Empty,
+  Tabs,
+  Badge,
+  Modal,
+  Tooltip,
+  Row,
+  Col,
+  Divider,
 } from "antd";
 import {
-  BellOutlined, CheckCircleOutlined, DeleteOutlined, 
-  ReloadOutlined, RestOutlined, EyeOutlined, MailOutlined
+  BellOutlined,
+  CheckCircleOutlined,
+  DeleteOutlined,
+  ReloadOutlined,
+  RestOutlined,
+  EyeOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 import {
   getNotificationsAPI,
@@ -15,9 +34,14 @@ import {
   restoreNotificationAPI,
 } from "../../services/api.notification";
 
+// ✅ i18n
+import { useTranslation } from "react-i18next";
+
 const { Title, Text, Paragraph } = Typography;
 
 const NotificationPage = () => {
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
   const [items, setItems] = useState([]);
@@ -37,13 +61,16 @@ const NotificationPage = () => {
       const data = res?.data?.data ?? res?.data ?? [];
       setItems(Array.isArray(data) ? data : []);
     } catch (err) {
-      message.error("Không thể tải danh sách thông báo");
+      message.error(t("notifications.toast.fetchError"));
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchNoti(); }, []);
+  useEffect(() => {
+    fetchNoti();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAction = async (id, apiFunc, successMsg) => {
     setBusyId(id);
@@ -52,7 +79,7 @@ const NotificationPage = () => {
       if (successMsg) message.success(successMsg);
       await fetchNoti();
     } catch (err) {
-      message.error(err?.response?.data?.message || "Thao tác thất bại");
+      message.error(err?.response?.data?.message || t("notifications.toast.actionFail"));
     } finally {
       setBusyId(null);
     }
@@ -62,7 +89,7 @@ const NotificationPage = () => {
     setBusyId("__all__");
     try {
       await markAllNotificationsReadAPI();
-      message.success("Tất cả đã được đánh dấu là đã đọc");
+      message.success(t("notifications.toast.allRead"));
       await fetchNoti();
     } finally {
       setBusyId(null);
@@ -72,14 +99,26 @@ const NotificationPage = () => {
   // --- FILTERED DATA ---
   const filteredItems = useMemo(() => {
     switch (activeTab) {
-      case "unread": return items.filter(n => !isRead(n) && !isDeleted(n));
-      case "read": return items.filter(n => isRead(n) && !isDeleted(n));
-      case "deleted": return items.filter(n => isDeleted(n));
-      default: return items.filter(n => !isDeleted(n));
+      case "unread":
+        return items.filter((n) => !isRead(n) && !isDeleted(n));
+      case "read":
+        return items.filter((n) => isRead(n) && !isDeleted(n));
+      case "deleted":
+        return items.filter((n) => isDeleted(n));
+      default:
+        return items.filter((n) => !isDeleted(n));
     }
   }, [items, activeTab]);
 
-  const unreadCount = useMemo(() => items.filter(n => !isRead(n) && !isDeleted(n)).length, [items]);
+  const unreadCount = useMemo(
+    () => items.filter((n) => !isRead(n) && !isDeleted(n)).length,
+    [items]
+  );
+
+  const nonDeletedCount = useMemo(
+    () => items.filter((n) => !isDeleted(n)).length,
+    [items]
+  );
 
   // --- RENDER HELPERS ---
   const showDetail = (n) => setDetailModal({ open: true, data: n });
@@ -92,45 +131,63 @@ const NotificationPage = () => {
           <Row gutter={[16, 16]} align="middle" justify="space-between">
             <Col xs={24} sm={14}>
               <Space align="start" size={16}>
-                <div className="noti-icon-main"><BellOutlined /></div>
+                <div className="noti-icon-main">
+                  <BellOutlined />
+                </div>
                 <div>
-                  <Title level={2} style={{ margin: 0, color: "#064e3b" }}>Thông báo</Title>
+                  <Title level={2} style={{ margin: 0, color: "#064e3b" }}>
+                    {t("notifications.title")}
+                  </Title>
+
                   <Text type="secondary">
-                    Bạn có <Badge count={unreadCount} offset={[10, -2]} size="small"><Text strong>{unreadCount}</Text></Badge> thông báo mới chưa đọc
+                    {t("notifications.subtitle.before")}{" "}
+                    <Badge
+                      count={unreadCount}
+                      offset={[10, -2]}
+                      size="small"
+                    >
+                      <Text strong>{unreadCount}</Text>
+                    </Badge>{" "}
+                    {t("notifications.subtitle.after")}
                   </Text>
                 </div>
               </Space>
             </Col>
+
             <Col xs={24} sm={10} className="noti-header-actions">
               <Space>
-                <Button 
-                  icon={<ReloadOutlined />} 
-                  onClick={fetchNoti} 
-                  loading={loading}
-                >Tải lại</Button>
-                <Button 
-                  type="primary" 
+                <Button icon={<ReloadOutlined />} onClick={fetchNoti} loading={loading}>
+                  {t("notifications.actions.reload")}
+                </Button>
+
+                <Button
+                  type="primary"
                   className="btn-mark-all"
-                  icon={<CheckCircleOutlined />} 
+                  icon={<CheckCircleOutlined />}
                   onClick={markAllRead}
                   loading={busyId === "__all__"}
                   disabled={unreadCount === 0}
-                >Đọc tất cả</Button>
+                >
+                  {t("notifications.actions.readAll")}
+                </Button>
               </Space>
             </Col>
           </Row>
         </header>
 
         {/* TABS FILTER */}
-        <Tabs 
+        <Tabs
           className="noti-tabs"
-          activeKey={activeTab} 
+          activeKey={activeTab}
           onChange={setActiveTab}
           items={[
-            { key: "all", label: `Tất cả (${items.filter(n => !isDeleted(n)).length})` },
-            { key: "unread", label: "Chưa đọc" },
-            { key: "read", label: "Đã đọc" },
-            { key: "deleted", label: "Đã xóa" },
+            {
+              key: "all",
+              label: t("notifications.tabs.all", { count: nonDeletedCount }),
+            },
+            { key: "unread", label: t("notifications.tabs.unread") },
+            { key: "read", label: t("notifications.tabs.read") },
+            { key: "deleted", label: t("notifications.tabs.deleted") },
           ]}
         />
 
@@ -139,66 +196,112 @@ const NotificationPage = () => {
           <List
             loading={loading}
             dataSource={filteredItems}
-            locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không tìm thấy thông báo nào" /> }}
+            locale={{
+              emptyText: (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={t("notifications.empty")}
+                />
+              ),
+            }}
             renderItem={(n) => {
               const id = getId(n);
               const readStatus = isRead(n);
               const deletedStatus = isDeleted(n);
 
+              const title =
+                n?.title || n?.subject || t("notifications.systemTitle");
+              const content = n?.message || n?.content || n?.body || "";
+              const createdAt = n?.createdAt || n?.created_at || t("notifications.justNow");
+
               return (
-                <List.Item 
-                  className={`noti-item ${!readStatus ? 'is-unread' : ''}`}
+                <List.Item
+                  className={`noti-item ${!readStatus ? "is-unread" : ""}`}
                   actions={[
-                    <Tooltip title="Xem chi tiết">
-                      <Button type="text" icon={<EyeOutlined />} onClick={() => showDetail(n)} />
+                    <Tooltip title={t("notifications.tooltips.detail")} key="detail">
+                      <Button
+                        type="text"
+                        icon={<EyeOutlined />}
+                        onClick={() => showDetail(n)}
+                      />
                     </Tooltip>,
+
                     !deletedStatus && !readStatus && (
-                      <Tooltip title="Đánh dấu đã đọc">
-                        <Button 
-                          type="text" 
-                          icon={<MailOutlined />} 
-                          loading={busyId === id} 
-                          onClick={() => handleAction(id, markNotificationReadAPI)} 
+                      <Tooltip title={t("notifications.tooltips.markRead")} key="markRead">
+                        <Button
+                          type="text"
+                          icon={<MailOutlined />}
+                          loading={busyId === id}
+                          onClick={() =>
+                            handleAction(id, markNotificationReadAPI, t("notifications.toast.markedRead"))
+                          }
                         />
                       </Tooltip>
                     ),
+
                     deletedStatus ? (
-                      <Tooltip title="Khôi phục">
-                        <Button 
-                          type="text" 
-                          icon={<RestOutlined />} 
-                          loading={busyId === id} 
-                          onClick={() => handleAction(id, restoreNotificationAPI, "Đã khôi phục")} 
+                      <Tooltip title={t("notifications.tooltips.restore")} key="restore">
+                        <Button
+                          type="text"
+                          icon={<RestOutlined />}
+                          loading={busyId === id}
+                          onClick={() =>
+                            handleAction(id, restoreNotificationAPI, t("notifications.toast.restored"))
+                          }
                         />
                       </Tooltip>
                     ) : (
-                      <Popconfirm title="Xóa thông báo này?" onConfirm={() => handleAction(id, deleteNotificationAPI, "Đã chuyển vào thùng rác")}>
-                        <Tooltip title="Xóa">
-                          <Button type="text" danger icon={<DeleteOutlined />} loading={busyId === id} />
+                      <Popconfirm
+                        key="delete"
+                        title={t("notifications.confirm.deleteTitle")}
+                        onConfirm={() =>
+                          handleAction(id, deleteNotificationAPI, t("notifications.toast.movedToTrash"))
+                        }
+                      >
+                        <Tooltip title={t("notifications.tooltips.delete")}>
+                          <Button
+                            type="text"
+                            danger
+                            icon={<DeleteOutlined />}
+                            loading={busyId === id}
+                          />
                         </Tooltip>
                       </Popconfirm>
-                    )
+                    ),
                   ].filter(Boolean)}
                 >
                   <List.Item.Meta
                     avatar={
-                      <div className={`noti-avatar ${!readStatus ? 'active' : ''}`}>
+                      <div className={`noti-avatar ${!readStatus ? "active" : ""}`}>
                         <BellOutlined />
                         {!readStatus && <span className="unread-dot" />}
                       </div>
                     }
                     title={
                       <Space>
-                        <Text strong={!readStatus} style={{ fontSize: 15 }}>{n?.title || n?.subject || "Thông báo hệ thống"}</Text>
-                        {deletedStatus ? <Tag color="error">Đã xóa</Tag> : !readStatus ? <Tag color="processing">Mới</Tag> : null}
+                        <Text strong={!readStatus} style={{ fontSize: 15 }}>
+                          {title}
+                        </Text>
+
+                        {deletedStatus ? (
+                          <Tag color="error">{t("notifications.tags.deleted")}</Tag>
+                        ) : !readStatus ? (
+                          <Tag color="processing">{t("notifications.tags.new")}</Tag>
+                        ) : null}
                       </Space>
                     }
                     description={
-                      <div onClick={() => showDetail(n)} style={{ cursor: 'pointer' }}>
-                        <Paragraph ellipsis={{ rows: 2 }} type="secondary" style={{ marginBottom: 4 }}>
-                          {n?.message || n?.content || n?.body}
+                      <div onClick={() => showDetail(n)} style={{ cursor: "pointer" }}>
+                        <Paragraph
+                          ellipsis={{ rows: 2 }}
+                          type="secondary"
+                          style={{ marginBottom: 4 }}
+                        >
+                          {content}
                         </Paragraph>
-                        <Text type="secondary" style={{ fontSize: 11 }}>{n?.createdAt || n?.created_at || "Vừa xong"}</Text>
+                        <Text type="secondary" style={{ fontSize: 11 }}>
+                          {createdAt}
+                        </Text>
                       </div>
                     }
                   />
@@ -210,22 +313,31 @@ const NotificationPage = () => {
 
         {/* DETAIL MODAL */}
         <Modal
-          title="Chi tiết thông báo"
+          title={t("notifications.detail.title")}
           open={detailModal.open}
           onCancel={() => setDetailModal({ open: false, data: null })}
           footer={[
-            <Button key="close" onClick={() => setDetailModal({ open: false, data: null })}>Đóng</Button>
+            <Button key="close" onClick={() => setDetailModal({ open: false, data: null })}>
+              {t("notifications.detail.close")}
+            </Button>,
           ]}
         >
           {detailModal.data && (
-            <div style={{ padding: '10px 0' }}>
-              <Title level={4}>{detailModal.data.title || detailModal.data.subject}</Title>
-              <Divider style={{ margin: '12px 0' }} />
-              <Paragraph style={{ whiteSpace: 'pre-wrap', fontSize: 15 }}>
-                {detailModal.data.message || detailModal.data.content || detailModal.data.body}
+            <div style={{ padding: "10px 0" }}>
+              <Title level={4}>
+                {detailModal.data.title ||
+                  detailModal.data.subject ||
+                  t("notifications.systemTitle")}
+              </Title>
+              <Divider style={{ margin: "12px 0" }} />
+              <Paragraph style={{ whiteSpace: "pre-wrap", fontSize: 15 }}>
+                {detailModal.data.message ||
+                  detailModal.data.content ||
+                  detailModal.data.body}
               </Paragraph>
               <Text type="secondary" style={{ fontSize: 12 }}>
-                Ngày gửi: {detailModal.data.createdAt || detailModal.data.created_at}
+                {t("notifications.detail.sentAt")}:{" "}
+                {detailModal.data.createdAt || detailModal.data.created_at || "—"}
               </Text>
             </div>
           )}
@@ -246,11 +358,14 @@ const NotificationPage = () => {
           margin-bottom: 30px;
         }
         .noti-icon-main {
-          width: 56px; height: 56px;
+          width: 56px;
+          height: 56px;
           background: #10b981;
           color: white;
           border-radius: 18px;
-          display: flex; align-items: center; justify-content: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           font-size: 26px;
           box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
         }
@@ -268,7 +383,7 @@ const NotificationPage = () => {
         }
         .noti-list-card {
           border-radius: 20px !important;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
           overflow: hidden;
         }
         .noti-item {
@@ -283,10 +398,13 @@ const NotificationPage = () => {
           background: #f0fdf4;
         }
         .noti-avatar {
-          width: 44px; height: 44px;
+          width: 44px;
+          height: 44px;
           background: #f1f5f9;
           border-radius: 12px;
-          display: flex; align-items: center; justify-content: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           font-size: 20px;
           color: #94a3b8;
           position: relative;
@@ -297,14 +415,17 @@ const NotificationPage = () => {
         }
         .unread-dot {
           position: absolute;
-          top: -2px; right: -2px;
-          width: 10px; height: 10px;
+          top: -2px;
+          right: -2px;
+          width: 10px;
+          height: 10px;
           background: #ef4444;
           border: 2px solid white;
           border-radius: 50%;
         }
         @media (max-width: 576px) {
-          .noti-header-actions, .noti-header-actions .ant-space {
+          .noti-header-actions,
+          .noti-header-actions .ant-space {
             width: 100%;
           }
           .noti-header-actions .ant-btn {

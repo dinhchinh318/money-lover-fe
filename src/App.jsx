@@ -1,7 +1,7 @@
-import { Outlet, useLocation } from "react-router-dom"
-import AppFooter from "./components/layout/app.footer"
-import AppHeader from "./components/layout/app.header"
-import { useCurrentApp } from "./components/context/app.context"
+import { Outlet, useLocation } from "react-router-dom";
+import AppFooter from "./components/layout/app.footer";
+import AppHeader from "./components/layout/app.header";
+import { useCurrentApp } from "./components/context/app.context";
 import AiChatWidget from "./components/ai/AiChatWidget";
 
 function App() {
@@ -16,17 +16,17 @@ function App() {
   const isLandingPage = location.pathname === "/" && !isAuthenticated;
 
   return (
-    <>
-      <div id="main-blur-area">
+    <div className="app-shell">
+      <div id="main-blur-area" className="app-content">
         {!isAuthPage && !isLandingPage && <AppHeader />}
         <Outlet />
         {!isAuthPage && !isLandingPage && <AppFooter />}
       </div>
 
-      {/* ✅ Render widget outside #main-blur-area to avoid overlay/overflow blocking clicks */}
+      {/* widget tách khỏi blur-area */}
       {isAuthenticated && !isAuthPage && <AiChatWidget />}
-    </>
+    </div>
   );
 }
 
-export default App
+export default App;
