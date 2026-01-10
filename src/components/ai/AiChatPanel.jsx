@@ -12,6 +12,12 @@ import {
   formatAlertsFallback,
 } from "./aiText";
 
+/**
+ * AiChatPanel
+ * - Remove system "Đang chạy..." bubbles (use button disabled state instead)
+ * - Keep chat as main, and quick actions return plain text (no JSON)
+ */
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -25,6 +31,8 @@ function makeMsg(role, text, meta = {}) {
     meta,
   };
 }
+
+const SYSTEM_STYLE = "Trả lời ngắn gọn, tối đa 6 dòng hoặc 5 gạch đầu dòng. Không lan man.";
 
 export default function AiChatPanel() {
   const [input, setInput] = useState("");
@@ -40,11 +48,12 @@ export default function AiChatPanel() {
   ]);
 
   const bottomRef = useRef(null);
-  const scrollDown = () => bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  const scrollDown = () =>
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
 
   const context = useMemo(() => {
-    // keep minimal recent context (text only)
-    return messages.slice(-10).map((m) => ({ role: m.role, text: m.text, at: m.at }));
+    const tail = messages.slice(-10).map((m) => ({ role: m.role, text: m.text, at: m.at }));
+    return [{ role: "system", text: SYSTEM_STYLE }, ...tail];
   }, [messages]);
 
   const push = (msg) => {
@@ -74,11 +83,10 @@ export default function AiChatPanel() {
     }
   };
 
-  const quickText = async (label, fn) => {
+  const run = async (fn) => {
     if (busy) return;
     setBusy(true);
     setError(null);
-    push(makeMsg("system", `Đang chạy: ${label}`));
     try {
       const text = await fn();
       push(makeMsg("assistant", text));
@@ -100,6 +108,7 @@ export default function AiChatPanel() {
       aiApi.getCategoryExpenseReport(range),
       aiApi.getStatsOverview(range),
     ]);
+
     return {
       range,
       dashboard: dashRes?.data ?? dashRes,
@@ -108,39 +117,12 @@ export default function AiChatPanel() {
     };
   };
 
-  const runMonthly = () =>
-    quickText(`Báo cáo tháng ${month}`, async () => {
-      const { range, dashboard, categories, overview } = await loadMonthData();
-      return formatMonthlyReport({
-        startDate: range.startDate,
-        endDate: range.endDate,
-        dashboard,
-        categories,
-        overview,
-      });
-    });
-
-  const runAnalysis = () =>
-    quickText(`Phân tích tháng ${month}`, async () => {
-      const { dashboard, categories } = await loadMonthData();
-      return formatAnalysisFromReport({ dashboard, categories });
-    });
-
-  const runForecast = () =>
-    quickText(`Dự báo (${period})`, async () => {
-      const { dashboard } = await loadMonthData();
-      return formatForecastLinear({ monthValue: month, dashboard, period });
-    });
-
-  const runAlerts = () =>
-    quickText("Cảnh báo", async () => {
-      // 1) try backend alerts first
+  const onAlerts = () =>
+    run(async () => {
       const res = await aiApi.getAlerts();
       const payload = res?.data ?? res;
       const list = Array.isArray(payload) ? payload : Array.isArray(payload?.alerts) ? payload.alerts : [];
-
       if (list.length) {
-        // render simple list
         const lines = ["Cảnh báo:"];
         list.slice(0, 10).forEach((a, i) => {
           const title = a?.title || a?.type || `Alert #${i + 1}`;
@@ -150,28 +132,40 @@ export default function AiChatPanel() {
         });
         return lines.join("\n");
       }
-
-      // 2) fallback from report data (deterministic)
       const { dashboard, categories } = await loadMonthData();
       return formatAlertsFallback({ monthValue: month, dashboard, categories });
     });
 
-  const runSuggestBudget = () =>
-    quickText("Dự toán", async () => {
+  const onAnalysis = () =>
+    run(async () => {
+      const { dashboard, categories } = await loadMonthData();
+      return formatAnalysisFromReport({ dashboard, categories });
+    });
+
+  const onMonthly = () =>
+    run(async () => {
+      const { range, dashboard, categories, overview } = await loadMonthData();
+      return formatMonthlyReport({ startDate: range.startDate, endDate: range.endDate, dashboard, categories, overview });
+    });
+
+  const onForecast = () =>
+    run(async () => {
+      const { dashboard } = await loadMonthData();
+      return formatForecastLinear({ monthValue: month, dashboard, period });
+    });
+
+  const onBudget = () =>
+    run(async () => {
       if (!categoryId.trim()) throw { message: "Thiếu ID danh mục." };
       const res = await aiApi.suggestBudget(categoryId.trim());
       const s = res?.data ?? res;
-
-      // text mapping without JSON
       if (typeof s === "string" && s.trim()) return s;
 
       const lines = ["Dự toán (gợi ý ngân sách):"];
       if (s?.categoryName) lines.push(`- Danh mục: ${s.categoryName}`);
       if (typeof s?.suggestedAmount === "number") lines.push(`- Mức đề xuất: ${s.suggestedAmount}`);
       if (s?.reason) lines.push(`- Lý do: ${s.reason}`);
-
-      if (lines.length === 1) return "Không có dữ liệu dự toán.";
-      return lines.join("\n");
+      return lines.length === 1 ? "Không có dữ liệu dự toán." : lines.join("\n");
     });
 
   return (
@@ -179,42 +173,22 @@ export default function AiChatPanel() {
       <header className="ai-card__head">
         <div className="ai-stack">
           <h2 className="ai-title">Trợ lý AI</h2>
-          <div className="ai-sub">Chat là chính. Phân tích/báo cáo lấy dữ liệu tháng từ report endpoints.</div>
+          <div className="ai-sub">Chat là chính. Phân tích/báo cáo/dự báo lấy dữ liệu theo tháng.</div>
         </div>
       </header>
 
       <div className="ai-quick">
-        <button className="ai-btn ai-btn--ghost" onClick={runAlerts} disabled={busy}>
-          🔔 Cảnh báo
-        </button>
-
-        <button className="ai-btn ai-btn--ghost" onClick={runAnalysis} disabled={busy}>
-          💡 Phân tích
-        </button>
+        <button className="ai-btn ai-btn--ghost" onClick={onAlerts} disabled={busy}>🔔 Cảnh báo</button>
+        <button className="ai-btn ai-btn--ghost" onClick={onAnalysis} disabled={busy}>💡 Phân tích</button>
 
         <div className="ai-quick__group">
-          <input
-            className="ai-input ai-input--month"
-            type="month"
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-            aria-label="Chọn tháng"
-          />
-          <button className="ai-btn ai-btn--ghost" onClick={runMonthly} disabled={busy}>
-            📊 Báo cáo tháng
-          </button>
+          <input className="ai-input ai-input--month" type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
+          <button className="ai-btn ai-btn--ghost" onClick={onMonthly} disabled={busy}>📊 Báo cáo tháng</button>
         </div>
 
         <div className="ai-quick__group">
-          <input
-            className="ai-input"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            placeholder="ID danh mục"
-          />
-          <button className="ai-btn ai-btn--ghost" onClick={runSuggestBudget} disabled={busy || !categoryId.trim()}>
-            💰 Dự toán
-          </button>
+          <input className="ai-input" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} placeholder="ID danh mục" />
+          <button className="ai-btn ai-btn--ghost" onClick={onBudget} disabled={busy || !categoryId.trim()}>💰 Dự toán</button>
         </div>
 
         <div className="ai-quick__group">
@@ -224,9 +198,7 @@ export default function AiChatPanel() {
             <option value="quarter">Quý</option>
             <option value="year">Năm</option>
           </select>
-          <button className="ai-btn ai-btn--ghost" onClick={runForecast} disabled={busy}>
-            🔮 Dự báo
-          </button>
+          <button className="ai-btn ai-btn--ghost" onClick={onForecast} disabled={busy}>🔮 Dự báo</button>
         </div>
       </div>
 
@@ -241,9 +213,7 @@ export default function AiChatPanel() {
         {messages.map((m) => (
           <div key={m.id} className={`ai-msg ai-msg--${m.role}`}>
             <div className="ai-msg__meta">
-              <span className="ai-msg__role">
-                {m.role === "user" ? "Bạn" : m.role === "assistant" ? "AI" : "Hệ Thống"}
-              </span>
+              <span className="ai-msg__role">{m.role === "user" ? "Bạn" : m.role === "assistant" ? "AI" : "Hệ Thống"}</span>
               <span className="ai-dot">•</span>
               <span>{new Date(m.at).toLocaleTimeString("vi-VN")}</span>
             </div>
@@ -268,7 +238,7 @@ export default function AiChatPanel() {
           rows={3}
         />
         <button className="ai-btn ai-btn--primary" onClick={send} disabled={busy || !input.trim()}>
-          {busy ? "Đang gửi..." : "Gửi"}
+          {busy ? "..." : "Gửi"}
         </button>
       </div>
     </section>
