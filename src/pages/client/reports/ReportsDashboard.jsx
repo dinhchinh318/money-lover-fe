@@ -47,80 +47,38 @@ const ReportsDashboard = () => {
     const [comparisonTab, setComparisonTab] = useState("month");
     const [chartTab, setChartTab] = useState("month");
     const [chartData, setChartData] = useState([]);
-    const [isUsingTestData, setIsUsingTestData] = useState(false);
     const [categoryExpenseData, setCategoryExpenseData] = useState([]);
     const [categoryExpenseLoading, setCategoryExpenseLoading] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState(dayjs()); // Tháng hiện tại
     const [expandedCategories, setExpandedCategories] = useState([]);
 
-    // Hàm tạo dữ liệu test cho biểu đồ
-    const generateTestData = (period) => {
-        const testData = [];
-        let count = 0;
-
-        if (period === "week") {
-            count = 7;
-            for (let i = 0; i < count; i++) {
-                const weekStart = dayjs().subtract(count - 1 - i, "week").startOf("week");
-                testData.push({
-                    label: `Tuần ${weekStart.format("DD/MM")}`,
-                    expense: Math.floor(Math.random() * 5000000) + 1000000,
-                    income: Math.floor(Math.random() * 8000000) + 2000000,
-                });
-            }
-        } else if (period === "month") {
-            count = 6;
-            for (let i = 0; i < count; i++) {
-                const monthDate = dayjs().subtract(count - 1 - i, "month");
-                testData.push({
-                    label: monthDate.format("MM/YYYY"),
-                    expense: Math.floor(Math.random() * 15000000) + 5000000,
-                    income: Math.floor(Math.random() * 25000000) + 10000000,
-                });
-            }
-        } else {
-            // year
-            count = 6;
-            for (let i = 0; i < count; i++) {
-                const year = dayjs().subtract(count - 1 - i, "year").year();
-                testData.push({
-                    label: String(year),
-                    expense: Math.floor(Math.random() * 100000000) + 50000000,
-                    income: Math.floor(Math.random() * 200000000) + 100000000,
-                });
-            }
-        }
-
-        return testData;
-    };
-
     // Financial Overview Data
     const [overview, setOverview] = useState({
-        totalIncome: 5990000,
-        incomeChange: 5,
-        totalExpense: 1200000,
-        expenseChange: 10,
-        totalBalance: 3600000,
-        difference: -3000000,
+        totalIncome: 0,
+        incomeChange: 0,
+        totalExpense: 0,
+        expenseChange: 0,
+        totalBalance: 0,
+        difference: 0,
     });
 
     // Comparison Data
     const [comparison, setComparison] = useState({
         current: {
-            income: 12000000,
-            incomeChange: 5,
-            expense: 11200000,
-            expenseChange: -10,
-            balance: 5600000,
-            balanceChange: 20,
+            income: 0,
+            incomeChange: 0,
+            expense: 0,
+            expenseChange: 0,
+            balance: 0,
+            balanceChange: 0,
         },
         previous: {
-            income: 12000000,
-            incomeChange: 20,
-            expense: 11200000,
-            expenseChange: -10,
-            balance: 5000000,
-            balanceChange: -5,
+            income: 0,
+            incomeChange: 0,
+            expense: 0,
+            expenseChange: 0,
+            balance: 0,
+            balanceChange: 0,
         },
     });
 
@@ -228,7 +186,6 @@ const ReportsDashboard = () => {
                 setWalletFluctuations([]);
             }
         } catch (error) {
-            console.error("Error loading wallet changes:", error);
             setWalletFluctuations([]);
         }
     };
@@ -323,9 +280,7 @@ const ReportsDashboard = () => {
                             apiSuccess = true;
                         } else {
                             // API thành công nhưng không có dữ liệu trong khoảng thời gian
-                            // Vẫn set data rỗng từ API, không dùng test data
                             setChartData([]);
-                            setIsUsingTestData(false);
                             setChartLoading(false);
                             return;
                         }
@@ -431,19 +386,14 @@ const ReportsDashboard = () => {
                         }
 
                         setChartData(formattedData);
-                        setIsUsingTestData(false);
                         setChartLoading(false);
                         return;
                     }
                 }
             } catch (apiError) {
-                // Error calling API
+                // Error calling API - set empty data
+                setChartData([]);
             }
-
-            // Nếu API không thành công hoặc không có dữ liệu, dùng test data
-            const testData = generateTestData(period);
-            setChartData(testData);
-            setIsUsingTestData(true);
         } catch (error) {
             setChartData([]);
         } finally {
@@ -1039,11 +989,6 @@ const ReportsDashboard = () => {
                                 <h2 className="text-lg font-semibold text-gray-900">
                                     Biến động
                                 </h2>
-                                {isUsingTestData && (
-                                    <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full border border-yellow-300">
-                                        📊 Dữ liệu TEST
-                                    </span>
-                                )}
                             </div>
                             <Tabs
                                 activeKey={chartTab}

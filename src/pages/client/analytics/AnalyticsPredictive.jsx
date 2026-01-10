@@ -184,7 +184,7 @@ const AnalyticsPredictive = () => {
                         const sparkData = generateTrendSparkline(baseValue, trendValue, 5);
                         setSparklineTrend(sparkData);
                     } else {
-                        setSparklineTrend(generateSparklineFromData(100000, 5));
+                        setSparklineTrend([]);
                     }
 
                     // Tạo dữ liệu cho biểu đồ tháng
@@ -354,9 +354,6 @@ const AnalyticsPredictive = () => {
             }
 
         } catch (error) {
-            console.error("❌ [DỰ ĐOÁN VƯỢT NGÂN SÁCH] Lỗi:", error);
-            console.error("Error response:", error.response?.data);
-            console.error("Error message:", error.message);
             // Khi có lỗi, set về giá trị mặc định (rỗng)
             setBudgetOverruns([]);
             setBudgetChartData([]);
@@ -366,7 +363,6 @@ const AnalyticsPredictive = () => {
     // Helper function để tạo budget chart data
     const createBudgetChartData = (budgets) => {
         if (!Array.isArray(budgets) || budgets.length === 0) {
-            console.warn("⚠️ [CHART] Không có budgets để tạo chart");
             return [];
         }
 
@@ -383,7 +379,6 @@ const AnalyticsPredictive = () => {
 
         // Nếu không có limit, không tạo chart
         if (limit <= 0) {
-            console.warn("⚠️ [CHART] Không có limit hợp lệ cho chart");
             return [];
         }
 
@@ -472,7 +467,6 @@ const AnalyticsPredictive = () => {
                 setCategoryPredictions([]);
             }
         } catch (error) {
-            console.error("Error loading category predictions:", error);
             // Khi có lỗi, set về giá trị mặc định (rỗng)
             setCategoryPredictions([]);
         }

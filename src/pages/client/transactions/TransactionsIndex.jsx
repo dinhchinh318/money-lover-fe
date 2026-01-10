@@ -98,7 +98,6 @@ const TransactionsIndex = () => {
                 setWallets([]);
             }
         } catch (error) {
-            console.error("Error loading wallets:", error);
             setWallets([]);
         }
     };
@@ -113,7 +112,6 @@ const TransactionsIndex = () => {
                 setCategories([]);
             }
         } catch (error) {
-            console.error("Error loading categories:", error);
             setCategories([]);
         }
     };

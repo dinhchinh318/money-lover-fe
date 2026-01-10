@@ -133,7 +133,6 @@
 
 //       setRecentTransactions(transformedTransactions);
 //     } catch (error) {
-//       console.error("Error loading dashboard data:", error);
 //       message.error("Không thể tải dữ liệu!");
 //       // Không set mock data, chỉ set giá trị mặc định
 //       setStats({
@@ -231,7 +230,6 @@
 //         setCategoryExpenses([]);
 //       }
 //     } catch (error) {
-//       console.error("Error loading financial overview:", error);
 //       // Khi có lỗi, set về giá trị mặc định (0 hoặc mảng rỗng)
 //       setFinancialOverview({
 //         totalIncome: 0,
@@ -896,8 +894,6 @@ function HomePage() {
         }),
       ]);
 
-      console.log("API Responses:", { walletsRes, statsRes, transactionsRes });
-
       // wallets - Wallet API trả về format { EC: 0, data: [...] }
       let totalBalance = 0;
       if (walletsRes?.EC === 0 && Array.isArray(walletsRes?.data)) {
@@ -971,8 +967,6 @@ function HomePage() {
           endDate: monthEnd.format("YYYY-MM-DD"),
         }),
       ]);
-
-      console.log("Financial Overview Responses:", { overviewRes, categoryRes });
 
       if (overviewRes?.status === true && overviewRes?.data) {
         const data = overviewRes.data;

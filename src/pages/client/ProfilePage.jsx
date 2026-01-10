@@ -211,13 +211,11 @@ const ProfilePage = () => {
         message.success("Cập nhật ảnh đại diện thành công");
         onSuccess?.("ok");
       } else {
-        // ❗ CHỈ log, KHÔNG message.error
         console.warn("Upload OK but avatarUrl missing:", res?.data);
         onSuccess?.("ok"); // vẫn coi là thành công
       }
 
     } catch (err) {
-      // ❌ KHÔNG throw nữa
       console.error("Upload avatar error:", err);
 
       message.error(
