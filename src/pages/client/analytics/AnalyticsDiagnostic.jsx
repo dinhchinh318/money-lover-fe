@@ -91,8 +91,7 @@ const AnalyticsDiagnostic = () => {
         loadHabitsData(weeks, days),
       ]);
     } catch (error) {
-      console.error("Error loading diagnostic data:", error);
-      message.error("Có lỗi xảy ra khi tải dữ liệu");
+      message.error(t("analyticsDiagnostic.toast.loadError"));
     } finally {
       setLoading(false);
     }
@@ -127,7 +126,6 @@ const AnalyticsDiagnostic = () => {
         setWalletVariations([]);
       }
     } catch (error) {
-      console.error("Error loading variations data:", error);
       setCategorySpikes([]);
       setWalletVariations([]);
     }
@@ -281,8 +279,6 @@ const AnalyticsDiagnostic = () => {
         setSpike24h(null);
       }
     } catch (error) {
-      console.error("Error loading anomalies data:", error);
-      // Khi có lỗi, set về giá trị mặc định (rỗng)
       setMonthlySpikes([]);
       setMonthlyStats({ mean: 0, threshold: 0 });
       setUnusualLarge([]);
@@ -374,7 +370,6 @@ const AnalyticsDiagnostic = () => {
         setTransactionFreq(null);
       }
     } catch (error) {
-      console.error("Error loading habits data:", error);
       setSpendingDays([]);
       setFrequentCategories([]);
       setTransactionFreq(null);

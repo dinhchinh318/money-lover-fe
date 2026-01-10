@@ -92,7 +92,6 @@ function HomePage() {
         }),
       ]);
 
-      // wallets
       let totalBalance = 0;
       if (walletsRes?.EC === 0 && Array.isArray(walletsRes?.data)) {
         totalBalance = walletsRes.data.reduce((sum, wallet) => sum + (Number(wallet.balance) || 0), 0);

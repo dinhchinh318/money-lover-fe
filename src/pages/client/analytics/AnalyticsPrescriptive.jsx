@@ -64,7 +64,6 @@ const AnalyticsPrescriptive = () => {
                 loadAlerts(),
             ]);
         } catch (error) {
-            console.error("Error loading prescriptive data:", error);
             message.error("Có lỗi xảy ra khi tải dữ liệu");
         } finally {
             setLoading(false);
@@ -109,7 +108,6 @@ const AnalyticsPrescriptive = () => {
 
             setBudgetSuggestions(budgetSuggestions);
         } catch (error) {
-            console.error("❌ Error loading optimize data:", error);
             // Khi có lỗi, set về giá trị mặc định (rỗng)
             setOptimizeSuggestions([]);
             setBudgetSuggestions([]);
@@ -134,7 +132,6 @@ const AnalyticsPrescriptive = () => {
 
             setTransferSuggestions(suggestions);
         } catch (error) {
-            console.error("❌ Error loading transfer data:", error);
             // Khi có lỗi, set về giá trị mặc định (rỗng)
             setTransferSuggestions([]);
         }
@@ -146,7 +143,7 @@ const AnalyticsPrescriptive = () => {
             try {
                 await createSmartAlertsAPI({});
             } catch (createError) {
-                console.warn("Could not create new alerts, will load existing ones:", createError);
+                // Tiếp tục load alerts hiện có nếu không tạo được mới
             }
 
             // Sau đó load lịch sử cảnh báo
@@ -166,7 +163,6 @@ const AnalyticsPrescriptive = () => {
             setAlerts(alertData);
             setUnreadCount(alertData.filter((a) => !a.isRead).length);
         } catch (error) {
-            console.error("Error loading alerts:", error);
             // Khi có lỗi, set về giá trị mặc định (rỗng)
             setAlerts([]);
             setUnreadCount(0);
@@ -196,7 +192,6 @@ const AnalyticsPrescriptive = () => {
                 message.error(res?.message || "Có lỗi xảy ra khi áp dụng ngân sách");
             }
         } catch (error) {
-            console.error("Error applying budget:", error);
             message.error("Có lỗi xảy ra khi áp dụng ngân sách");
         }
     };
@@ -231,7 +226,6 @@ const AnalyticsPrescriptive = () => {
                 message.error(res?.message || "Có lỗi xảy ra khi chuyển tiền");
             }
         } catch (error) {
-            console.error("Error transferring money:", error);
             message.error(error?.response?.data?.message || "Có lỗi xảy ra khi chuyển tiền");
         } finally {
             setTransferring(false);

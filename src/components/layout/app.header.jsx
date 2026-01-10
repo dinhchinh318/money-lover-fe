@@ -1,3 +1,4 @@
+// src/components/layout/AppHeader.jsx
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   LogOut,
@@ -20,10 +21,13 @@ import {
   Plus,
   Users,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Dropdown, message, Avatar, Badge } from "antd";
 import { useCurrentApp } from "../context/app.context";
 import { logoutAPI } from "../../services/api.user";
+
+// ✅ notifications API
+import { getNotificationsAPI } from "../../services/api.notification";
 
 // ✅ i18n
 import { useTranslation } from "react-i18next";
@@ -41,6 +45,9 @@ const AppHeader = () => {
   } = useCurrentApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // ✅ show dot only when have unread notifications
+  const [hasUnread, setHasUnread] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -97,6 +104,43 @@ const AppHeader = () => {
       message.error(t("header.toast.systemError"));
     }
   };
+
+  // ===== Notifications dot logic (NO business logic change) =====
+  const isReadNoti = (n) => Boolean(n?.isRead ?? n?.read);
+  const isDeletedNoti = (n) => Boolean(n?.deleted || n?.deletedAt || n?.isDeleted);
+
+  const extractArray = (root) => {
+    if (!root) return [];
+    const arr = root?.data?.items || root?.data || root?.items || root;
+    return Array.isArray(arr) ? arr : [];
+  };
+
+  const fetchUnreadFlag = async () => {
+    if (!isAuthenticated) {
+      setHasUnread(false);
+      return;
+    }
+    try {
+      const res = await getNotificationsAPI();
+      const arr = extractArray(res?.data);
+      const unread = arr.some((n) => !isReadNoti(n) && !isDeletedNoti(n));
+      setHasUnread(unread);
+    } catch (e) {
+      // nếu lỗi thì không hiển thị dot để tránh gây hiểu nhầm
+      setHasUnread(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnreadFlag();
+
+    // refresh khi quay lại tab/browser
+    const onFocus = () => fetchUnreadFlag();
+    window.addEventListener("focus", onFocus);
+
+    return () => window.removeEventListener("focus", onFocus);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, location.pathname]);
 
   // ===== Nav Data (useMemo để update khi đổi ngôn ngữ) =====
   const mainNav = useMemo(
@@ -294,7 +338,7 @@ const AppHeader = () => {
               </button>
             )}
 
-            {/* Notification */}
+            {/* Notification (✅ dot chỉ hiện khi có unread) */}
             {isAuthenticated && (
               <button
                 onClick={() => goAndScroll("/notification")}
@@ -302,9 +346,13 @@ const AppHeader = () => {
                 title={t("header.actions.notifications")}
                 aria-label={t("header.actions.notifications")}
               >
-                <Badge dot color="#10b981" offset={[-2, 2]}>
+                {hasUnread ? (
+                  <Badge dot color="#10b981" offset={[-2, 2]}>
+                    <Bell size={22} />
+                  </Badge>
+                ) : (
                   <Bell size={22} />
-                </Badge>
+                )}
               </button>
             )}
 

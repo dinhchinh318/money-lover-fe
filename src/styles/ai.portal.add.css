@@ -1,0 +1,14 @@
+
+/* Portal layer must receive clicks while portal root blocks pointer events */
+.ai-portal-layer{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+}
+
+/* Re-enable clicks for widget/button */
+.ai-float-btn,
+.ai-widget{
+  pointer-events: auto;
+}
