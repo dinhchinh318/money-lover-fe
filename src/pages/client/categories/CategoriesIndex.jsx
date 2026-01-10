@@ -1,12 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Folder,
-  TrendingUp,
-  Search,
-} from "lucide-react";
+import { Plus, Edit, Trash2, Folder, TrendingUp, Search } from "lucide-react";
 import { message, Modal, Pagination, Input } from "antd";
 import {
   getCategoriesAPI,
@@ -15,7 +8,12 @@ import {
 } from "../../../services/api.category";
 import CategoryModal from "../../../components/categories/CategoryModal";
 
+// ✅ i18n
+import { useTranslation } from "react-i18next";
+
 const CategoriesIndex = () => {
+  const { t } = useTranslation();
+
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,14 +25,14 @@ const CategoriesIndex = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
-  // optional: search theo tên (giúp nhiều danh mục)
+  // search by name
   const [q, setQ] = useState("");
 
   useEffect(() => {
     loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // reset về trang 1 khi đổi tab / đổi search / đổi data
   useEffect(() => {
     setPage(1);
   }, [activeTab, q, categories.length]);
@@ -46,10 +44,10 @@ const CategoriesIndex = () => {
       if (res?.EC === 0 && res?.data) {
         setCategories(Array.isArray(res.data) ? res.data : []);
       } else {
-        message.error("Không thể tải danh sách danh mục!");
+        message.error(t("categories.toast.loadFail"));
       }
     } catch (error) {
-      message.error("Có lỗi xảy ra khi tải danh sách danh mục!");
+      message.error(t("categories.toast.loadFail"));
     } finally {
       setLoading(false);
     }
@@ -106,22 +104,22 @@ const CategoriesIndex = () => {
 
   const handleDeleteCategory = (category) => {
     Modal.confirm({
-      title: "Xác nhận xóa danh mục",
-      content: `Bạn có chắc chắn muốn xóa danh mục "${category.name}"?`,
-      okText: "Xóa",
+      title: t("categories.confirm.deleteTitle"),
+      content: t("categories.confirm.deleteContent", { name: category?.name || "" }),
+      okText: t("common3.delete"),
       okType: "danger",
-      cancelText: "Hủy",
+      cancelText: t("common3.cancel"),
       onOk: async () => {
         try {
           const res = await deleteCategoryAPI(category._id);
           if (res?.EC === 0) {
-            message.success("Xóa danh mục thành công!");
+            message.success(t("categories.toast.deleteSuccess"));
             loadCategories();
           } else {
-            message.error(res?.message || "Xóa danh mục thất bại!");
+            message.error(res?.message || t("categories.toast.deleteFail"));
           }
         } catch (error) {
-          message.error("Có lỗi xảy ra!");
+          message.error(t("common3.error"));
         }
       },
     });
@@ -131,23 +129,23 @@ const CategoriesIndex = () => {
     try {
       const res = await setDefaultCategoryAPI(category._id);
       if (res?.EC === 0) {
-        message.success("Đặt làm danh mục mặc định thành công!");
+        message.success(t("categories.toast.setDefaultSuccess"));
         loadCategories();
       } else {
-        message.error(res?.message || "Thất bại!");
+        message.error(res?.message || t("categories.toast.setDefaultFail"));
       }
     } catch (error) {
-      message.error("Có lỗi xảy ra!");
+      message.error(t("common3.error"));
     }
   };
 
   const tabs = [
-    { key: "all", label: "Tất cả" },
-    { key: "income", label: "Thu nhập", color: "#10B981" },
-    { key: "expense", label: "Chi tiêu", color: "#EF4444" },
+    { key: "all", label: t("categories.tabs.all") },
+    { key: "income", label: t("categories.tabs.income"), color: "#10B981" },
+    { key: "expense", label: t("categories.tabs.expense"), color: "#EF4444" },
   ];
 
-  // FILTER + SEARCH (memo)
+  // FILTER + SEARCH
   const filteredCategories = useMemo(() => {
     let filtered = [...categories];
 
@@ -162,32 +160,44 @@ const CategoriesIndex = () => {
     return filtered;
   }, [categories, activeTab, q]);
 
-  // PAGINATION (memo)
+  // PAGINATION
   const total = filteredCategories.length;
   const pagedCategories = useMemo(() => {
     const start = (page - 1) * pageSize;
     return filteredCategories.slice(start, start + pageSize);
   }, [filteredCategories, page, pageSize]);
 
+  const emptyText =
+    activeTab === "income"
+      ? t("categories.empty.income")
+      : activeTab === "expense"
+      ? t("categories.empty.expense")
+      : t("categories.empty.all");
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
+    <div
+      className="
+        min-h-screen
+        bg-gradient-to-b from-emerald-50/70 via-white to-white
+        dark:bg-none dark:bg-[var(--color-background)]
+      "
+    >
       <div className="max-w-[95%] mx-auto px-2 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-10">
         {/* Header */}
         <div className="flex items-center justify-between gap-3 mb-4">
           <h1 className="ds-heading-1" style={{ fontSize: "24px", fontWeight: 700 }}>
-            Quản lý Danh mục
+            {t("categories.title")}
           </h1>
 
-          {/* Nút thêm: mobile chỉ dấu + */}
           <button
             onClick={handleAddCategory}
             className="ds-button-primary"
             style={{ display: "flex", alignItems: "center", gap: "8px" }}
-            aria-label="Thêm danh mục"
-            title="Thêm danh mục"
+            aria-label={t("categories.actions.addAria")}
+            title={t("categories.actions.addTitle")}
           >
             <Plus size={18} />
-            <span className="hidden sm:inline">Thêm danh mục</span>
+            <span className="hidden sm:inline">{t("categories.actions.add")}</span>
           </button>
         </div>
 
@@ -217,7 +227,7 @@ const CategoriesIndex = () => {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               allowClear
-              placeholder="Tìm danh mục theo tên..."
+              placeholder={t("categories.search.placeholder")}
               prefix={<Search size={16} className="text-slate-400" />}
               className="h-11 rounded-xl"
             />
@@ -248,7 +258,7 @@ const CategoriesIndex = () => {
                           handleSetDefault(category);
                         }}
                         className="p-2 bg-white rounded-lg shadow-md hover:bg-green-50 transition-colors"
-                        title="Đặt làm mặc định"
+                        title={t("categories.actions.setDefault")}
                       >
                         <TrendingUp size={16} className="text-[#10B981]" />
                       </button>
@@ -260,7 +270,7 @@ const CategoriesIndex = () => {
                         handleEditCategory(category);
                       }}
                       className="p-2 bg-white rounded-lg shadow-md hover:bg-[#F9FAFB] transition-colors"
-                      title="Chỉnh sửa"
+                      title={t("common3.edit")}
                     >
                       <Edit size={16} className="text-[#6B7280]" />
                     </button>
@@ -271,27 +281,29 @@ const CategoriesIndex = () => {
                         handleDeleteCategory(category);
                       }}
                       className="p-2 bg-white rounded-lg shadow-md hover:bg-red-50 transition-colors"
-                      title="Xóa"
+                      title={t("common3.delete")}
                     >
                       <Trash2 size={16} className="text-[#EF4444]" />
                     </button>
                   </div>
 
-                  {/* Badge loại */}
+                  {/* Type badge */}
                   <div className="absolute top-2 left-2">
                     <span
                       className={`ds-badge ${
                         category.type === "income" ? "ds-badge-success" : "ds-badge-danger"
                       }`}
                     >
-                      {category.type === "income" ? "Thu nhập" : "Chi tiêu"}
+                      {category.type === "income"
+                        ? t("categories.type.income")
+                        : t("categories.type.expense")}
                     </span>
                   </div>
 
-                  {/* Badge mặc định */}
+                  {/* Default badge */}
                   {category.is_default && (
                     <div className="absolute top-2 left-2 mt-6">
-                      <span className="ds-badge ds-badge-primary">Mặc định</span>
+                      <span className="ds-badge ds-badge-primary">{t("categories.badge.default")}</span>
                     </div>
                   )}
 
@@ -309,10 +321,11 @@ const CategoriesIndex = () => {
                   {/* Name */}
                   <div className="text-center">
                     <h3 className="ds-heading-3 mb-2 line-clamp-2">{category.name}</h3>
+
                     {category.parent_id && (
                       <p className="ds-text-small text-[#6B7280]">
                         <Folder size={12} className="inline mr-1" />
-                        Danh mục con
+                        {t("categories.badge.child")}
                       </p>
                     )}
                   </div>
@@ -323,15 +336,11 @@ const CategoriesIndex = () => {
             {/* Pagination */}
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-sm text-slate-600">
-                Hiển thị{" "}
-                <span className="font-semibold text-slate-800">
-                  {(page - 1) * pageSize + 1}
-                </span>
+                {t("categories.pagination.showing")}{" "}
+                <span className="font-semibold text-slate-800">{(page - 1) * pageSize + 1}</span>
                 {" - "}
-                <span className="font-semibold text-slate-800">
-                  {Math.min(page * pageSize, total)}
-                </span>{" "}
-                / {total} danh mục
+                <span className="font-semibold text-slate-800">{Math.min(page * pageSize, total)}</span>{" "}
+                / {total} {t("categories.pagination.items")}
               </div>
 
               <Pagination
@@ -351,16 +360,11 @@ const CategoriesIndex = () => {
         ) : (
           <div className="ds-empty-state">
             <Folder className="ds-empty-state-icon" size={64} />
-            <p className="ds-empty-state-text">
-              {activeTab === "income"
-                ? "Chưa có danh mục thu nhập nào"
-                : activeTab === "expense"
-                ? "Chưa có danh mục chi tiêu nào"
-                : "Chưa có danh mục nào"}
-            </p>
+            <p className="ds-empty-state-text">{emptyText}</p>
+
             <button onClick={handleAddCategory} className="ds-button-primary mt-4">
               <Plus size={18} />
-              <span className="hidden sm:inline ml-2">Thêm danh mục đầu tiên</span>
+              <span className="hidden sm:inline ml-2">{t("categories.actions.addFirst")}</span>
             </button>
           </div>
         )}

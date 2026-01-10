@@ -1,0 +1,2132 @@
+{
+  "settings": {
+    "title": "App Settings",
+    "subtitle": "Customize your personal experience and security",
+
+    "editBtn": "Edit settings",
+    "saveBtn": "Save",
+    "cancelBtn": "Cancel",
+
+    "reset": "Restore defaults",
+    "resetConfirm": "Confirm reset?",
+
+    "booleanHint": "Toggle this option",
+    "advancedConfig": "Advanced configuration",
+
+    "mode": {
+      "view": "View mode",
+      "editing": "Editing"
+    },
+
+    "groups": {
+      "security": "Account Security",
+      "notification": "Notifications & Reminders",
+      "display": "Appearance & Language",
+      "other": "Other Settings"
+    },
+
+    "placeholders": {
+      "select": "Select a value...",
+      "input": "Enter a value...",
+      "number": "Enter a number..."
+    },
+
+    "toast": {
+      "serverError": "Cannot connect to settings server",
+      "updated": "Settings updated successfully",
+      "updateError": "Update failed"
+    },
+
+    "count": {
+      "options": "{{count}} options",
+      "items": "{{count}} items"
+    },
+
+    "options": {
+      "language": {
+        "vi": "Vietnamese",
+        "en": "English"
+      },
+      "currency": {
+        "vnd": "VND (₫)"
+      },
+      "theme": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "notif": {
+        "instant": "Instant",
+        "daily": "Daily",
+        "weekly": "Weekly"
+      }
+    },
+
+    "fieldLabels": {
+      "transactions": "Transactions",
+      "transaction": "Transaction",
+      "budgets": "Budgets",
+      "budget": "Budget",
+      "wallets": "Wallets",
+      "wallet": "Wallet",
+      "categories": "Categories",
+      "category": "Category",
+      "reports": "Reports",
+      "analytics": "Analytics",
+      "notifications": "Notifications",
+      "profile": "Profile",
+      "groups": "Groups",
+      "savingGoals": "Saving goals",
+      "recurringBills": "Recurring bills"
+    }
+  },
+  "footer": {
+    "logoAlt": "Money Lover Logo",
+    "about": "A modern expense and income management app that helps you control your finances easily and effectively.",
+
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "X (Twitter)",
+      "instagram": "Instagram"
+    },
+
+    "contact": {
+      "title": "Contact",
+      "hotlineHint": "Support hotline",
+      "emailHint": "Support email",
+      "city": "Ho Chi Minh City",
+      "country": "Vietnam"
+    },
+
+    "support": {
+      "title": "Customer support",
+      "faq": "FAQs",
+      "faqHint": "Find quick answers",
+      "hours": "Working hours",
+      "hoursValue": "7:00 AM - 8:00 PM daily",
+      "more": "See more"
+    },
+
+    "quickLinks": {
+      "title": "Quick links",
+      "home": "Home",
+      "transactions": "Transactions",
+      "reports": "Reports",
+      "analytics": "Analytics"
+    },
+
+    "copyright": "Copyright © {{year}} MoneyLover.",
+    "rights": "All rights reserved.",
+    "madeWith": "Made with",
+    "inVietnam": "in Vietnam"
+  },
+  "header": {
+    "brandTagline": "Smart Finance",
+    "more": "More",
+
+    "userFallbackName": "User",
+
+    "toast": {
+      "logoutSuccess": "Logged out successfully",
+      "systemError": "System error"
+    },
+
+    "nav": {
+      "overview": "Overview",
+      "transactions": "Transactions",
+      "wallets": "My wallets",
+      "budgets": "Budgets",
+      "reports": "Reports"
+    },
+
+    "tools": {
+      "categories": "Categories",
+      "recurringBills": "Recurring bills",
+      "savingGoals": "Saving goals",
+      "analytics": "Analytics",
+      "aiCenter": "AI Center",
+      "groups": "Groups"
+    },
+
+    "userMenu": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+
+    "auth": {
+      "login": "Login",
+      "getStarted": "Get started"
+    },
+
+    "actions": {
+      "addTransaction": "Add transaction",
+      "notifications": "Notifications"
+    },
+
+    "mobile": {
+      "mainMenu": "Main menu",
+      "tools": "Tools",
+      "logout": "Exit app",
+      "loginNow": "Login now"
+    },
+
+    "aria": {
+      "goHome": "Go home",
+      "openUserMenu": "Open user menu",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    }
+  },
+  "profile": {
+    "title": "Personal information",
+    "mode": { "view": "View mode", "editing": "Editing" },
+
+    "sections": {
+      "basic": "BASIC INFO",
+      "contact": "CONTACT & ADDRESS",
+      "bio": "ABOUT"
+    },
+
+    "fields": {
+      "displayName": "Display name",
+      "gender": "Gender",
+      "dateOfBirth": "Date of birth",
+      "email": "Email address",
+      "phone": "Phone number",
+      "address": "Address",
+      "bio": "Bio"
+    },
+
+    "gender": { "male": "Male", "female": "Female" },
+
+    "placeholders": {
+      "date": "Select date of birth",
+      "bio": "Example: I aim to save 20% of my monthly income...",
+      "input": "Enter {{field}}..."
+    },
+
+    "hints": { "emailLocked": "Email cannot be changed" },
+
+    "validation": { "phoneInvalid": "Invalid phone number" },
+
+    "actions": {
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "reload": "Reload",
+      "update": "Update profile"
+    },
+
+    "confirm": {
+      "cancelTitle": "Cancel editing?",
+      "cancelDesc": "All changes will be discarded and reverted.",
+      "cancelOk": "Discard changes",
+      "cancelNo": "Continue editing"
+    },
+
+    "toast": {
+      "serverError": "Cannot connect to server",
+      "cancelled": "Edits cancelled",
+      "updated": "Profile updated successfully",
+      "updateFail": "Update failed, please check your connection"
+    },
+
+    "avatar": {
+      "change": "Avatar",
+      "tooLarge": "Image must be under 2MB",
+      "updated": "Avatar updated successfully",
+      "uploadError": "Cannot upload image"
+    },
+
+    "badge": { "trusted": "Trusted profile" },
+
+    "completion": {
+      "title": "Completion",
+      "hint": "Complete your profile for a better personalized experience."
+    },
+
+    "notFound": {
+      "title": "Profile not found",
+      "subtitle": "An error occurred while loading user data.",
+      "retry": "Try again"
+    },
+
+    "fallback": { "displayName": "User" }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": {
+      "before": "You have",
+      "after": "new unread notifications"
+    },
+
+    "actions": {
+      "reload": "Reload",
+      "readAll": "Mark all as read"
+    },
+
+    "tabs": {
+      "all": "All ({{count}})",
+      "unread": "Unread",
+      "read": "Read",
+      "deleted": "Deleted"
+    },
+
+    "empty": "No notifications found",
+    "systemTitle": "System notification",
+    "justNow": "Just now",
+
+    "tooltips": {
+      "detail": "View details",
+      "markRead": "Mark as read",
+      "restore": "Restore",
+      "delete": "Delete"
+    },
+
+    "tags": {
+      "new": "New",
+      "deleted": "Deleted"
+    },
+
+    "confirm": {
+      "deleteTitle": "Delete this notification?"
+    },
+
+    "detail": {
+      "title": "Notification details",
+      "close": "Close",
+      "sentAt": "Sent at"
+    },
+
+    "toast": {
+      "fetchError": "Failed to load notifications",
+      "actionFail": "Action failed",
+      "allRead": "All notifications marked as read",
+      "markedRead": "Marked as read",
+      "restored": "Restored",
+      "movedToTrash": "Moved to trash"
+    }
+  },
+  "wallets": {
+    "title": "Wallet Manager",
+    "subtitle": "Track and manage all your wallets",
+    "resultSuffix": "results",
+
+    "actions": {
+      "add": "Add wallet",
+      "clearFilters": "Clear filters",
+      "setDefault": "Default"
+    },
+
+    "summary": {
+      "totalWallets": "Total wallets",
+      "totalBalance": "Total balance",
+      "cashWallets": "Cash",
+      "bankWallets": "Bank"
+    },
+
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "archived": "Archived"
+    },
+
+    "filters": {
+      "type": {
+        "all": "All types",
+        "cash": "Cash",
+        "bank": "Bank"
+      }
+    },
+
+    "search": {
+      "placeholder": "Search by wallet / bank name..."
+    },
+
+    "sort": {
+      "default_first": "Default first",
+      "balance_desc": "Balance (desc)",
+      "name_asc": "Name A → Z",
+      "updated_desc": "Recently updated"
+    },
+
+    "pagination": {
+      "show": "Show",
+      "perPage": "{{n}}/page"
+    },
+
+    "list": {
+      "summary": "{{total}} wallets • Page {{page}}"
+    },
+
+    "labels": {
+      "cash": "Cash",
+      "bank": "Bank",
+      "balance": "Balance",
+      "isDefault": "Default wallet"
+    },
+
+    "badges": {
+      "default": "Default",
+      "archived": "Archived"
+    },
+
+    "tooltips": {
+      "setDefault": "Set as default",
+      "archive": "Archive wallet",
+      "unarchive": "Restore wallet"
+    },
+
+    "menu": {
+      "edit": "Edit",
+      "setDefault": "Set as default",
+      "archive": "Archive",
+      "unarchive": "Restore",
+      "delete": "Delete"
+    },
+
+    "confirm": {
+      "delete": {
+        "title": "Delete wallet",
+        "content": "Are you sure you want to delete wallet \"{{name}}\"? This action cannot be undone.",
+        "ok": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+
+    "empty": {
+      "all": {
+        "title": "No wallets yet"
+      },
+      "active": {
+        "title": "No active wallets"
+      },
+      "archived": {
+        "title": "No archived wallets",
+        "desc": "Your archived wallets will appear here"
+      },
+      "common": {
+        "desc": "Start by creating your first wallet"
+      }
+    },
+
+    "toast": {
+      "fetchFail": "Failed to load wallets!",
+      "fetchError": "Something went wrong while loading wallets!",
+      "deleteSuccess": "Wallet deleted successfully!",
+      "deleteFail": "Failed to delete wallet!",
+      "setDefaultSuccess": "Default wallet set successfully!",
+      "archiveSuccess": "Wallet archived successfully!",
+      "unarchiveSuccess": "Wallet restored successfully!",
+      "actionFail": "Action failed!",
+      "genericError": "Something went wrong!"
+    }
+  },
+  "walletDetail": {
+    "loading": "Loading...",
+    "tabs": {
+      "info": "Info",
+      "transactions": "Transactions",
+      "statistics": "Statistics"
+    },
+    "labels": {
+      "cash": "Cash",
+      "bank": "Bank",
+      "balance": "Balance",
+      "updatedAt": "Updated",
+      "cashWallet": "Cash wallet",
+      "bankWallet": "Bank wallet"
+    },
+    "badges": {
+      "default": "Default",
+      "archived": "Archived"
+    },
+    "actions": {
+      "back": "Back",
+      "edit": "Edit wallet",
+      "editShort": "Edit",
+      "more": "Actions",
+      "setDefault": "Set as default",
+      "archive": "Archive",
+      "unarchive": "Restore",
+      "delete": "Delete wallet",
+      "loadMore": "Load more",
+      "loadingMore": "Loading..."
+    },
+    "filters": {
+      "allTime": "All time",
+      "txTitle": "Filter transactions",
+      "statsTitle": "Statistics filters"
+    },
+    "summary": {
+      "income": "Total income",
+      "expense": "Total expense",
+      "net": "Net change",
+      "balance": "Balance"
+    },
+    "txList": {
+      "title": "Transaction list",
+      "subtitle": "Grouped by day for easier tracking",
+      "count": "{{n}} items"
+    },
+    "empty": {
+      "tx": {
+        "title": "No transactions yet",
+        "hint": "Try another date range or add transactions to start tracking cash flow."
+      },
+      "stats": {
+        "title": "No data for statistics",
+        "hint": "Try another date range or add transactions to display charts."
+      },
+      "pie": {
+        "title": "No expense data",
+        "hint": "Add expense transactions to see the allocation chart."
+      }
+    },
+    "endOfList": "All transactions loaded",
+    "mobileActions": {
+      "title": "Wallet actions",
+      "cannotDeleteDefault": "* You can't delete the default wallet. Set another wallet as default first."
+    },
+    "charts": {
+      "cumulative": {
+        "title": "Cumulative change",
+        "subtitle": "By day (cumulative balance change)",
+        "total": "Total change"
+      },
+      "inout": {
+        "title": "Income / Expense by day",
+        "subtitle": "Compare cash in and cash out"
+      },
+      "pie": {
+        "title": "Expense allocation",
+        "subtitle": "By category",
+        "totalExpense": "Total expense"
+      }
+    },
+    "legend": {
+      "cumulative": "Cumulative",
+      "income": "Income",
+      "expense": "Expense"
+    },
+    "tx": {
+      "type": {
+        "transfer": "Transfer",
+        "adjust": "Adjust",
+        "other": "Other"
+      },
+      "desc": {
+        "transferTo": "To wallet: {{name}}",
+        "adjust": "Adjust: {{from}} → {{to}}"
+      }
+    },
+    "confirm": {
+      "delete": {
+        "title": "Delete wallet",
+        "content": "Are you sure you want to delete wallet \"{{name}}\"? This action cannot be undone.",
+        "ok": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+    "toast": {
+      "notFound": "Wallet not found!",
+      "loadWalletError": "Failed to load wallet information!",
+      "loadTxFail": "Failed to load transactions!",
+      "loadTxError": "Failed to load transactions!",
+      "deleteSuccess": "Wallet deleted successfully!",
+      "deleteFail": "Failed to delete wallet!",
+      "setDefaultSuccess": "Default wallet set successfully!",
+      "archiveSuccess": "Wallet archived successfully!",
+      "unarchiveSuccess": "Wallet restored successfully!",
+      "actionFail": "Action failed!",
+      "genericError": "Something went wrong!"
+    }
+  },
+  "transactions": {
+    "title": "Transactions",
+    "subtitle": "Manage and track all your transactions",
+
+    "tabs": {
+      "all": "All",
+      "income": "Income",
+      "expense": "Expense",
+      "transfer": "Transfer",
+      "debtLoan": "Debt & Loan",
+      "recurring": "Recurring"
+    },
+
+    "type": {
+      "income": "Income",
+      "expense": "Expense",
+      "transfer": "Transfer",
+      "debt": "Debt receivable",
+      "loan": "Debt payable",
+      "adjust": "Adjust"
+    },
+
+    "date": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+
+    "actions": {
+      "add": "Add transaction",
+      "filter": "Filter",
+      "edit": "Edit",
+      "editShort": "Edit",
+      "delete": "Delete",
+      "clearFilters": "Clear filters",
+      "done": "Done"
+    },
+
+    "filters": {
+      "dateRange": "Date range",
+      "type": "Transaction type",
+      "wallet": "Wallet",
+      "category": "Category",
+      "all": "All",
+      "allWallets": "All wallets",
+      "allCategories": "All categories",
+      "onlyRecurring": "Recurring only"
+    },
+
+    "quick": {
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "year": "This year"
+    },
+
+    "summary": {
+      "totalIncome": "Total income",
+      "totalExpense": "Total expense",
+      "totalWalletBalance": "Wallet balance",
+      "transactionCount": "Transactions"
+    },
+
+    "badges": {
+      "recurring": "Recurring",
+      "settledShort": "Settled"
+    },
+
+    "loaded": {
+      "prefix": "Loaded",
+      "pullToLoad": "• Pull to load more",
+      "allLoaded": "• All loaded"
+    },
+
+    "pageSize": {
+      "20": "20 / page",
+      "30": "30 / page",
+      "50": "50 / page"
+    },
+
+    "empty": {
+      "title": "No transactions yet",
+      "hint": "Add your first transaction to get started"
+    },
+
+    "footer": {
+      "loading": "Loading...",
+      "pullToLoad": "Pull to load more",
+      "allLoaded": "All loaded"
+    },
+
+    "drawer": {
+      "title": "Filters"
+    },
+
+    "confirm": {
+      "delete": {
+        "title": "Delete transaction",
+        "content": "Are you sure you want to delete this transaction?",
+        "ok": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+
+    "toast": {
+      "loadListFail": "Unable to load transactions!",
+      "loadListError": "Something went wrong while loading transactions!",
+      "deleteSuccess": "Transaction deleted successfully!",
+      "deleteFail": "Failed to delete transaction!",
+      "genericError": "Something went wrong!"
+    }
+  },
+  "transactionDetail": {
+    "loading": "Loading...",
+    "back": "Back to transactions",
+
+    "fields": {
+      "wallet": "Wallet:",
+      "category": "Category:",
+      "toWallet": "To wallet:",
+      "counterparty": "Counterparty:",
+      "contact": "Contact:",
+      "dueDate": "Due date:",
+      "note": "Note:",
+      "adjustReason": "Adjust reason:",
+      "image": "Image:"
+    },
+
+    "imageAlt": "Receipt",
+
+    "badges": {
+      "recurring": "Recurring",
+      "settled": "Settled"
+    },
+
+    "recurring": {
+      "title": "Recurring transaction",
+      "repeat": "Repeats",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "endDate": "End date",
+      "viewAll": "View all recurring transactions"
+    },
+
+    "actions": {
+      "edit": "Edit",
+      "settle": "Mark as settled",
+      "delete": "Delete"
+    },
+
+    "related": {
+      "title": "Related transactions"
+    },
+
+    "confirm": {
+      "delete": {
+        "title": "Delete transaction",
+        "content": "Are you sure you want to delete this transaction?",
+        "ok": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+
+    "toast": {
+      "notFound": "Transaction not found!",
+      "loadError": "Failed to load transaction details!",
+      "deleteSuccess": "Transaction deleted successfully!",
+      "deleteFail": "Failed to delete transaction!",
+      "settleSuccess": "Marked as settled successfully!",
+      "actionFail": "Action failed!",
+      "genericError": "Something went wrong!"
+    }
+  },
+  "savingGoals": {
+    "title": "Saving Goals",
+    "subtitle": "Track and achieve your financial goals",
+
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed"
+    },
+
+    "summary": {
+      "totalGoals": "Total goals",
+      "totalTarget": "Total target",
+      "totalSaved": "Saved",
+      "avgProgress": "Avg progress"
+    },
+
+    "labels": {
+      "remaining": "Remaining",
+      "progress": "Progress",
+      "targetDate": "Target date:",
+      "timeRemaining": "Time left:"
+    },
+
+    "badges": {
+      "completed": "Completed",
+      "paused": "Paused",
+      "dueSoon": "Due soon",
+      "overdue": "Overdue"
+    },
+
+    "date": {
+      "noDeadline": "No deadline"
+    },
+
+    "time": {
+      "overdue": "Overdue",
+      "daysLeft": "{{days}} days left"
+    },
+
+    "actions": {
+      "add": "Add goal",
+      "addFirst": "Add your first goal",
+      "edit": "Edit",
+      "delete": "Delete",
+      "markCompleted": "Mark as completed",
+      "deposit": "+ Deposit",
+      "withdraw": "− Withdraw"
+    },
+
+    "confirm": {
+      "complete": {
+        "title": "Mark as completed?",
+        "content": "After completing, progress will be locked at 100%.",
+        "ok": "Complete",
+        "cancel": "Cancel"
+      },
+      "delete": {
+        "title": "Delete goal",
+        "content": "Are you sure you want to delete \"{{name}}\"?",
+        "ok": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+
+    "empty": {
+      "allTitle": "No goals yet",
+      "activeTitle": "No active goals",
+      "completedTitle": "No completed goals",
+      "subtitle": "Create a saving goal to reach your dreams"
+    },
+
+    "moneyModal": {
+      "depositTitle": "Deposit to goal",
+      "withdrawTitle": "Withdraw to wallet",
+      "amountPlaceholder": "Enter amount",
+      "invalidAmount": "Please enter a valid amount",
+      "withdrawTooMuch": "Cannot withdraw more than saved amount",
+      "ok": "Confirm",
+      "cancel": "Cancel"
+    },
+
+    "toast": {
+      "loadFail": "Failed to load goals!",
+      "loadError": "An error occurred while loading goals!",
+      "deleteSuccess": "Goal deleted successfully!",
+      "deleteFail": "Delete failed!",
+      "completeSuccess": "Marked as completed!",
+      "depositSuccess": "Deposit successful",
+      "withdrawSuccess": "Withdraw successful",
+      "actionFail": "Action failed",
+      "genericError": "Something went wrong!"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "na": "N/A"
+  },
+  "savingGoalDetail": {
+    "tabs": { "info": "Info" },
+
+    "badges": {
+      "completed": "Completed",
+      "paused": "Paused",
+      "dueSoon": "Due soon"
+    },
+
+    "labels": {
+      "progress": "Progress",
+      "wallet": "Wallet",
+      "target": "Target",
+      "remaining": "Remaining",
+      "deadline": "Deadline",
+      "timeRemaining": "Time left"
+    },
+
+    "date": {
+      "noDeadline": "No deadline"
+    },
+
+    "time": {
+      "overdue": "Overdue",
+      "daysLeft": "{{days}} days left"
+    },
+
+    "money": {
+      "placeholder": "Enter amount",
+      "invalidAmount": "Amount must be greater than 0"
+    },
+
+    "actions": {
+      "backToList": "Back to goals list",
+      "deposit": "Deposit",
+      "withdraw": "Withdraw to wallet",
+      "markCompleted": "Mark completed",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+
+    "confirm": {
+      "complete": {
+        "title": "Mark this goal as completed?",
+        "content": "After completing, progress will be locked at 100%.",
+        "ok": "Complete",
+        "cancel": "Cancel"
+      },
+      "delete": {
+        "title": "Delete goal",
+        "content": "Are you sure you want to delete \"{{name}}\"?",
+        "ok": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+
+    "toast": {
+      "notFound": "Goal not found!",
+      "loadError": "Failed to load goal details!",
+      "completeSuccess": "Goal marked as completed!",
+      "depositSuccess": "Deposited successfully",
+      "depositFail": "Deposit failed",
+      "withdrawSuccess": "Withdrawn successfully",
+      "withdrawFail": "Withdraw failed",
+      "deleteSuccess": "Goal deleted successfully!",
+      "deleteFail": "Delete failed!",
+      "actionFail": "Action failed",
+      "genericError": "Something went wrong!"
+    }
+  },
+  "reportsDashboard": {
+    "title": "Financial Overview",
+
+    "tabs": {
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    },
+
+    "period": {
+      "monthDisplay": "Month {{value}}",
+      "backToThisMonth": "Back to this month",
+      "monthThis": "This month",
+      "monthPrev": "Last month",
+      "yearThis": "This year",
+      "yearPrev": "Last year"
+    },
+
+    "overview": {
+      "totalIncome": "Total Income",
+      "totalExpense": "Total Expense",
+      "totalBalance": "Total Wallet Balance",
+      "difference": "Difference",
+      "totalAllWallets": "All wallets total",
+      "incomeMinusExpense": "Income - Expense"
+    },
+
+    "comparison": {
+      "title": "Comparison vs Previous Period",
+      "totalIncome": "Income",
+      "totalExpense": "Expense",
+      "balance": "Balance"
+    },
+
+    "walletFluct": {
+      "title": "Wallet Fluctuations",
+      "overallRate": "Overall change rate",
+      "noData": "No wallet fluctuation data",
+      "change": "Change",
+      "changeRate": "Change rate",
+      "unnamed": "Unnamed wallet"
+    },
+
+    "chart": {
+      "title": "Trend",
+      "testDataBadge": "📊 TEST data",
+      "expense": "Expense",
+      "income": "Income"
+    },
+
+    "empty": {
+      "title": "No data yet",
+      "subtitle": "Please choose another period or add transactions"
+    },
+
+    "pie": {
+      "title": "Income & Expense Overview",
+      "uncategorized": "Uncategorized",
+      "prevPrefix": "Previous:",
+      "emptyTitle": "No expense data",
+      "emptySubtitle": "Please add expense transactions",
+
+      "summary": {
+        "expense": "Expense",
+        "income": "Income",
+        "vsPrev": "vs last month",
+        "incomeHint": "Total income in the month"
+      },
+
+      "detailsInline": "Category details ({{count}})",
+      "detailsTitle": "Category details ({{count}})",
+      "percentOfTotal": "{{percent}}% of total expense"
+    },
+
+    "labels": {
+      "weekLabelShort": "Week {{date}}",
+      "weekFallback": "Week {{index}}",
+      "monthFallback": "Month {{index}}",
+      "yearFallback": "Year {{index}}",
+      "itemFallback": "Item {{index}}"
+    }
+  },
+  "reportsIndex": {
+    "title": "Financial Reports",
+    "subtitle": "Choose the report type you want to view",
+    "viewDetail": "View details",
+    "types": {
+      "time": {
+        "title": "Time-based Report",
+        "description": "Analyze income & expense over time with line and bar charts"
+      },
+      "category": {
+        "title": "Category-based Report",
+        "description": "Analyze expenses by category with pie and horizontal bar charts"
+      },
+      "wallet": {
+        "title": "Wallet-based Report",
+        "description": "Analyze expenses by wallet with pie and multi-line charts"
+      }
+    }
+  },
+  "reportsCategory": {
+    "title": "Category Report",
+    "subtitle": "Analyze expenses by category",
+    "uncategorized": "Uncategorized",
+    "loadError": "An error occurred while loading data",
+    "summary": {
+      "totalExpense": "Total expense",
+      "categoryCount": "{{count}} categories"
+    },
+    "charts": {
+      "pieTitle": "Expense distribution by category",
+      "barTitle": "Top expense categories"
+    },
+    "empty": {
+      "title": "No expense data yet",
+      "subtitle": "Please add expense transactions within this period"
+    },
+    "top": {
+      "title": "Top {{count}} expense categories",
+      "subtitle": "List of highest spending categories",
+      "percentOfTotal": "{{percent}}% of total",
+      "transactionCount": "{{count}} transactions"
+    }
+  },
+  "reportsTime": {
+    "title": "Time Report",
+    "subtitle": "Analyze income and expenses over time with charts and detailed table",
+    "filter": {
+      "title": "Filters"
+    },
+    "loading": "Loading report data...",
+    "empty": "No data to display",
+    "na": "N/A",
+    "cannotLoad": "Cannot load data",
+    "loadError": "An error occurred while loading data",
+    "charts": {
+      "lineTitle": "Line chart - Income vs Expense over time",
+      "barTitle": "Bar chart - Income vs Expense comparison"
+    },
+    "series": {
+      "income": "Income",
+      "expense": "Expense"
+    },
+    "table": {
+      "title": "Details table",
+      "time": "Time",
+      "income": "Income",
+      "expense": "Expense",
+      "balance": "Balance",
+      "totalRecords": "Total {{total}} records"
+    }
+  },
+  "reportsWallet": {
+    "title": "Wallet Report",
+    "subtitle": "Analyze expenses by wallet",
+    "unknownWallet": "Unknown",
+    "na": "N/A",
+    "loadError": "An error occurred while loading data",
+
+    "period": {
+      "month": "Month {{month}}/{{year}}",
+      "week": "Week {{week}}/{{year}}",
+      "year": "Year {{year}}"
+    },
+
+    "summary": {
+      "totalIncome": "Total income",
+      "totalExpense": "Total expense",
+      "balance": "Balance",
+      "totalWallets": "Total {{total}} wallets"
+    },
+
+    "charts": {
+      "pieTitle": "Expense distribution by wallet",
+      "lineTitle": "Wallet expense comparison over time"
+    },
+
+    "tooltip": {
+      "walletLabel": "Wallet: {{label}}"
+    },
+
+    "empty": {
+      "noExpenseTitle": "No expenses yet",
+      "noExpenseDesc": "All wallets have no expense transactions in this period",
+      "noDataTitle": "No data",
+      "noDataDesc": "No expenses in this period",
+      "noExpenseDataTitle": "No expense data",
+      "noExpenseDataDesc": "Please add expense transactions in this period"
+    },
+
+    "table": {
+      "title": "Wallet statistics table",
+      "wallet": "Wallet",
+      "totalIncome": "Total income",
+      "totalExpense": "Total expense",
+      "balance": "Balance",
+      "rate": "Rate",
+      "transactions": "Transactions",
+      "totalWallets": "Total {{total}} wallets"
+    }
+  },
+  "common1": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "errorOccurred": "Something went wrong!"
+  },
+  "recurringBills": {
+    "title": "Recurring Bills",
+    "subtitle": "Track and pay bills automatically",
+
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "paused": "Paused"
+    },
+
+    "actions": {
+      "add": "Add bill",
+      "addFirst": "Add your first bill",
+      "payNow": "Pay now",
+      "paid": "Paid",
+      "pause": "Pause",
+      "activate": "Activate"
+    },
+
+    "summary": {
+      "totalBills": "Total bills",
+      "totalAmountPerMonth": "Total / month",
+      "upcoming": "Upcoming",
+      "paidThisMonth": "Paid (this month)"
+    },
+
+    "alert": {
+      "upcoming7days": "You have {{count}} bills due within the next 7 days"
+    },
+
+    "empty": {
+      "allTitle": "No recurring bills yet",
+      "activeTitle": "No active bills",
+      "pausedTitle": "No paused bills",
+      "desc": "Create recurring bills to manage your spending automatically"
+    },
+
+    "badges": {
+      "active": "Active",
+      "paused": "Paused",
+      "upcoming": "Due soon",
+      "paid": "Paid"
+    },
+
+    "frequency": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "biweekly": "Every 2 weeks",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "custom": "Custom"
+    },
+
+    "confirm": {
+      "deleteTitle": "Delete bill",
+      "deleteContent": "Are you sure you want to delete \"{{name}}\"?",
+      "pauseTitle": "Pause bill",
+      "pauseContent": "Are you sure you want to pause \"{{name}}\"?",
+      "resumeTitle": "Activate bill",
+      "resumeContent": "Are you sure you want to activate \"{{name}}\" again?"
+    },
+
+    "toast": {
+      "deleteSuccess": "Bill deleted successfully!",
+      "deleteFail": "Delete failed!",
+      "paySuccess": "Payment successful!",
+      "payFail": "Payment failed!",
+      "pauseSuccess": "Bill paused!",
+      "resumeSuccess": "Bill activated!",
+      "actionFail": "Action failed!"
+    },
+
+    "errors": {
+      "loadList": "Unable to load recurring bills!"
+    }
+  },
+  "common2": {
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "reload": "Reload",
+    "retry": "Try again"
+  },
+  "profile1": {
+    "fallbackUser": "User",
+
+    "toast": {
+      "loadFail": "Unable to load profile",
+      "cancelEdit": "Edits canceled",
+      "updateSuccess": "Profile updated",
+      "updateFail": "Update failed"
+    },
+
+    "result404": {
+      "title": "Profile not found",
+      "subtitle": "There was an error loading user data."
+    },
+
+    "avatar": {
+      "change": "Change avatar",
+      "tooLarge": "Image must be smaller than 2MB",
+      "success": "Avatar updated successfully",
+      "fail": "Unable to upload image"
+    },
+
+    "tags": {
+      "trusted": "Trusted profile"
+    },
+
+    "completion": {
+      "title": "Completion",
+      "hint": "Complete your profile for a better personalized experience."
+    },
+
+    "section": {
+      "personalInfo": "Personal information"
+    },
+
+    "mode": {
+      "editing": "Editing",
+      "view": "View mode"
+    },
+
+    "actions": {
+      "update": "Update profile"
+    },
+
+    "confirm": {
+      "cancelTitle": "Cancel editing?",
+      "cancelDesc": "All changes will be discarded and reverted to the previous data.",
+      "okCancelEdit": "Cancel edits",
+      "keepEditing": "Keep editing"
+    },
+
+    "email": {
+      "lockedTooltip": "Identity email cannot be changed"
+    },
+
+    "validation": {
+      "phoneInvalid": "Invalid phone number"
+    },
+
+    "gender": {
+      "male": "Male",
+      "female": "Female"
+    },
+
+    "placeholders": {
+      "default": "Enter information..."
+    },
+
+    "fields": {
+      "displayName": {
+        "label": "Display name",
+        "placeholder": "Enter display name..."
+      },
+      "email": {
+        "label": "Email address",
+        "placeholder": "Email"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "Enter phone number..."
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Enter address..."
+      },
+      "dateOfBirth": {
+        "label": "Date of birth",
+        "placeholder": "Select date of birth"
+      },
+      "bio": {
+        "label": "Bio",
+        "placeholder": "Example: I try to save 20% of my monthly income..."
+      },
+      "gender": {
+        "label": "Gender"
+      }
+    }
+  },
+  "common3": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "error": "Something went wrong!"
+  },
+
+  "categories": {
+    "title": "Category Management",
+
+    "tabs": {
+      "all": "All",
+      "income": "Income",
+      "expense": "Expense"
+    },
+
+    "type": {
+      "income": "Income",
+      "expense": "Expense"
+    },
+
+    "badge": {
+      "default": "Default",
+      "child": "Subcategory"
+    },
+
+    "search": {
+      "placeholder": "Search categories by name..."
+    },
+
+    "actions": {
+      "add": "Add category",
+      "addTitle": "Add category",
+      "addAria": "Add category",
+      "addFirst": "Add your first category",
+      "setDefault": "Set as default"
+    },
+
+    "confirm": {
+      "deleteTitle": "Delete category",
+      "deleteContent": "Are you sure you want to delete \"{{name}}\"?"
+    },
+
+    "toast": {
+      "loadFail": "Unable to load categories!",
+      "deleteSuccess": "Category deleted successfully!",
+      "deleteFail": "Delete failed!",
+      "setDefaultSuccess": "Set as default successfully!",
+      "setDefaultFail": "Failed!"
+    },
+
+    "pagination": {
+      "showing": "Showing",
+      "items": "categories"
+    },
+
+    "empty": {
+      "all": "No categories yet",
+      "income": "No income categories yet",
+      "expense": "No expense categories yet"
+    }
+  },
+  "common4": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "copy": "Copy",
+    "error": "Something went wrong!",
+    "loadingDots": "..."
+  },
+  "budgets": {
+    "title": "Budget Management",
+    "subtitle": "Set spending limits and track budgets",
+
+    "actions": {
+      "add": "Add budget",
+      "addFirst": "Add your first budget"
+    },
+
+    "summary": {
+      "totalBudgets": "Total budgets",
+      "totalLimit": "Total limit",
+      "totalSpent": "Total spent",
+      "warningBudgets": "Warning budgets"
+    },
+
+    "alert": {
+      "warning": "You have {{count}} budgets in warning state (≥80%) or over the limit"
+    },
+
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "expired": "Expired"
+    },
+
+    "empty": {
+      "all": "No budgets yet",
+      "active": "No active budgets yet",
+      "expired": "No expired budgets yet",
+      "hint": "Create a budget to manage your spending effectively"
+    },
+
+    "confirm": {
+      "deleteTitle": "Delete budget",
+      "deleteContent": "Are you sure you want to delete \"{{name}}\"?"
+    },
+
+    "toast": {
+      "loadFail": "Unable to load budgets!",
+      "deleteSuccess": "Budget deleted successfully!",
+      "deleteFail": "Delete failed!"
+    },
+
+    "defaultName": "Budget",
+    "copyName": "{{name}} (Copy)",
+    "noEndDateShort": "No end date"
+  },
+  "common5": {
+    "na": "N/A",
+    "loading": "Loading...",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "error": "Something went wrong!"
+  },
+  "budgetDetail": {
+    "back": "Back to budgets list",
+
+    "tabs": {
+      "info": "Info",
+      "transactions": "Spending",
+      "statistics": "Statistics"
+    },
+
+    "period": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "custom": "Custom"
+    },
+
+    "defaultName": "Budget",
+
+    "toast": {
+      "notFound": "Budget not found!",
+      "loadFail": "Failed to load budget details!",
+      "deleteSuccess": "Budget deleted successfully!",
+      "deleteFail": "Delete failed!",
+      "txLoadFail": "Unable to load transactions"
+    },
+
+    "confirm": {
+      "deleteTitle": "Delete budget",
+      "deleteContent": "Are you sure you want to delete this budget?"
+    },
+
+    "info": {
+      "progress": "Progress",
+      "category": "Category",
+      "wallet": "Wallet",
+      "allWallets": "All wallets",
+      "limit": "Limit",
+      "spent": "Spent",
+      "remaining": "Remaining",
+      "timeRange": "Time range",
+      "description": "Description"
+    },
+
+    "tx": {
+      "title": "Spending list",
+      "count": "{{count}} items",
+      "empty": "No spending found for this budget",
+      "defaultCategory": "Spending"
+    },
+
+    "stats": {
+      "limit": "Limit",
+      "spent": "Spent",
+      "remaining": "Remaining",
+      "usageProgress": "Usage progress",
+      "breakdownTitle": "Budget breakdown",
+      "total": "Total",
+      "byTimeTitle": "Spending over time",
+      "noTimeData": "No spending-over-time data yet",
+      "dayLabel": "Day {{day}}"
+    },
+
+    "pie": {
+      "spent": "Spent",
+      "remaining": "Remaining"
+    }
+  },
+  "analyticsIndex": {
+    "header": {
+      "title": "Smart Analytics",
+      "subtitle": "Choose the analysis type you want to view"
+    },
+    "cta": {
+      "viewDetail": "View details"
+    },
+    "types": {
+      "diagnostic": {
+        "title": "Diagnostic Analysis",
+        "description": "Analyze fluctuations, detect anomalies, and spending habits"
+      },
+      "predictive": {
+        "title": "Predictive Finance",
+        "description": "Forecast spending and budget overrun risk"
+      },
+      "prescriptive": {
+        "title": "Prescriptive Actions",
+        "description": "Optimization tips, recommendations, and smart alerts"
+      }
+    }
+  },
+  "analyticsDiagnostic": {
+    "header": {
+      "title": "Diagnostic Analysis",
+      "subtitle": "Analyze fluctuations, detect anomalies, and understand your spending habits"
+    },
+    "filters": {
+      "rangeLabel": "Analysis time range"
+    },
+    "loading": "Loading data...",
+    "toast": {
+      "loadError": "An error occurred while loading data",
+      "categoryIdMissing": "Category ID not found"
+    },
+    "monthLabel": "Month {{month}}/{{year}}",
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "badges": {
+      "growthPercent": "+{{percent}}%"
+    },
+    "wallet": {
+      "tooltip": "Spending in {{month}}/{{year}}: {{latest}} | Previous month: {{prev}}",
+      "increase": "Spending increased",
+      "decrease": "Spending decreased",
+      "noChange": "No change",
+      "percentPlus": "+{{percent}}%"
+    },
+    "tooltip": {
+      "amount": "Amount",
+      "aboveAvg": "Above average by {{percent}}%"
+    },
+    "empty": {
+      "noVariationData": "No variation data yet",
+      "noWalletData": "No wallet data yet",
+      "noMonthlyData": "No monthly data yet",
+      "noCategoryData": "No category data yet",
+      "noData": "No data yet"
+    },
+    "cards": {
+      "variations": {
+        "title": "Spending Variations",
+        "categorySpikesTitle": "Unusual category spikes",
+        "comparePrev": "Compared to the previous period",
+        "walletTitle": "Wallet variations"
+      },
+      "anomalies": {
+        "title": "Anomaly Detection",
+        "largeTitle": "Unusually large expenses",
+        "largeCount": "{{count}} suspicious transactions",
+        "timeTitle": "Spending at unusual times",
+        "timeCount": "{{count}} transactions",
+        "monthlyTitle": "Monthly spending spikes",
+        "thresholdLabel": "Threshold",
+        "hourlyTitle": "Hourly spending analysis",
+        "spike24hTitle": "24h spending spike",
+        "spike24hDesc": "Up {{percent}}% vs previous 24h"
+      },
+      "habits": {
+        "title": "Spending Habits",
+        "mostSpendingDayTitle": "Highest spending day of week",
+        "frequencyTitle": "Transaction frequency",
+        "perDay": "Transactions/day",
+        "perWeek": "Transactions/week",
+        "perMonth": "Transactions/month",
+        "frequentCategoriesTitle": "Most frequent categories",
+        "transactions": "transactions",
+        "categoryHint": "Click to view {{count}} transactions of {{name}}"
+      }
+    },
+    "drawer": {
+      "largeTitle": "Unusually large expenses",
+      "timeTitle": "Unusual time spending",
+      "viewAll": "View all transactions",
+      "empty": "No transactions"
+    }
+  },
+  "home": {
+    "appName": "MoneyLover",
+    "greeting": "Hello",
+    "greetingWithName": "Hello, {{name}}",
+    "welcomeBack": "Welcome back to",
+    "uncategorized": "Uncategorized",
+    "other": "Other",
+    "toast": {
+      "loadFail": "Failed to load data!"
+    },
+    "sync": {
+      "label": "Sync status",
+      "loading": "Loading",
+      "ready": "Ready"
+    },
+    "overview": {
+      "title": "Income & Expense Overview",
+      "subtitle": "Track monthly income, spending, and top categories",
+      "expense": "Expense",
+      "income": "Income",
+      "inMonth": "This month",
+      "expenseHint": "Total expense for the selected month",
+      "incomeHint": "Total income for the selected month"
+    },
+    "month": {
+      "label": "Month",
+      "prev": "Previous month",
+      "next": "Next month"
+    },
+    "pie": {
+      "title": "Spending by category",
+      "subtitle": "Tap a slice or legend to hide/show & highlight",
+      "count": "{{count}} categories",
+      "noData": "No data yet",
+      "emptyTitle": "No spending data",
+      "emptyDesc": "Add transactions to see category reports"
+    },
+    "breakdown": {
+      "title": "Category breakdown",
+      "subtitle": "Tap a category to highlight & see its share",
+      "txCount": "{{count}} transactions",
+      "hide": "Hide",
+      "show": "Show",
+      "onChart": "on chart",
+      "tapToHighlight": "Tap to highlight",
+      "emptyTitle": "No spending data",
+      "emptyDesc": "Choose another month or add new transactions"
+    },
+    "stats": {
+      "totalBalance": "Total balance",
+      "income": "Income",
+      "expense": "Expense",
+      "transactions": "Transactions",
+      "badgeNow": "Now",
+      "badgeThisMonth": "This month"
+    },
+    "recent": {
+      "title": "Recent transactions",
+      "subtitle": "Your latest 10 transactions",
+      "viewAll": "View all",
+      "emptyTitle": "No transactions yet",
+      "emptyDesc": "Start logging income/expenses to track your finances",
+      "addFirst": "Add your first transaction",
+      "filters": {
+        "days7": "7 days",
+        "days30": "30 days",
+        "allWallets": "All wallets"
+      }
+    },
+    "actions": {
+      "addTransaction": {
+        "title": "Add transaction",
+        "desc": "Record a new income/expense"
+      },
+      "addWallet": {
+        "title": "Add wallet",
+        "desc": "Manage multiple wallets"
+      },
+      "viewReports": {
+        "title": "View reports",
+        "desc": "Analyze your finance"
+      }
+    }
+  },
+  "wallet": {
+    "modal": {
+      "title": {
+        "create": "Add new wallet",
+        "edit": "Edit wallet"
+      },
+      "actions": {
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "type": {
+        "cash": "Cash",
+        "bank": "Bank"
+      },
+      "fields": {
+        "name": {
+          "label": "Wallet name",
+          "placeholder": "e.g. Daily spending, Savings fund...",
+          "required": "Please enter a wallet name!"
+        },
+        "currency": {
+          "label": "Currency",
+          "placeholder": "Select currency",
+          "required": "Please select a currency!",
+          "vnd": "VND - Vietnamese Dong"
+        },
+        "balance": {
+          "label": "Current balance",
+          "placeholder": "0",
+          "required": "Please enter balance!"
+        },
+        "bankName": {
+          "label": "Bank name",
+          "placeholder": "e.g. Vietcombank",
+          "required": "Please enter bank name!"
+        },
+        "bankCode": {
+          "label": "Bank code (Swift)",
+          "placeholder": "e.g. VCB"
+        },
+        "bankAccount": {
+          "label": "Account number",
+          "placeholder": "Enter bank account number",
+          "required": "Please enter account number!"
+        },
+        "isDefault": {
+          "title": "Set as default",
+          "desc": "Auto-select this wallet when adding a new transaction"
+        }
+      },
+      "bankSection": {
+        "title": "Bank account details"
+      },
+      "toast": {
+        "createSuccess": "Wallet created successfully!",
+        "updateSuccess": "Wallet updated successfully!",
+        "actionFail": "Action failed!"
+      }
+    }
+  },
+  "transaction": {
+    "modal": {
+      "title": {
+        "create": "New transaction",
+        "edit": "Edit transaction"
+      },
+      "actions": {
+        "save": "Save transaction",
+        "cancel": "Cancel",
+        "processing": "Processing..."
+      },
+      "types": {
+        "expense": "Expense",
+        "income": "Income",
+        "transfer": "Transfer",
+        "debt": "Receivable debt",
+        "loan": "Payable debt",
+        "adjust": "Adjust"
+      },
+      "fields": {
+        "currencyUnit": {
+          "vnd": "VND"
+        },
+        "amount": {
+          "label": "Amount",
+          "required": "Enter amount"
+        },
+        "adjustTo": {
+          "label": "New balance",
+          "required": "Enter new balance",
+          "validatorMin0": "New balance must be >= 0"
+        },
+        "walletSend": { "label": "From wallet" },
+        "walletPay": { "label": "Payment wallet" },
+        "walletId": {
+          "required": "Select wallet",
+          "placeholder": "Select a wallet"
+        },
+        "categoryId": {
+          "label": "Category",
+          "required": "Select category",
+          "placeholder": "Search category..."
+        },
+        "toWalletId": {
+          "label": "To wallet",
+          "required": "Select destination wallet",
+          "placeholder": "Select destination wallet"
+        },
+        "transferFee": {
+          "label": "Transfer fee",
+          "placeholder": "0"
+        },
+        "counterpartyName": {
+          "label": "Counterparty",
+          "required": "Enter counterparty name",
+          "placeholder": "Borrower/Lender name"
+        },
+        "isSettled": { "label": "Settled" },
+        "adjustReason": {
+          "label": "Adjustment reason",
+          "required": "Enter adjustment reason",
+          "placeholder": "e.g. Cash recount, bank balance update..."
+        },
+        "date": {
+          "label": "Date",
+          "required": "Select date"
+        },
+        "receipt": { "label": "Receipt / Proof" },
+        "note": {
+          "label": "Note",
+          "placeholderNormal": "Lunch, fuel, monthly salary...",
+          "placeholderAdjust": "e.g. Actual balance differs from system..."
+        }
+      },
+      "recurring": {
+        "title": "Recurring setup",
+        "repeatBy": "Repeat by",
+        "endDate": "End date",
+        "noEnd": "None",
+        "daily": "Day",
+        "weekly": "Week",
+        "monthly": "Month",
+        "yearly": "Year"
+      },
+      "upload": {
+        "uploading": "Uploading...",
+        "clickToUpload": "Click to upload receipt",
+        "updating": "Updating...",
+        "change": "CHANGE",
+        "delete": "DELETE"
+      },
+      "toast": {
+        "loadWalletFail": "Cannot load wallets",
+        "loadCategoryFail": "Cannot load categories",
+        "imageOnly": "Only image files are allowed!",
+        "uploadSuccess": "Image uploaded successfully",
+        "uploadFail": "Image upload failed",
+        "deleteImageFail": "Cannot delete image on server",
+        "createSuccess": "Added successfully",
+        "updateSuccess": "Updated successfully",
+        "actionFail": "Action failed"
+      }
+    }
+  },
+  "savingGoal": {
+    "modal": {
+      "title": {
+        "create": "Add saving goal",
+        "edit": "Edit saving goal"
+      },
+      "actions": {
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "fields": {
+        "currencyUnit": {
+          "vnd": "VND"
+        },
+        "name": {
+          "label": "Goal name",
+          "required": "Please enter a goal name!",
+          "placeholder": "e.g. Buy a motorbike"
+        },
+        "wallet": {
+          "label": "Wallet",
+          "required": "Please select a wallet!",
+          "placeholder": "Select wallet"
+        },
+        "targetAmount": {
+          "label": "Target amount",
+          "required": "Please enter a target amount!",
+          "min": "Amount must be greater than 0!",
+          "placeholder": "0"
+        },
+        "targetDate": {
+          "label": "Target date",
+          "tooltip": "Leave empty if there is no deadline"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Enter description (optional)"
+        }
+      },
+      "toast": {
+        "loadWalletFail": "Failed to load wallets",
+        "createSuccess": "Goal created successfully!",
+        "createFail": "Create failed!",
+        "updateSuccess": "Goal updated successfully!",
+        "updateFail": "Update failed!",
+        "fillAll": "Please fill in all required fields!",
+        "generalError": "Something went wrong!"
+      }
+    }
+  },
+  "filterBar": {
+    "common": {
+      "notFound": "Not found"
+    },
+    "actions": {
+      "apply": "Apply",
+      "reset": "Clear filters"
+    },
+    "period": {
+      "placeholder": "Select period",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    },
+    "type": {
+      "placeholder": "Type",
+      "all": "All",
+      "income": "Income",
+      "expense": "Expense"
+    },
+    "wallet": {
+      "placeholder": "Select wallet",
+      "all": "All wallets",
+      "empty": "No wallets yet"
+    },
+    "category": {
+      "placeholder": "Select category",
+      "all": "All categories",
+      "empty": "No categories yet"
+    },
+    "limit": {
+      "placeholder": "Limit",
+      "top": "Top {{n}}",
+      "all": "All"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "drawerTitle": "Reports Menu",
+    "actions": {
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "nav": {
+      "overview": "Overview",
+      "time": "Time-based report",
+      "category": "Category report",
+      "wallet": "Wallet report"
+    }
+  },
+  "common6": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "optional": "Optional",
+    "actionFailed": "Action failed!",
+    "pleaseFillAll": "Please fill in all required fields!",
+    "errorOccurred": "Something went wrong!"
+  },
+  "recurringBill": {
+    "title": {
+      "create": "Add recurring bill",
+      "edit": "Edit recurring bill"
+    },
+    "actions": {
+      "payNow": "Pay now"
+    },
+    "fields": {
+      "name": "Bill name",
+      "type": "Type",
+      "amount": "Amount",
+      "wallet": "Wallet",
+      "category": "Category",
+      "frequency": "Frequency",
+      "cronRule": "Cron rule",
+      "nextRun": "Next run",
+      "endsAt": "End date",
+      "description": "Description",
+      "active": "Active",
+      "autoCreateTransaction": "Auto create transaction"
+    },
+    "type": {
+      "expense": "Expense",
+      "income": "Income"
+    },
+    "frequency": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "biweekly": "Bi-weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "custom": "Custom"
+    },
+    "placeholder": {
+      "name": "e.g. Monthly electricity bill",
+      "wallet": "Select a wallet",
+      "category": "Select a category",
+      "description": "Optional description"
+    },
+    "tooltip": {
+      "cronRule": "Example: 0 0 1 * * (run at 00:00 on day 1 every month)"
+    },
+    "validate": {
+      "name": "Please enter bill name!",
+      "type": "Please select type!",
+      "amountRequired": "Please enter amount!",
+      "amountMin": "Amount must be greater than 0!",
+      "wallet": "Please select a wallet!",
+      "category": "Please select a category!",
+      "frequency": "Please select a frequency!",
+      "cronRule": "Please enter cron rule!",
+      "nextRun": "Please select next run date!"
+    },
+    "pay": {
+      "confirmTitle": "Confirm payment",
+      "amount": "Amount:",
+      "ok": "Pay"
+    },
+    "toast": {
+      "createSuccess": "Recurring bill created successfully!",
+      "updateSuccess": "Recurring bill updated successfully!",
+      "paySuccess": "Payment successful!",
+      "payFailed": "Payment failed!",
+      "loadWalletsFailed": "Failed to load wallets",
+      "loadCategoriesFailed": "Failed to load categories"
+    }
+  },
+  "dateRangePicker": {
+    "quick": {
+      "week": "This week",
+      "month": "This month",
+      "year": "This year"
+    }
+  },
+  "common7": {
+    "button": {
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "toast": {
+      "actionFailed": "Action failed!",
+      "fillRequired": "Please fill in required fields!",
+      "genericError": "Something went wrong!"
+    }
+  },
+  "category": {
+    "modal": {
+      "createTitle": "Add new category",
+      "editTitle": "Edit category"
+    },
+    "type": {
+      "expense": "Expense",
+      "income": "Income"
+    },
+    "field": {
+      "name": {
+        "label": "Category name",
+        "placeholder": "e.g. Food, Salary, Bills...",
+        "required": "Please enter category name!",
+        "max40": "Category name must be at most 40 characters!"
+      },
+      "parent": {
+        "label": "Parent category",
+        "placeholder": "Select parent (optional)"
+      },
+      "icon": {
+        "label": "Icon",
+        "searchPlaceholder": "Search icons...",
+        "selected": "Selected icon:"
+      },
+      "default": {
+        "title": "Set as default",
+        "desc": "Prefer this category when creating a new transaction"
+      }
+    },
+    "toast": {
+      "createSuccess": "Category created successfully!",
+      "updateSuccess": "Category updated successfully!"
+    },
+    "icon": {
+      "default": "Default",
+      "food": "Food",
+      "shopping": "Shopping",
+      "transport": "Transport",
+      "bills": "Bills",
+      "entertainment": "Entertainment",
+      "health": "Health",
+      "education": "Education",
+      "salary": "Salary",
+      "investment": "Investment",
+      "gift": "Gift",
+      "other": "Other"
+    }
+  },
+  "common8": {
+    "currency": { "vnd": "VND" }
+  },
+  "budget": {
+    "modal": {
+      "createTitle": "Add budget",
+      "editTitle": "Edit budget"
+    },
+    "period": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "custom": "Custom"
+    },
+    "field": {
+      "name": {
+        "label": "Budget name",
+        "tooltip": "Leave empty to use the category name",
+        "placeholder": "e.g. December food budget"
+      },
+      "category": {
+        "label": "Category",
+        "placeholder": "Select an expense category"
+      },
+      "wallet": {
+        "label": "Wallet",
+        "placeholder": "All wallets (optional)"
+      },
+      "limit": { "label": "Limit" },
+      "period": { "label": "Budget period" },
+      "startDate": { "label": "Start date" },
+      "endDate": { "label": "End date" },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter description (optional)"
+      }
+    },
+    "validation": {
+      "categoryRequired": "Please select a category!",
+      "limitRequired": "Please enter the limit!",
+      "limitMin": "Limit must be greater than 0!",
+      "periodRequired": "Please select a period!",
+      "startDateRequired": "Please select a start date!",
+      "endDateRequired": "Please select an end date!",
+      "customDateRequired": "Please select both start and end dates!"
+    },
+    "toast": {
+      "createSuccess": "Budget created successfully!",
+      "createFailed": "Failed to create budget!",
+      "updateSuccess": "Budget updated successfully!",
+      "updateFailed": "Failed to update budget!",
+      "loadCategoriesFailed": "Failed to load categories!",
+      "loadWalletsFailed": "Failed to load wallets!"
+    }
+  },
+  "analytics": {
+    "title": "Analytics",
+    "drawerTitle": "Analytics Menu",
+    "a11y": {
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "nav": {
+      "diagnostic": "Diagnostic Analysis",
+      "predictive": "Financial Forecast",
+      "prescriptive": "Action Recommendations"
+    }
+  }
+}

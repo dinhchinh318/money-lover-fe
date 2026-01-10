@@ -36,8 +36,15 @@ import {
   HomeOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getMyProfileAPI, updateMyProfileAPI,uploadMyAvatarAPI } from "../../services/api.profile";
+import {
+  getMyProfileAPI,
+  updateMyProfileAPI,
+  uploadMyAvatarAPI,
+} from "../../services/api.profile";
 import { useCurrentApp } from "../../components/context/app.context";
+
+// ✅ i18n
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
@@ -56,33 +63,10 @@ const COLORS = {
 };
 
 // ✅ Field names đúng theo schema BE
-const FIELD_ORDER = [
-  "displayName",
-  "gender",
-  "dateOfBirth",
-  "email",
-  "phone",
-  "address",
-  "bio",
-];
-
-const labelMap = {
-  displayName: "Tên hiển thị",
-  email: "Địa chỉ Email",
-  phone: "Số điện thoại",
-  address: "Địa chỉ cư trú",
-  dateOfBirth: "Ngày sinh",
-  bio: "Giới thiệu bản thân",
-  gender: "Giới tính",
-};
-
-// Gender mapping
-const genderMap = {
-  toUI: (val) => (val === "male" ? "Nam" : val === "female" ? "Nữ" : null),
-  toBE: (val) => (val === "Nam" ? "male" : "female"),
-};
+const FIELD_ORDER = ["displayName", "gender", "dateOfBirth", "email", "phone", "address", "bio"];
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const { setProfile } = useCurrentApp();
 
@@ -99,10 +83,36 @@ const ProfilePage = () => {
 
   const [avatarLoading, setAvatarLoading] = useState(false);
 
-  // ✅ Chỉ render các field hợp lệ (đỡ lệch key giữa BE/FE)
-  const editableKeys = useMemo(() => {
-    return FIELD_ORDER.filter((k) => k !== "email"); // email chỉ xem, không sửa
-  }, []);
+  // ✅ label map theo i18n
+  const labelMap = useMemo(
+    () => ({
+      displayName: t("profile.fields.displayName"),
+      email: t("profile.fields.email"),
+      phone: t("profile.fields.phone"),
+      address: t("profile.fields.address"),
+      dateOfBirth: t("profile.fields.dateOfBirth"),
+      bio: t("profile.fields.bio"),
+      gender: t("profile.fields.gender"),
+    }),
+    [t]
+  );
+
+  // ✅ Gender mapping (UI <-> BE) (UI string phụ thuộc i18n)
+  const genderMap = useMemo(
+    () => ({
+      toUI: (val) =>
+        val === "male"
+          ? t("profile.gender.male")
+          : val === "female"
+          ? t("profile.gender.female")
+          : null,
+      toBE: (val) => (val === t("profile.gender.male") ? "male" : "female"),
+    }),
+    [t]
+  );
+
+  // ✅ Chỉ render các field hợp lệ (email chỉ xem)
+  const editableKeys = useMemo(() => FIELD_ORDER.filter((k) => k !== "email"), []);
 
   const profileCompletion = useMemo(() => {
     if (!rawProfile) return 0;
@@ -113,21 +123,19 @@ const ProfilePage = () => {
   }, [rawProfile, isDirty, form]);
 
   const buildFormattedProfile = (profile) => {
-    // profile có thể kèm user/email tuỳ API
     const email = profile?.email ?? profile?.user?.email ?? profile?.userId?.email ?? "";
-    const displayName = profile?.displayName ?? "Người Dùng";
+    const displayName = profile?.displayName ?? t("profile.fallback.displayName");
     const avatarUrl = profile?.avatarUrl ?? profile?.avatar ?? "";
     const phone = profile?.phone ?? "";
     const address = profile?.address ?? "";
     const bio = profile?.bio ?? "";
     const gender = profile?.gender ? genderMap.toUI(profile.gender) : null;
-
     const dateOfBirth = profile?.dateOfBirth ? dayjs(profile.dateOfBirth) : null;
 
     return {
       displayName,
       email,
-      avatarUrl, // để hiển thị avatar lấy đúng key
+      avatarUrl,
       phone,
       address,
       bio,
@@ -154,7 +162,7 @@ const ProfilePage = () => {
         setIsEditing(false);
       }
     } catch (err) {
-      message.error("Không thể kết nối máy chủ tài chính");
+      message.error(t("profile.toast.serverError"));
     } finally {
       setLoading(false);
     }
@@ -174,20 +182,18 @@ const ProfilePage = () => {
     if (initialFormValues) form.setFieldsValue(initialFormValues);
     setIsDirty(false);
     setIsEditing(false);
-    message.info("Đã hủy chỉnh sửa");
+    message.info(t("profile.toast.cancelled"));
   };
 
   const handleUploadAvatar = async ({ file, onSuccess, onError }) => {
     const realFile = file?.originFileObj ?? file;
 
-    // validate size
     if (realFile.size / 1024 / 1024 >= 2) {
-      message.error("Ảnh phải nhỏ hơn 2MB");
+      message.error(t("profile.avatar.tooLarge"));
       onError?.();
       return;
     }
 
-    // preview ngay
     const previewUrl = URL.createObjectURL(realFile);
     form.setFieldsValue({ avatarUrl: previewUrl });
     setAvatarLoading(true);
@@ -203,28 +209,19 @@ const ProfilePage = () => {
         null;
 
       if (avatarUrl) {
-        form.setFieldsValue({
-          avatarUrl: `${avatarUrl}?t=${Date.now()}`,
-        });
-
+        form.setFieldsValue({ avatarUrl: `${avatarUrl}?t=${Date.now()}` });
         setProfile((prev) => ({ ...prev, avatarUrl }));
-        message.success("Cập nhật ảnh đại diện thành công");
+        message.success(t("profile.avatar.updated"));
         onSuccess?.("ok");
       } else {
-        // ❗ CHỈ log, KHÔNG message.error
         console.warn("Upload OK but avatarUrl missing:", res?.data);
-        onSuccess?.("ok"); // vẫn coi là thành công
+        onSuccess?.("ok");
       }
-
     } catch (err) {
-      // ❌ KHÔNG throw nữa
       console.error("Upload avatar error:", err);
 
-      message.error(
-        err?.response?.data?.message || "Không thể tải ảnh lên"
-      );
+      message.error(err?.response?.data?.message || t("profile.avatar.uploadError"));
 
-      // revert preview
       if (initialFormValues?.avatarUrl) {
         form.setFieldsValue({ avatarUrl: initialFormValues.avatarUrl });
       }
@@ -235,13 +232,11 @@ const ProfilePage = () => {
     }
   };
 
-
   const onSave = async () => {
     try {
       const values = await form.validateFields();
       setSaving(true);
 
-      // ✅ payload đúng schema BE
       const payload = {
         displayName: values.displayName ?? "",
         phone: values.phone ?? "",
@@ -253,13 +248,13 @@ const ProfilePage = () => {
 
       await updateMyProfileAPI(payload);
 
-      message.success("Hồ sơ đã được cập nhật");
+      message.success(t("profile.toast.updated"));
       setIsDirty(false);
       setIsEditing(false);
       await fetchProfile();
     } catch (err) {
       if (err?.errorFields) return;
-      message.error("Cập nhật thất bại, vui lòng kiểm tra đường truyền");
+      message.error(t("profile.toast.updateFail"));
     } finally {
       setSaving(false);
     }
@@ -268,7 +263,6 @@ const ProfilePage = () => {
   const renderField = (key) => {
     const label = labelMap[key] || key;
 
-    // ✅ email luôn khóa, các field khác khóa khi không edit
     const isEmail = key === "email";
     const disabled = !isEditing || isEmail;
 
@@ -282,11 +276,11 @@ const ProfilePage = () => {
             style={{ width: "100%" }}
             className="fintech-radio"
           >
-            <Radio.Button value="Nam" style={{ width: "50%", textAlign: "center" }}>
-              <ManOutlined /> Nam
+            <Radio.Button value={t("profile.gender.male")} style={{ width: "50%", textAlign: "center" }}>
+              <ManOutlined /> {t("profile.gender.male")}
             </Radio.Button>
-            <Radio.Button value="Nữ" style={{ width: "50%", textAlign: "center" }}>
-              <WomanOutlined /> Nữ
+            <Radio.Button value={t("profile.gender.female")} style={{ width: "50%", textAlign: "center" }}>
+              <WomanOutlined /> {t("profile.gender.female")}
             </Radio.Button>
           </Radio.Group>
         </Form.Item>
@@ -300,7 +294,7 @@ const ProfilePage = () => {
             disabled={!isEditing}
             format="DD/MM/YYYY"
             style={{ width: "100%" }}
-            placeholder="Chọn ngày sinh"
+            placeholder={t("profile.placeholders.date")}
             className="fintech-input"
           />
         </Form.Item>
@@ -313,7 +307,7 @@ const ProfilePage = () => {
           <Input.TextArea
             disabled={!isEditing}
             rows={3}
-            placeholder="Ví dụ: Tôi ưu tiên tiết kiệm 20% thu nhập hàng tháng..."
+            placeholder={t("profile.placeholders.bio")}
             className="fintech-input"
           />
         </Form.Item>
@@ -330,7 +324,7 @@ const ProfilePage = () => {
             ? [
                 {
                   pattern: /^(0[3|5|7|8|9])([0-9]{8})$/,
-                  message: "Số điện thoại không hợp lệ",
+                  message: t("profile.validation.phoneInvalid"),
                 },
               ]
             : []
@@ -351,12 +345,12 @@ const ProfilePage = () => {
           }
           suffix={
             isEmail ? (
-              <Tooltip title="Email định danh không thể thay đổi">
+              <Tooltip title={t("profile.hints.emailLocked")}>
                 <LockOutlined style={{ color: "#94a3b8" }} />
               </Tooltip>
             ) : null
           }
-          placeholder={`Nhập ${label.toLowerCase()}...`}
+          placeholder={t("profile.placeholders.input", { field: String(label).toLowerCase() })}
           className="fintech-input"
         />
       </Form.Item>
@@ -367,20 +361,19 @@ const ProfilePage = () => {
     return (
       <Result
         status="404"
-        title="Không tìm thấy hồ sơ"
-        subTitle="Có lỗi khi tải dữ liệu người dùng."
+        title={t("profile.notFound.title")}
+        subTitle={t("profile.notFound.subtitle")}
         extra={
           <Button type="primary" icon={<ReloadOutlined />} onClick={fetchProfile}>
-            Thử lại
+            {t("profile.notFound.retry")}
           </Button>
         }
       />
     );
   }
 
-  // ✅ display data đúng schema
   const uiValues = form.getFieldsValue();
-  const displayName = uiValues.displayName || rawProfile?.displayName || "Người Dùng";
+  const displayName = uiValues.displayName || rawProfile?.displayName || t("profile.fallback.displayName");
   const email = uiValues.email || rawProfile?.email || rawProfile?.user?.email || "";
   const avatarSrc = uiValues.avatarUrl || rawProfile?.avatarUrl || rawProfile?.avatar || null;
 
@@ -424,7 +417,7 @@ const ProfilePage = () => {
                         <div className="avatar-overlay">
                           <CameraOutlined style={{ fontSize: 24, color: "#fff" }} />
                           <Text style={{ color: "#fff", display: "block", fontSize: 12 }}>
-                            Ảnh đại diện
+                            {t("profile.avatar.change")}
                           </Text>
                         </div>
                       </Upload>
@@ -452,7 +445,7 @@ const ProfilePage = () => {
                           fontWeight: 600,
                         }}
                       >
-                        Hồ sơ tin cậy
+                        {t("profile.badge.trusted")}
                       </Tag>
                     </div>
 
@@ -468,7 +461,7 @@ const ProfilePage = () => {
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                         <Text strong style={{ color: "#0f766e" }}>
-                          Mức độ hoàn thiện
+                          {t("profile.completion.title")}
                         </Text>
                         <Text strong style={{ color: COLORS.primary }}>
                           {profileCompletion}%
@@ -481,7 +474,7 @@ const ProfilePage = () => {
                         trailColor="#e2e8f0"
                       />
                       <Text style={{ fontSize: 12, color: COLORS.muted, marginTop: 8, display: "block" }}>
-                        Hoàn thiện hồ sơ để trải nghiệm tính năng cá nhân hóa tốt hơn.
+                        {t("profile.completion.hint")}
                       </Text>
                     </div>
                   </Card>
@@ -519,7 +512,7 @@ const ProfilePage = () => {
                           }}
                         />
                         <span style={{ fontWeight: 900, fontSize: 18, color: COLORS.ink }}>
-                          Thông tin cá nhân
+                          {t("profile.title")}
                         </span>
                       </Space>
                     }
@@ -527,10 +520,10 @@ const ProfilePage = () => {
                       <Space>
                         {isEditing ? (
                           <Tag color="gold" icon={<InfoCircleOutlined />}>
-                            Đang chỉnh sửa
+                            {t("profile.mode.editing")}
                           </Tag>
                         ) : (
-                          <Tag color="green">Chế độ xem</Tag>
+                          <Tag color="green">{t("profile.mode.view")}</Tag>
                         )}
 
                         <Button
@@ -539,13 +532,13 @@ const ProfilePage = () => {
                           disabled={isEditing}
                           className="btn-edit"
                         >
-                          Chỉnh sửa
+                          {t("profile.actions.edit")}
                         </Button>
                       </Space>
                     }
                   >
                     <Title level={5} className="form-section-title">
-                      THÔNG TIN CƠ BẢN
+                      {t("profile.sections.basic")}
                     </Title>
                     <Row gutter={20}>
                       {["displayName", "gender", "dateOfBirth"].map((key) => (
@@ -558,7 +551,7 @@ const ProfilePage = () => {
                     <Divider style={{ margin: "24px 0" }} />
 
                     <Title level={5} className="form-section-title">
-                      LIÊN HỆ & CƯ TRÚ
+                      {t("profile.sections.contact")}
                     </Title>
                     <Row gutter={20}>
                       {["email", "phone", "address"].map((key) => (
@@ -571,7 +564,7 @@ const ProfilePage = () => {
                     <Divider style={{ margin: "24px 0" }} />
 
                     <Title level={5} className="form-section-title">
-                      GIỚI THIỆU
+                      {t("profile.sections.bio")}
                     </Title>
                     {renderField("bio")}
 
@@ -588,15 +581,15 @@ const ProfilePage = () => {
                       }}
                     >
                       <Popconfirm
-                        title="Hủy chỉnh sửa?"
-                        description="Mọi thay đổi sẽ bị bỏ và quay lại dữ liệu trước đó."
+                        title={t("profile.confirm.cancelTitle")}
+                        description={t("profile.confirm.cancelDesc")}
                         onConfirm={cancelEdit}
-                        okText="Hủy chỉnh sửa"
-                        cancelText="Tiếp tục sửa"
+                        okText={t("profile.confirm.cancelOk")}
+                        cancelText={t("profile.confirm.cancelNo")}
                         disabled={!isEditing || saving}
                       >
                         <Button danger type="text" icon={<ReloadOutlined />} disabled={!isEditing || saving}>
-                          Hủy
+                          {t("profile.actions.cancel")}
                         </Button>
                       </Popconfirm>
 
@@ -608,7 +601,7 @@ const ProfilePage = () => {
                           disabled={saving}
                           className="btn-soft"
                         >
-                          Tải lại
+                          {t("profile.actions.reload")}
                         </Button>
 
                         <Button
@@ -619,7 +612,7 @@ const ProfilePage = () => {
                           disabled={!isEditing || !isDirty}
                           className="fintech-btn-primary"
                         >
-                          Cập nhật hồ sơ
+                          {t("profile.actions.update")}
                         </Button>
                       </Space>
                     </div>
