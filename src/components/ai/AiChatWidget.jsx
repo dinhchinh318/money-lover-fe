@@ -6,9 +6,14 @@ import "../../styles/ai.css";
 import { extractChatText, errorToText } from "./aiText";
 
 /**
- * AiChatWidget (Messenger-like)
- * - Render via React Portal to document.body to avoid being blocked by layout overlays / z-index / overflow hidden.
+ * AiChatWidget (Messenger-like, responsive)
+ * - Portal to body (avoid overlay/overflow blocking clicks)
+ * - Minimized state shows a compact bottom bar like Messenger
+ * - Mobile: opens as full-screen bottom sheet (100dvh)
+ * - History stored per-user (avoid account A seeing account B on same browser)
  */
+
+const SYSTEM_STYLE = "Trả lời ngắn gọn (<= 6 dòng hoặc 5 gạch đầu dòng).";
 
 function nowIso() {
   return new Date().toISOString();
@@ -17,24 +22,58 @@ function nowIso() {
 function makeMsg(role, text) {
   return {
     id: `${role}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    role,
+    role, // user | assistant | system
     text,
     at: nowIso(),
   };
 }
 
-function loadHistory() {
+function decodeJwtPayload(token) {
   try {
-    const raw = localStorage.getItem("ml_ai_widget_history");
+    const parts = String(token || "").split(".");
+    if (parts.length < 2) return null;
+    const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = b64.padEnd(b64.length + (4 - (b64.length % 4 || 4)) % 4, "=");
+    const json = atob(padded);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function inferUserKey() {
+  const candidates = [
+    localStorage.getItem("access_token"),
+    localStorage.getItem("accessToken"),
+    localStorage.getItem("token"),
+    localStorage.getItem("jwt"),
+    localStorage.getItem("ml_token"),
+  ].filter(Boolean);
+
+  for (const t of candidates) {
+    const p = decodeJwtPayload(t);
+    const id = p?._id || p?.userId || p?.id || p?.sub || p?.uid;
+    if (id) return String(id);
+  }
+  return "anonymous";
+}
+
+function storageKey(userKey) {
+  return `ml_ai_widget_history::${userKey || "anonymous"}`;
+}
+
+function loadHistory(key) {
+  try {
+    const raw = localStorage.getItem(key);
     const parsed = raw ? JSON.parse(raw) : null;
     if (Array.isArray(parsed)) return parsed.slice(-50);
   } catch {}
   return null;
 }
 
-function saveHistory(list) {
+function saveHistory(key, list) {
   try {
-    localStorage.setItem("ml_ai_widget_history", JSON.stringify(list.slice(-50)));
+    localStorage.setItem(key, JSON.stringify(list.slice(-50)));
   } catch {}
 }
 
@@ -45,22 +84,24 @@ function ensurePortalRoot() {
 
   el = document.createElement("div");
   el.id = id;
-  // keep highest stacking layer
   el.style.position = "fixed";
   el.style.inset = "0";
   el.style.pointerEvents = "none";
-  el.style.zIndex = "2147483647"; // max-ish
+  el.style.zIndex = "2147483647";
   document.body.appendChild(el);
   return el;
 }
 
-export default function AiChatWidget() {
+export default function AiChatWidget({ userKey: userKeyProp }) {
   const nav = useNavigate();
 
   const portalRoot = useMemo(() => {
     if (typeof document === "undefined") return null;
     return ensurePortalRoot();
   }, []);
+
+  const userKey = useMemo(() => userKeyProp || inferUserKey(), [userKeyProp]);
+  const key = useMemo(() => storageKey(userKey), [userKey]);
 
   const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
@@ -69,24 +110,32 @@ export default function AiChatWidget() {
   const [errText, setErrText] = useState("");
 
   const [messages, setMessages] = useState(() => {
-    const cached = loadHistory();
+    const cached = loadHistory(key);
     if (cached) return cached;
     return [makeMsg("assistant", "AI sẵn sàng. Nhập tin nhắn để chat.")];
   });
+
+  // Reload history when user changes (logout/login another account)
+  useEffect(() => {
+    const cached = loadHistory(key);
+    setMessages(cached || [makeMsg("assistant", "AI sẵn sàng. Nhập tin nhắn để chat.")]);
+    setErrText("");
+  }, [key]);
 
   const bottomRef = useRef(null);
   const scrollDown = () => bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
 
   useEffect(() => {
-    saveHistory(messages);
-  }, [messages]);
+    saveHistory(key, messages);
+  }, [key, messages]);
 
   useEffect(() => {
     if (open && !minimized) setTimeout(scrollDown, 0);
   }, [open, minimized]);
 
   const context = useMemo(() => {
-    return messages.slice(-10).map((m) => ({ role: m.role, text: m.text, at: m.at }));
+    const tail = messages.slice(-10).map((m) => ({ role: m.role, text: m.text, at: m.at }));
+    return [{ role: "system", text: SYSTEM_STYLE }, ...tail];
   }, [messages]);
 
   const push = (msg) => {
@@ -105,7 +154,7 @@ export default function AiChatWidget() {
 
     try {
       const res = await aiApi.chat({ message: text, context });
-      const ans = extractChatText(res?.data ?? res) || "Không có nội dung trả lời từ chatbot.";
+      const ans = extractChatText(res?.data ?? res) || "Không có nội dung trả lời.";
       push(makeMsg("assistant", ans));
     } catch (e) {
       const err = normalizeApiError(e);
@@ -120,10 +169,9 @@ export default function AiChatWidget() {
   const clear = () => {
     setMessages([makeMsg("assistant", "Đã xóa lịch sử chat.")]);
     setErrText("");
-    try { localStorage.removeItem("ml_ai_widget_history"); } catch {}
+    try { localStorage.removeItem(key); } catch {}
   };
 
-  // Close on ESC
   useEffect(() => {
     const onKey = (ev) => {
       if (ev.key === "Escape") {
@@ -138,42 +186,42 @@ export default function AiChatWidget() {
   const ui = (
     <div className="ai-portal-layer">
       {!open ? (
-        <button className="ai-float-btn" onClick={() => setOpen(true)} aria-label="Open AI Chat" type="button">
-          <span className="ai-float-btn__icon" aria-hidden="true">💬</span>
-          <span className="ai-float-btn__text">AI</span>
+        <button className="ai-float-bubble" onClick={() => setOpen(true)} aria-label="Open AI" type="button">
+          <span className="ai-float-bubble__icon" aria-hidden="true">💬</span>
         </button>
       ) : (
-        <div className={`ai-widget ${minimized ? "is-minimized" : ""}`} role="dialog" aria-label="AI Chat">
-          <div className="ai-widget__head">
+        <div className={`ai-widget ai-widget--messenger ${minimized ? "is-minimized" : ""}`} role="dialog" aria-label="AI Chat">
+          <div
+            className="ai-widget__head ai-widget__head--messenger"
+            onClick={() => { if (minimized) setMinimized(false); }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (minimized && (e.key === "Enter" || e.key === " ")) setMinimized(false);
+            }}
+          >
             <div className="ai-widget__title">
               <span className="ai-widget__dot" aria-hidden="true" />
               <span>MoneyLover AI</span>
             </div>
 
             <div className="ai-widget__headActions">
-              <button className="ai-widget__iconBtn" onClick={() => nav("/ai")} title="Mở trang AI" type="button">↗</button>
+              <button className="ai-widget__iconBtn" onClick={(e) => { e.stopPropagation(); nav("/ai"); }} title="Mở trang AI" type="button">↗</button>
               <button
                 className="ai-widget__iconBtn"
-                onClick={() => setMinimized((v) => !v)}
+                onClick={(e) => { e.stopPropagation(); setMinimized((v) => !v); }}
                 title={minimized ? "Mở rộng" : "Thu nhỏ"}
                 type="button"
               >
                 {minimized ? "▢" : "—"}
               </button>
-              <button
-                className="ai-widget__iconBtn"
-                onClick={() => { setOpen(false); setMinimized(false); }}
-                title="Đóng"
-                type="button"
-              >
-                ✕
-              </button>
+              <button className="ai-widget__iconBtn" onClick={(e) => { e.stopPropagation(); setOpen(false); setMinimized(false); }} title="Đóng" type="button">✕</button>
             </div>
           </div>
 
           {!minimized ? (
             <>
-              <div className="ai-widget__body">
+              <div className="ai-widget__body ai-widget__body--messenger">
                 {messages.map((m) => (
                   <div key={m.id} className={`ai-widget__msg ai-widget__msg--${m.role}`}>
                     <div className="ai-widget__bubble">{m.text}</div>
@@ -183,7 +231,7 @@ export default function AiChatWidget() {
                 <div ref={bottomRef} />
               </div>
 
-              <div className="ai-widget__foot">
+              <div className="ai-widget__foot ai-widget__foot--messenger">
                 {errText ? <div className="ai-widget__error">{errText}</div> : null}
 
                 <div className="ai-widget__compose">
@@ -197,7 +245,7 @@ export default function AiChatWidget() {
                         send();
                       }
                     }}
-                    placeholder="Nhập tin nhắn... (Enter để gửi)"
+                    placeholder="Nhập tin nhắn..."
                     rows={2}
                   />
                   <button className="ai-widget__send" onClick={send} disabled={busy || !input.trim()} type="button">
@@ -207,7 +255,6 @@ export default function AiChatWidget() {
 
                 <div className="ai-widget__tools">
                   <button className="ai-widget__toolBtn" onClick={clear} type="button">Xóa chat</button>
-                  <button className="ai-widget__toolBtn" onClick={() => nav("/ai")} type="button">Phân tích tại /ai</button>
                 </div>
               </div>
             </>
@@ -217,6 +264,5 @@ export default function AiChatWidget() {
     </div>
   );
 
-  if (!portalRoot) return ui;
-  return createPortal(ui, portalRoot);
+  return portalRoot ? createPortal(ui, portalRoot) : ui;
 }
