@@ -158,8 +158,8 @@ const BudgetModal = ({ open, onClose, budget, onSuccess }) => {
       onOk={handleSubmit}
       confirmLoading={loading}
       width={600}
-      okText={t("common8.button.save")}
-      cancelText={t("common8.button.cancel")}
+      okText={t("common7.button.save")}
+      cancelText={t("common7.button.cancel")}
     >
       <Form
         form={form}
