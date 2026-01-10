@@ -423,7 +423,7 @@ const AnalyticsDiagnostic = () => {
         other: "📦",
         default: "📁",
       };
-      return iconStringMap[icon.toLowerCase()] || icon;
+      return iconStringMap[icon.toLowerCase()] || "📦";
     }
 
     // Fallback: map category name sang emoji
@@ -569,7 +569,7 @@ const AnalyticsDiagnostic = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         {/* Header Section */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -605,12 +605,12 @@ const AnalyticsDiagnostic = () => {
             <p className="mt-4 text-gray-500 text-sm sm:text-base">Đang tải dữ liệu...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
             {/* Card 1: Biến động chi tiêu */}
             <Card
               className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50"
               title={
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <div className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg">
                     <TrendingUp className="text-white" size={20} />
                   </div>
@@ -630,22 +630,19 @@ const AnalyticsDiagnostic = () => {
                     </h3>
                   </div>
                   {categorySpikes.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
                       {categorySpikes.slice(0, 5).map((item, index) => (
                         <div
                           key={index}
                           className="group p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl hover:shadow-md transition-all duration-200 cursor-pointer"
                         >
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
                               <div
-                                className={`w-2 h-2 rounded-full ${
-                                  item.growthPercent > 50
-                                    ? "bg-red-500"
-                                    : "bg-amber-500"
-                                } animate-pulse`}
-                              ></div>
-                              <span className="font-semibold text-gray-900">
+                                className={`w-2 h-2 flex-shrink-0 rounded-full ${item.growthPercent > 50 ? "bg-red-500" : "bg-amber-500"
+                                  }`}
+                              />
+                              <span className="font-semibold text-gray-900 truncate text-sm" title={item.categoryName}>
                                 {item.categoryName}
                               </span>
                             </div>
@@ -689,7 +686,7 @@ const AnalyticsDiagnostic = () => {
                     </h3>
                   </div>
                   {walletVariations.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
                       {walletVariations.map((wallet, index) => {
                         const changePercent =
                           wallet.changePercent || wallet.variation || 0;
@@ -702,40 +699,38 @@ const AnalyticsDiagnostic = () => {
                           <div
                             key={index}
                             className="group p-4 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all duration-200 cursor-pointer"
-                            title={`Chi tiêu tháng ${
-                              wallet.latestMonth?.month
-                            }/${wallet.latestMonth?.year}: ${formatCurrency(
-                              wallet.latestMonth?.totalAmount || 0
-                            )} | Tháng trước: ${formatCurrency(
-                              wallet.previousMonth?.totalAmount || 0
-                            )}`}
+                            title={`Chi tiêu tháng ${wallet.latestMonth?.month
+                              }/${wallet.latestMonth?.year}: ${formatCurrency(
+                                wallet.latestMonth?.totalAmount || 0
+                              )} | Tháng trước: ${formatCurrency(
+                                wallet.previousMonth?.totalAmount || 0
+                              )}`}
                           >
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3 flex-1">
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
                                 <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
                                   <Wallet className="text-blue-600" size={16} />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <span className="font-semibold text-gray-900 block truncate">
+                                  <span className="font-semibold text-gray-900 block truncate max-w-[140px]" title={wallet.walletName}>
                                     {wallet.walletName}
                                   </span>
                                   <span className="text-xs text-gray-500">
                                     {isIncrease
                                       ? "Chi tiêu tăng"
                                       : isDecrease
-                                      ? "Chi tiêu giảm"
-                                      : "Không đổi"}
+                                        ? "Chi tiêu giảm"
+                                        : "Không đổi"}
                                   </span>
                                 </div>
                               </div>
                               <div
-                                className={`flex items-center gap-1 font-bold ${
-                                  isIncrease
-                                    ? "text-red-500"
-                                    : isDecrease
+                                className={`flex items-center gap-1 font-bold flex-shrink-0 ${isIncrease
+                                  ? "text-red-500 "
+                                  : isDecrease
                                     ? "text-green-500"
                                     : "text-gray-500"
-                                }`}
+                                  }`}
                               >
                                 {isIncrease ? (
                                   <>
@@ -777,8 +772,8 @@ const AnalyticsDiagnostic = () => {
             <Card
               className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50"
               title={
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-red-400 to-pink-500 rounded-lg">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-1.5 bg-gradient-to-br from-red-400 to-pink-500 rounded-lg flex-shrink-0">
                     <AlertTriangle className="text-white" size={20} />
                   </div>
                   <span className="font-bold text-gray-800">
@@ -791,25 +786,33 @@ const AnalyticsDiagnostic = () => {
                 {/* Cảnh báo khoản chi quá lớn */}
                 {unusualLarge.length > 0 && (
                   <div
-                    className="bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-300 rounded-xl p-4 mb-4 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
+                    className="bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-300 rounded-xl px-4 py-3 cursor-pointer hover:shadow-md transition
+  "
                     onClick={() => handleAlertClick("large")}
                   >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 bg-red-500 rounded-lg group-hover:bg-red-600 transition-colors">
+                    <div className="flex items-start gap-3 min-w-0">
+                      {/* ICON */}
+                      <div className="w-10 h-10 flex-shrink-0 bg-red-500 rounded-lg flex items-center justify-center">
                         <AlertTriangle className="text-white" size={20} />
                       </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-bold text-red-800">
+
+                      {/* TEXT */}
+                      <div className="min-w-0 flex-1">
+                        <div
+                          className="text-sm font-bold text-red-800 truncate"
+                          title="Khoản chi quá lớn"
+                        >
                           Khoản chi quá lớn
                         </div>
-                        <div className="text-xs text-red-600 mt-1">
+                        <div className="text-xs text-red-600 leading-tight truncate">
                           {unusualLarge.length} giao dịch bất thường
                         </div>
                       </div>
-                      <ExternalLink
-                        className="text-red-400 group-hover:text-red-600 transition-colors"
-                        size={18}
-                      />
+
+                      {/* ACTION */}
+                      <div className="flex-shrink-0">
+                        <ExternalLink className="text-red-400" size={18} />
+                      </div>
                     </div>
                   </div>
                 )}
@@ -820,22 +823,35 @@ const AnalyticsDiagnostic = () => {
                     className="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-300 rounded-xl p-4 mb-4 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
                     onClick={() => handleAlertClick("time")}
                   >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 bg-orange-500 rounded-lg group-hover:bg-orange-600 transition-colors">
-                        <Clock className="text-white" size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-bold text-orange-800">
-                          Chi vào thời điểm lạ
+                    <div
+                      className="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-300 rounded-xl px-4 py-3 cursor-pointer hover:shadow-md transition
+  "
+                      onClick={() => handleAlertClick("time")}
+                    >
+                      <div className="flex items-start gap-3 min-w-0">
+                        {/* ICON */}
+                        <div className="w-10 h-10 flex-shrink-0 bg-orange-500 rounded-lg flex items-center justify-center">
+                          <Clock className="text-white" size={20} />
                         </div>
-                        <div className="text-xs text-orange-600 mt-1">
-                          {unusualTime.length} giao dịch
+
+                        {/* TEXT */}
+                        <div className="min-w-0 flex-1">
+                          <div
+                            className="text-sm font-bold text-orange-800 truncate"
+                            title="Chi vào thời điểm lạ"
+                          >
+                            Chi vào thời điểm lạ
+                          </div>
+                          <div className="text-xs text-orange-600 leading-tight truncate">
+                            {unusualTime.length} giao dịch
+                          </div>
+                        </div>
+
+                        {/* ACTION */}
+                        <div className="flex-shrink-0">
+                          <ExternalLink className="text-orange-400" size={18} />
                         </div>
                       </div>
-                      <ExternalLink
-                        className="text-orange-400 group-hover:text-orange-600 transition-colors"
-                        size={18}
-                      />
                     </div>
                   </div>
                 )}
@@ -968,7 +984,7 @@ const AnalyticsDiagnostic = () => {
                 {/* Chi tăng đột biến 24h */}
                 {spike24h && spike24h.isSpike && (
                   <div className="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 rounded-xl">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
                       <div className="p-2 bg-yellow-500 rounded-lg">
                         <TrendingUp className="text-white" size={18} />
                       </div>
@@ -991,7 +1007,7 @@ const AnalyticsDiagnostic = () => {
             <Card
               className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50"
               title={
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <div className="p-2 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg">
                     <Activity className="text-white" size={20} />
                   </div>
@@ -1038,12 +1054,12 @@ const AnalyticsDiagnostic = () => {
                         Tần suất giao dịch
                       </h3>
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:shadow-md transition-all duration-200">
-                        <div className="text-2xl font-bold text-[#10B981] mb-1">
+                        <div className="text-xl sm:text-2xl font-bold truncate">
                           {transactionFreq.frequency?.perDay?.toFixed(1) || 0}
                         </div>
-                        <div className="text-xs font-medium text-gray-600">
+                        <div className="text-xs text-gray-600 leading-tight text-center">
                           Giao dịch/ngày
                         </div>
                       </div>
@@ -1076,41 +1092,37 @@ const AnalyticsDiagnostic = () => {
                     </h3>
                   </div>
                   {frequentCategories.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                       {frequentCategories.slice(0, 5).map((item, index) => (
                         <div
                           key={index}
                           onClick={() => handleCategoryClick(item)}
-                          className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-300 transition-all duration-200 group cursor-pointer"
-                          title={`Click để xem ${item.count} giao dịch của ${item.categoryName}`}
+                          className="flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition min-w-0 cursor-pointer"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 border-2 border-indigo-300 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 group-hover:border-indigo-400 transition-all duration-300">
-                              <span className="text-3xl leading-none">
-                                {getCategoryIcon(item)}
-                              </span>
+                          {/* LEFT */}
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            {/* ICON */}
+                            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg bg-indigo-100 border border-indigo-300 text-lg">
+                              {getCategoryIcon(item)}
                             </div>
-                            <div className="flex items-center gap-3 flex-1">
-                              <span className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+
+                            {/* TEXT */}
+                            <div className="min-w-0">
+                              <div
+                                className="text-sm font-semibold text-gray-900 truncate"
+                                title={item.categoryName}
+                              >
                                 {item.categoryName}
-                              </span>
-                              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md">
-                                {index + 1}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {item.count} giao dịch
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge
-                              count={item.count}
-                              style={{
-                                backgroundColor: "#6366F1",
-                                fontSize: "11px",
-                                fontWeight: "bold",
-                              }}
-                            />
-                            <span className="text-xs text-gray-500">
-                              giao dịch
-                            </span>
+
+                          {/* RIGHT – RANK */}
+                          <div className="w-6 h-6 flex-shrink-0 rounded-full bg-indigo-500 text-white text-xs font-bold flex items-center justify-center">
+                            {index + 1}
                           </div>
                         </div>
                       ))}
@@ -1163,7 +1175,7 @@ const AnalyticsDiagnostic = () => {
                   className="hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => navigate(`/transactions?id=${transaction.id}`)}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-3 min-w-0">
                     <div className="flex-1">
                       <div className="font-semibold text-gray-900 mb-1">
                         {transaction.category || transaction.categoryName}
