@@ -139,27 +139,50 @@ const ReportsCategory = () => {
 
   const getIconEmoji = (iconValue) => {
     if (!iconValue) return "💰";
+
     const iconStr = String(iconValue).toLowerCase().trim();
 
-    const iconMap = {
+    const ICON_MAP = {
+      coffee: "☕",
       food: "🍽️",
-      "🍔": "🍽️",
+      restaurant: "🍽️",
+
+      car: "🚗",
+      transport: "🚕",
+
+      smartphone: "📱",
+      phone: "📱",
+      internet: "🌐",
+
+      zap: "⚡",
+      electricity: "⚡",
+
+      water: "💧",
+
       shopping: "🛒",
-      transport: "🚗",
-      bills: "💳",
+      gift: "🎁",
+
       entertainment: "🎬",
+
       health: "🏥",
       education: "📚",
+
+      bills: "💳",
       salary: "💰",
       investment: "📈",
-      gift: "🎁",
+
       other: "📦",
+      "more-horizontal": "📦",
     };
 
-    if (iconStr === "🍔" || iconValue === "🍔") return "🍽️";
-    if (iconMap[iconStr]) return iconMap[iconStr];
-    return iconValue;
+    // Nếu backend đã trả emoji → dùng luôn
+    if (/[\u{1F300}-\u{1FAFF}]/u.test(iconStr)) {
+      return iconValue;
+    }
+
+    return ICON_MAP[iconStr] || "💰";
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-white">
@@ -369,7 +392,7 @@ const ReportsCategory = () => {
                               border: `2px solid ${color}40`,
                             }}
                           >
-                            <span style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}>
+                            <span className="text-[26px] sm:text-[30px] leading-none" style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}>
                               {getIconEmoji(category.icon)}
                             </span>
                           </div>
