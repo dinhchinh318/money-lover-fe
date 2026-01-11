@@ -1,5 +1,5 @@
 // src/components/ai/aiText.js
-// Deterministic text builders for monthly report / analysis / forecast / alerts (no JSON dump)
+// Clean, deterministic context + output sanitization
 
 const VND = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -9,21 +9,6 @@ const VND = new Intl.NumberFormat("vi-VN", {
 
 export function money(x) {
   return typeof x === "number" && Number.isFinite(x) ? VND.format(x) : null;
-}
-
-export function pct(x) {
-  return typeof x === "number" && Number.isFinite(x) ? `${x.toFixed(2)}%` : null;
-}
-
-export function dateYMD(x) {
-  if (!x) return null;
-  if (typeof x === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x)) return x;
-  const d = new Date(x);
-  if (Number.isNaN(d.getTime())) return null;
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
 }
 
 export function monthValueNow() {
@@ -38,28 +23,10 @@ export function monthRangeYMD(monthValue) {
   const y = Number(yStr);
   const m = Number(mStr);
   if (!Number.isFinite(y) || !Number.isFinite(m) || m < 1 || m > 12) return null;
-
   const last = new Date(y, m, 0).getDate();
   const mm = String(m).padStart(2, "0");
   const dd = String(last).padStart(2, "0");
   return { startDate: `${y}-${mm}-01`, endDate: `${y}-${mm}-${dd}`, days: last };
-}
-
-export function nextMonthsDayCount(fromMonthValue, nMonths) {
-  const [yStr, mStr] = String(fromMonthValue || "").split("-");
-  const y = Number(yStr);
-  const m = Number(mStr);
-  if (!Number.isFinite(y) || !Number.isFinite(m) || m < 1 || m > 12) return null;
-
-  let total = 0;
-  for (let i = 1; i <= nMonths; i++) {
-    const dt = new Date(y, (m - 1) + i, 1);
-    const yy = dt.getFullYear();
-    const mm = dt.getMonth() + 1;
-    const last = new Date(yy, mm, 0).getDate();
-    total += last;
-  }
-  return total;
 }
 
 export function extractChatText(payload) {
@@ -70,12 +37,11 @@ export function extractChatText(payload) {
     (typeof p?.data?.answer === "string" && p.data.answer) ||
     (typeof p?.data?.reply === "string" && p.data.reply) ||
     (typeof p === "string" && p);
-  return (typeof s === "string" && s.trim()) ? s.trim() : null;
+  return typeof s === "string" && s.trim() ? s.trim() : null;
 }
 
 export function errorToText(err) {
   if (!err) return "Lỗi không xác định.";
-
   const msg =
     (typeof err?.message === "string" && err.message) ||
     (typeof err?.error === "string" && err.error) ||
@@ -83,154 +49,202 @@ export function errorToText(err) {
     "Lỗi không xác định.";
 
   const raw = String(err?.error || err?.message || "");
-  const m = raw.match(/retry in\s+([0-9.]+)s/i) || raw.match(/retryDelay"\s*:\s*"([0-9.]+)s/i);
+  const m =
+    raw.match(/retry in\s+([0-9.]+)s/i) ||
+    raw.match(/retryDelay"\s*:\s*"([0-9.]+)s/i);
   const retry = m ? Number(m[1]) : null;
   if (Number.isFinite(retry)) return `${msg} (thử lại sau ~${Math.ceil(retry)} giây)`;
-
   return msg;
 }
 
-export function formatMonthlyReport({ startDate, endDate, dashboard, categories, overview }) {
-  const d = dashboard || {};
-  const cats = Array.isArray(categories) ? categories : Array.isArray(categories?.data) ? categories.data : [];
-
-  const lines = ["Báo cáo tháng:"];
-  lines.push(`- Kỳ: ${dateYMD(startDate) || "N/A"} → ${dateYMD(endDate) || "N/A"}`);
-
-  const totalIncome = money(d?.totalIncome);
-  const totalExpense = money(d?.totalExpense);
-  const balance = money(d?.balance);
-  const totalWalletBalance = money(d?.totalWalletBalance);
-
-  if (totalIncome) lines.push(`- Tổng thu: ${totalIncome}`);
-  if (totalExpense) lines.push(`- Tổng chi: ${totalExpense}`);
-  if (balance) lines.push(`- Chênh lệch: ${balance}`);
-  if (totalWalletBalance) lines.push(`- Tổng số dư ví: ${totalWalletBalance}`);
-  if (typeof d?.walletCount === "number") lines.push(`- Số ví: ${d.walletCount}`);
-
-  const ic = pct(d?.incomeChangePercent);
-  const ec = pct(d?.expenseChangePercent);
-  if (ic) lines.push(`- Thu so với kỳ trước: ${ic}`);
-  if (ec) lines.push(`- Chi so với kỳ trước: ${ec}`);
-
-  const sorted = [...cats].sort((a, b) => (b?.totalAmount || 0) - (a?.totalAmount || 0));
-  if (sorted.length) {
-    lines.push("Top danh mục chi:");
-    sorted.slice(0, 5).forEach((c) => {
-      const name = c?.categoryName || "Không rõ";
-      const icon = c?.categoryIcon || "";
-      const amt = money(c?.totalAmount) || "N/A";
-      lines.push(`- ${icon ? icon + " " : ""}${name}: ${amt}`);
-    });
-  } else {
-    lines.push("Top danh mục chi: Không có dữ liệu.");
-  }
-
-  // Optional overview count (only if numeric)
-  const txCount = overview?.totalTransactions ?? overview?.count;
-  if (typeof txCount === "number" && Number.isFinite(txCount)) {
-    lines.push(`- Số giao dịch: ${txCount}`);
-  }
-
-  return lines.join("\n");
+function stripMarkdown(s) {
+  let t = String(s || "");
+  // remove fenced code blocks
+  t = t.replace(/```[\s\S]*?```/g, "");
+  // remove inline code
+  t = t.replace(/`([^`]*)`/g, "$1");
+  // remove bold/italic markers
+  t = t.replace(/\*\*(.*?)\*\*/g, "$1");
+  t = t.replace(/__(.*?)__/g, "$1");
+  t = t.replace(/\*(.*?)\*/g, "$1");
+  t = t.replace(/_(.*?)_/g, "$1");
+  // normalize bullets: "* " -> "- "
+  t = t.replace(/^\s*\*\s+/gm, "- ");
+  return t;
 }
 
-export function formatAnalysisFromReport({ dashboard, categories }) {
-  const d = dashboard || {};
-  const cats = Array.isArray(categories) ? categories : Array.isArray(categories?.data) ? categories.data : [];
-  const lines = ["Phân tích:"];
-  const totalIncome = d?.totalIncome;
-  const totalExpense = d?.totalExpense;
-
-  const inc = money(totalIncome);
-  const exp = money(totalExpense);
-  const bal = money(d?.balance);
-
-  if (inc) lines.push(`- Tổng thu: ${inc}`);
-  if (exp) lines.push(`- Tổng chi: ${exp}`);
-  if (bal) lines.push(`- Chênh lệch: ${bal}`);
-
-  const ic = pct(d?.incomeChangePercent);
-  const ec = pct(d?.expenseChangePercent);
-  if (ic) lines.push(`- Thu so với kỳ trước: ${ic}`);
-  if (ec) lines.push(`- Chi so với kỳ trước: ${ec}`);
-
-  // Category share (only if we can compute)
-  if (typeof totalExpense === "number" && totalExpense > 0 && cats.length) {
-    const sorted = [...cats].sort((a, b) => (b?.totalAmount || 0) - (a?.totalAmount || 0));
-    const top = sorted[0];
-    const topAmt = typeof top?.totalAmount === "number" ? top.totalAmount : null;
-    if (typeof topAmt === "number" && Number.isFinite(topAmt)) {
-      const share = (topAmt / totalExpense) * 100;
-      lines.push(`- Danh mục chi lớn nhất: ${top?.categoryName || "Không rõ"} (${share.toFixed(1)}% tổng chi)`);
+function stripGreeting(s) {
+  const t = String(s || "").trim();
+  // remove leading greeting line(s)
+  const lines = t.split("\n");
+  while (lines.length) {
+    const l = lines[0].trim().toLowerCase();
+    if (
+      l.startsWith("chào") ||
+      l.startsWith("xin chào") ||
+      l.startsWith("hi") ||
+      l.startsWith("hello") ||
+      l.startsWith("mình là") ||
+      l.startsWith("tôi là")
+    ) {
+      lines.shift();
+      continue;
     }
+    break;
   }
-
-  if (lines.length === 1) return "Phân tích: Không đủ dữ liệu.";
-  return lines.join("\n");
+  return lines.join("\n").trim();
 }
 
-export function formatForecastLinear({ monthValue, dashboard, period }) {
-  const d = dashboard || {};
+export function compactReply(text, maxLines = 8) {
+  let s = stripGreeting(stripMarkdown(text));
+  s = s.replace(/\r/g, "").trim();
+  if (!s) return "";
+
+  // remove excessive blank lines
+  s = s.replace(/\n{3,}/g, "\n\n");
+
+  const lines = s.split("\n").map((l) => l.trim()).filter(Boolean);
+
+  // prefer bullet / numbered lines
+  const bullets = lines.filter((l) => /^(-|•|\d+\.)\s+/.test(l));
+  const chosen = (bullets.length >= 3 ? bullets : lines).slice(0, maxLines);
+
+  // ensure bullets use "- "
+  const normalized = chosen.map((l) => {
+    if (/^•\s+/.test(l)) return "- " + l.replace(/^•\s+/, "");
+    return l;
+  });
+
+  return normalized.join("\n");
+}
+
+function sumWallets(wallets) {
+  const arr = Array.isArray(wallets) ? wallets : Array.isArray(wallets?.data) ? wallets.data : [];
+  const total = arr.reduce((s, w) => s + (typeof w?.balance === "number" ? w.balance : 0), 0);
+  return {
+    count: arr.length,
+    total,
+    sample: arr.slice(0, 5).map((w) => ({
+      name: w?.name,
+      balance: typeof w?.balance === "number" ? w.balance : undefined,
+      currency: w?.currency,
+    })),
+  };
+}
+
+function slimBudgets(budgets) {
+  const arr = Array.isArray(budgets) ? budgets : Array.isArray(budgets?.data) ? budgets.data : [];
+  return arr.slice(0, 12).map((b) => ({
+    categoryId: b?.categoryId || b?.category?._id,
+    categoryName: b?.categoryName || b?.category?.name,
+    limit:
+      (typeof b?.amount === "number" ? b.amount : undefined) ??
+      (typeof b?.limit === "number" ? b.limit : undefined),
+    startDate: b?.startDate,
+    endDate: b?.endDate,
+  }));
+}
+
+function slimCategoryExpense(categories) {
+  const arr = Array.isArray(categories) ? categories : Array.isArray(categories?.data) ? categories.data : [];
+  const sorted = [...arr].sort((a, b) => (b?.totalAmount || 0) - (a?.totalAmount || 0));
+  return sorted.slice(0, 8).map((c) => ({
+    categoryId: c?.categoryId || c?._id,
+    categoryName: c?.categoryName,
+    categoryIcon: c?.categoryIcon,
+    totalAmount: typeof c?.totalAmount === "number" ? c.totalAmount : undefined,
+  }));
+}
+
+function slimTx(txs) {
+  const arr = Array.isArray(txs) ? txs : Array.isArray(txs?.data) ? txs.data : (Array.isArray(txs?.data?.data) ? txs.data.data : []);
+  return arr.slice(0, 10).map((t) => ({
+    date: t?.date,
+    type: t?.type,
+    amount: typeof t?.amount === "number" ? t.amount : undefined,
+    categoryName: t?.category?.name || t?.categoryName,
+    walletName: t?.wallet?.name || t?.walletName,
+  }));
+}
+
+/**
+ * Build a SMALL, verifiable snapshot to feed into LLM.
+ * Only totals + top categories + budget list + wallet sum + recent tx.
+ */
+export async function buildAiSnapshot({ aiApi, monthValue }) {
   const range = monthRangeYMD(monthValue);
-  if (!range) return "Dự báo: Tháng không hợp lệ.";
+  if (!range) return { period: null, note: "invalid-month" };
 
-  const totalExpense = d?.totalExpense;
-  if (typeof totalExpense !== "number" || !Number.isFinite(totalExpense) || totalExpense <= 0) {
-    return "Dự báo: Không đủ dữ liệu chi tiêu để ước tính.";
-  }
+  const settled = await Promise.allSettled([
+    aiApi.getFinancialDashboard(range),
+    aiApi.getCategoryExpenseReport(range),
+    aiApi.getWallets(),
+    aiApi.getBudgets(),
+    aiApi.getRecentTransactions(),
+  ]);
 
-  const avgDaily = totalExpense / range.days;
+  const getVal = (i) => (settled[i].status === "fulfilled" ? (settled[i].value?.data ?? settled[i].value) : null);
 
-  let days = null;
-  if (period === "week") days = 7;
-  else if (period === "month") days = nextMonthsDayCount(monthValue, 1);
-  else if (period === "quarter") days = nextMonthsDayCount(monthValue, 3);
-  else if (period === "year") days = nextMonthsDayCount(monthValue, 12);
+  const dashboard = getVal(0);
+  const categories = getVal(1);
+  const wallets = getVal(2);
+  const budgets = getVal(3);
+  const txs = getVal(4);
 
-  if (typeof days !== "number" || !Number.isFinite(days) || days <= 0) {
-    return "Dự báo: Không hỗ trợ period này.";
-  }
+  const snap = {
+    period: range,
+    dashboard: {
+      totalIncome: typeof dashboard?.totalIncome === "number" ? dashboard.totalIncome : null,
+      totalExpense: typeof dashboard?.totalExpense === "number" ? dashboard.totalExpense : null,
+      balance: typeof dashboard?.balance === "number" ? dashboard.balance : null,
+      totalWalletBalance: typeof dashboard?.totalWalletBalance === "number" ? dashboard.totalWalletBalance : null,
+    },
+    topExpenseCategories: slimCategoryExpense(categories),
+    wallets: sumWallets(wallets),
+    budgets: slimBudgets(budgets),
+    recentTransactions: slimTx(txs),
+  };
 
-  const projected = avgDaily * days;
-
-  const lines = ["Dự báo (ước tính tuyến tính):"];
-  lines.push(`- Cơ sở: tổng chi ${money(totalExpense)} trong ${range.days} ngày (≈ ${money(avgDaily)} / ngày)`);
-  lines.push(`- Period: ${period} (${days} ngày)`);
-  lines.push(`- Ước tính chi: ${money(projected) || "N/A"}`);
-
-  return lines.join("\n");
+  return snap;
 }
 
-export function formatAlertsFallback({ monthValue, dashboard, categories }) {
-  const d = dashboard || {};
-  const cats = Array.isArray(categories) ? categories : Array.isArray(categories?.data) ? categories.data : [];
+export function snapshotToSystemText(snapshot) {
+  const p = snapshot?.period;
+  const d = snapshot?.dashboard || {};
+  const lines = [];
+  lines.push("DATA_TEXT:");
+  if (p?.startDate && p?.endDate) lines.push(`Period: ${p.startDate} -> ${p.endDate}`);
+  if (typeof d.totalIncome === "number") lines.push(`TotalIncome: ${money(d.totalIncome)}`);
+  if (typeof d.totalExpense === "number") lines.push(`TotalExpense: ${money(d.totalExpense)}`);
+  if (typeof d.balance === "number") lines.push(`Balance: ${money(d.balance)}`);
+  if (typeof d.totalWalletBalance === "number") lines.push(`WalletTotal: ${money(d.totalWalletBalance)}`);
 
-  const lines = ["Cảnh báo (từ dữ liệu kỳ):"];
-  let count = 0;
-
-  if (typeof d?.balance === "number" && d.balance < 0) {
-    lines.push(`- Chi vượt thu trong kỳ: ${money(Math.abs(d.balance)) || "N/A"}`);
-    count++;
+  const cats = Array.isArray(snapshot?.topExpenseCategories) ? snapshot.topExpenseCategories : [];
+  if (cats.length) {
+    lines.push("TopExpenseCategories:");
+    cats.slice(0, 6).forEach((c) => {
+      if (typeof c?.totalAmount === "number") {
+        lines.push(`- ${c.categoryIcon ? c.categoryIcon + " " : ""}${c.categoryName || "N/A"}: ${money(c.totalAmount)}`);
+      }
+    });
   }
 
-  if (typeof d?.expenseChangePercent === "number" && Number.isFinite(d.expenseChangePercent)) {
-    lines.push(`- Chi so với kỳ trước: ${pct(d.expenseChangePercent) || "N/A"}`);
-    count++;
+  const budgets = Array.isArray(snapshot?.budgets) ? snapshot.budgets : [];
+  if (budgets.length) {
+    lines.push("Budgets:");
+    budgets.slice(0, 10).forEach((b) => {
+      const lim = typeof b?.limit === "number" ? money(b.limit) : null;
+      lines.push(`- ${b.categoryName || b.categoryId || "N/A"}: ${lim || "Không đủ dữ liệu để xác minh"} (${b.startDate || "?"} -> ${b.endDate || "?"})`);
+    });
   }
 
-  // Top category share
-  if (typeof d?.totalExpense === "number" && d.totalExpense > 0 && cats.length) {
-    const sorted = [...cats].sort((a, b) => (b?.totalAmount || 0) - (a?.totalAmount || 0));
-    const top = sorted[0];
-    const topAmt = typeof top?.totalAmount === "number" ? top.totalAmount : null;
-    if (typeof topAmt === "number" && Number.isFinite(topAmt)) {
-      const share = (topAmt / d.totalExpense) * 100;
-      lines.push(`- Danh mục chi lớn nhất: ${top?.categoryName || "Không rõ"} (${share.toFixed(1)}% tổng chi)`);
-      count++;
-    }
+  const walletSum = snapshot?.wallets;
+  if (walletSum && typeof walletSum.total === "number") {
+    lines.push(`Wallets: ${walletSum.count} | TotalBalance: ${money(walletSum.total)}`);
   }
 
-  if (count == 0) return "Không có cảnh báo.";
+  // Also include compact JSON for exact parse if model wants
+  lines.push("DATA_JSON:" + JSON.stringify(snapshot));
+
   return lines.join("\n");
 }

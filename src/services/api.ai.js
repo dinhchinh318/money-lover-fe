@@ -1,22 +1,8 @@
 import axios from "./axios.customize";
 
 /**
- * api.ai.js
- *
- * baseURL (axios.customize.js): http://localhost:5000 (KHÔNG có /v1/api)
- * => Tất cả path trong file này dùng FULL prefix /v1/api/...
- *
- * Endpoints dùng cho AI UI:
- * - Chat:        POST /v1/api/chat/quick-query   body: { query, context }
- * - Alerts:      GET  /v1/api/ai/alerts
- * - SuggestBudget:GET /v1/api/ai/suggest-budget?categoryId=...
- *
- * Endpoints deterministic để lấy dữ liệu tháng (không phụ thuộc Gemini):
- * - GET /v1/api/report/financial-dashboard?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
- * - GET /v1/api/report/category/expense?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
- * - GET /v1/api/transaction/stats/overview?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
- *
- * (Các endpoint analysis/insights/forecast có thể rỗng khi Gemini 429/503)
+ * baseURL (axios.customize.js) là host (ví dụ http://localhost:5000)
+ * => mọi endpoint dùng full prefix /v1/api/...
  */
 
 export const aiApi = {
@@ -25,37 +11,22 @@ export const aiApi = {
   suggestBudget: (categoryId) =>
     axios.get("/v1/api/ai/suggest-budget", { params: { categoryId } }),
 
-  // ===== Analysis (AI-dependent) =====
-  insights: () => axios.get("/v1/api/analysis/insights"),
-  quickMonthly: () => axios.get("/v1/api/analysis/quick/monthly"),
-  analyzeSpending: ({ startDate, endDate }) =>
-    axios.post("/v1/api/analysis/spending", { startDate, endDate }),
-  forecast: ({ period }) => axios.post("/v1/api/analysis/forecast", { period }),
-  compare: ({ period1Start, period1End, period2Start, period2End }) =>
-    axios.post("/v1/api/analysis/compare", {
-      period1Start,
-      period1End,
-      period2Start,
-      period2End,
-    }),
-
-  // ===== Reports (deterministic monthly data) =====
+  // ===== Deterministic data (không phụ thuộc Gemini) =====
   getFinancialDashboard: ({ startDate, endDate }) =>
     axios.get("/v1/api/report/financial-dashboard", { params: { startDate, endDate } }),
 
   getCategoryExpenseReport: ({ startDate, endDate }) =>
     axios.get("/v1/api/report/category/expense", { params: { startDate, endDate } }),
 
-  getStatsOverview: ({ startDate, endDate }) =>
-    axios.get("/v1/api/transaction/stats/overview", { params: { startDate, endDate } }),
+  getWallets: () => axios.get("/v1/api/wallet"),
+  getBudgets: () => axios.get("/v1/api/budget"),
+  getRecentTransactions: () =>
+    axios.get("/v1/api/transaction", { params: { limit: 10, sortBy: "-date" } }),
 
   // ===== Chat =====
-  // Backend expects: { query, context }
+  // Backend expects body: { query, context }
   chat: ({ message, context }) =>
-    axios.post("/v1/api/chat/quick-query", {
-      query: message,
-      context,
-    }),
+    axios.post("/v1/api/chat/quick-query", { query: message, context }),
 };
 
 export function normalizeApiError(err) {
@@ -64,24 +35,20 @@ export function normalizeApiError(err) {
   return { message: err?.message || "Unknown error" };
 }
 
+// useAiAlerts.js imports this
 export function pickAlertsPayload(payload) {
   const raw = payload;
   const candidates = [raw?.data?.alerts, raw?.alerts, raw?.data, raw];
 
   let list = [];
   for (const c of candidates) {
-    if (Array.isArray(c)) {
-      list = c;
-      break;
-    }
-    if (c && Array.isArray(c.alerts)) {
-      list = c.alerts;
-      break;
-    }
+    if (Array.isArray(c)) { list = c; break; }
+    if (c && Array.isArray(c.alerts)) { list = c.alerts; break; }
   }
   return { list: Array.isArray(list) ? list : [], raw };
 }
 
+// AiAlertsPanel.jsx imports this
 export function stableAlertKey(a, idx) {
   return (
     a?._id ||
