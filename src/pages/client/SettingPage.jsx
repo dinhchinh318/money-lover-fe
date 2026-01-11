@@ -1,164 +1,322 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Card, Form, Switch, Button, message, Space, Typography, Divider, 
-  Spin, Tag, Row, Col, Popconfirm, Tooltip, Select, Segmented, ConfigProvider
+  Card,
+  Form,
+  Switch,
+  Button,
+  message,
+  Space,
+  Typography,
+  Spin,
+  Tag,
+  Row,
+  Col,
+  Popconfirm,
+  Select,
+  Segmented,
+  Input,
+  InputNumber,
 } from "antd";
 import {
-  SettingOutlined, EditOutlined, SaveOutlined, CloseOutlined,
-  ReloadOutlined, LockOutlined, BellOutlined, GlobalOutlined,
-  AppstoreOutlined, InfoCircleOutlined, BgColorsOutlined
+  SettingOutlined,
+  EditOutlined,
+  SaveOutlined,
+  CloseOutlined,
+  ReloadOutlined,
+  LockOutlined,
+  BellOutlined,
+  GlobalOutlined,
+  AppstoreOutlined,
+  BgColorsOutlined,
 } from "@ant-design/icons";
-import { getMySettingAPI, updateMySettingAPI, resetMySettingAPI } from "../../services/api.setting";
+
+import {
+  getMySettingAPI,
+  updateMySettingAPI,
+  resetMySettingAPI,
+} from "../../services/api.setting";
+import { useCurrentApp } from "../../components/context/app.context";
+
+// ✅ i18n
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
-// 1. Danh sách các trường kỹ thuật tuyệt đối không hiển thị
-const EXCLUDED_FIELDS = ["_id", "id", "user", "userId", "createdAt", "updatedAt", "deletedAt", "__v", "deleted", "isSystem", "role"];
+const EXCLUDED_FIELDS = [
+  "_id",
+  "id",
+  "user",
+  "userId",
+  "createdAt",
+  "updatedAt",
+  "deletedAt",
+  "__v",
+  "deleted",
+  "isSystem",
+  "role",
+];
 
-// 2. Định nghĩa các Options cho các trường đặc thù (Thay vì nhập liệu)
-const FIELD_OPTIONS = {
-  language: [
-    { label: 'Tiếng Việt', value: 'vi' },
-    { label: 'English', value: 'en' },
-    { label: 'Français', value: 'fr' }
-  ],
-  currency: [
-    { label: 'VNĐ (₫)', value: 'VND' },
-    { label: 'USD ($)', value: 'USD' },
-    { label: 'EUR (€)', value: 'EUR' }
-  ],
-  theme: [
-    { label: 'Sáng', value: 'light', icon: <BgColorsOutlined /> },
-    { label: 'Tối', value: 'dark', icon: <BgColorsOutlined /> },
-    { label: 'Hệ thống', value: 'system', icon: <SettingOutlined /> }
-  ],
-  notificationFrequency: [
-    { label: 'Tức thì', value: 'instant' },
-    { label: 'Hàng ngày', value: 'daily' },
-    { label: 'Hàng tuần', value: 'weekly' }
-  ]
+const toLabel = (s = "") =>
+  String(s)
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[_-]/g, " ")
+    .replace(/^./, (c) => c.toUpperCase())
+    .trim();
+
+const getFieldLabel = (t, pathArr) => {
+  const last = pathArr[pathArr.length - 1];
+  const fallback = toLabel(last);
+
+  // ưu tiên path đầy đủ (nested), nếu thiếu thì fallback theo key cuối
+  // settings.fieldLabels.transactions
+  // settings.fieldLabels.notifications.push
+  const byPath = `settings.fieldLabels.${pathArr.join(".")}`;
+  const byKey = `settings.fieldLabels.${last}`;
+
+  return t(byPath, {
+    defaultValue: t(byKey, { defaultValue: fallback }),
+  });
+};
+
+
+const isPlainObject = (v) =>
+  v !== null && typeof v === "object" && !Array.isArray(v);
+
+const getObjectKeys = (obj) => (obj ? Object.keys(obj) : []);
+
+const isAllBooleanObject = (obj) => {
+  if (!isPlainObject(obj)) return false;
+  const keys = Object.keys(obj);
+  if (keys.length === 0) return false;
+  return keys.every((k) => typeof obj[k] === "boolean");
 };
 
 const SettingPage = () => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
+  const { applySettings } = useCurrentApp();
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [rawSetting, setRawSetting] = useState(null);
+
+  const pickAppSettings = (obj) => ({
+    theme: obj?.theme,
+    language: obj?.language,
+    currency: obj?.currency,
+  });
+
+  // ✅ options theo i18n (phải useMemo để label cập nhật khi đổi ngôn ngữ)
+  const FIELD_OPTIONS = useMemo(
+    () => ({
+      language: [
+        { label: t("settings.options.language.vi"), value: "vi" },
+        { label: t("settings.options.language.en"), value: "en" },
+      ],
+      currency: [{ label: t("settings.options.currency.vnd"), value: "VND" }],
+      theme: [
+        {
+          label: (
+            <span className="flex items-center gap-2">
+              <BgColorsOutlined /> {t("settings.options.theme.light")}
+            </span>
+          ),
+          value: "light",
+        },
+        {
+          label: (
+            <span className="flex items-center gap-2">
+              <BgColorsOutlined /> {t("settings.options.theme.dark")}
+            </span>
+          ),
+          value: "dark",
+        },
+        {
+          label: (
+            <span className="flex items-center gap-2">
+              <SettingOutlined /> {t("settings.options.theme.system")}
+            </span>
+          ),
+          value: "system",
+        },
+      ],
+      notificationFrequency: [
+        { label: t("settings.options.notif.instant"), value: "instant" },
+        { label: t("settings.options.notif.daily"), value: "daily" },
+        { label: t("settings.options.notif.weekly"), value: "weekly" },
+      ],
+    }),
+    [t]
+  );
 
   const fetchSetting = async () => {
     setLoading(true);
     try {
       const res = await getMySettingAPI();
       const setting = res?.data?.data ?? res?.data ?? null;
-      
+
       if (setting) {
         const cleanSetting = Object.keys(setting)
-          .filter(key => !EXCLUDED_FIELDS.includes(key))
+          .filter((key) => !EXCLUDED_FIELDS.includes(key))
           .reduce((obj, key) => {
             obj[key] = setting[key];
             return obj;
           }, {});
-        
+
         setRawSetting(cleanSetting);
         form.setFieldsValue(cleanSetting);
+
+        // ✅ Apply ngay vào toàn app
+        applySettings(pickAppSettings(cleanSetting));
       }
+
       setIsEditing(false);
     } catch (err) {
-      message.error("Không thể kết nối máy chủ thiết lập");
+      message.error(t("settings.toast.serverError"));
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchSetting(); }, []);
+  useEffect(() => {
+    fetchSetting();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSave = async () => {
     try {
       const values = await form.validateFields();
       setSaving(true);
+
+      // ✅ Apply ngay (optimistic)
+      applySettings(pickAppSettings(values));
+
       await updateMySettingAPI(values);
-      message.success("Thiết lập đã được cập nhật thành công");
+      message.success(t("settings.toast.updated"));
+
       await fetchSetting();
     } catch (err) {
-      message.error("Lỗi cập nhật");
+      message.error(t("settings.toast.updateError"));
     } finally {
       setSaving(false);
     }
   };
 
-  // Phân loại nhóm logic
+  const onCancelEdit = () => {
+    setIsEditing(false);
+    form.setFieldsValue(rawSetting);
+    applySettings(pickAppSettings(rawSetting));
+  };
+
   const groupedFields = useMemo(() => {
     if (!rawSetting) return {};
     const groups = {
-      security: { title: "Bảo mật tài khoản", icon: <LockOutlined />, keys: [] },
-      notification: { title: "Thông báo & Nhắc nhở", icon: <BellOutlined />, keys: [] },
-      display: { title: "Giao diện & Ngôn ngữ", icon: <GlobalOutlined />, keys: [] },
-      other: { title: "Cấu hình khác", icon: <AppstoreOutlined />, keys: [] },
+      security: { title: t("settings.groups.security"), icon: <LockOutlined />, keys: [] },
+      notification: {
+        title: t("settings.groups.notification"),
+        icon: <BellOutlined />,
+        keys: [],
+      },
+      display: {
+        title: t("settings.groups.display"),
+        icon: <GlobalOutlined />,
+        keys: [],
+      },
+      other: { title: t("settings.groups.other"), icon: <AppstoreOutlined />, keys: [] },
     };
 
-    Object.keys(rawSetting).forEach(key => {
+    Object.keys(rawSetting).forEach((key) => {
       const k = key.toLowerCase();
       if (k.match(/pass|2fa|security|lock|privacy/)) groups.security.keys.push(key);
       else if (k.match(/notif|alert|remind|email|push/)) groups.notification.keys.push(key);
       else if (k.match(/theme|lang|color|display|mode|currency/)) groups.display.keys.push(key);
       else groups.other.keys.push(key);
     });
+
     return groups;
-  }, [rawSetting]);
+  }, [rawSetting, t]);
 
-  // Hàm render UI thông minh dựa trên Key và Type
-  const renderSmartField = (key) => {
-    const value = rawSetting[key];
+  const findOptionKey = (pathStrLower) =>
+    Object.keys(FIELD_OPTIONS).find((optKey) =>
+      pathStrLower.includes(optKey.toLowerCase())
+    );
+
+  const renderBooleanTile = (namePath, label) => (
+    <Col xs={24} sm={12} md={8} key={namePath.join(".")}>
+      <div
+        className={[
+          "flex items-center justify-between gap-4 rounded-2xl p-4 border",
+          "bg-slate-50 border-slate-200",
+          "dark:bg-slate-900/40 dark:border-slate-800",
+        ].join(" ")}
+      >
+        <div className="min-w-0">
+          <Text className="!text-slate-900 dark:!text-slate-100 !font-semibold block truncate">
+            {label}
+          </Text>
+          <Text type="secondary" className="!text-xs">
+            {t("settings.booleanHint")}
+          </Text>
+        </div>
+
+        <Form.Item name={namePath} valuePropName="checked" noStyle>
+          <Switch disabled={!isEditing} />
+        </Form.Item>
+      </div>
+    </Col>
+  );
+
+  const renderPrimitiveField = (namePath, value, label, pathStrLower) => {
     const type = typeof value;
-    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
 
-    // 1. Dạng Boolean (Switch)
     if (type === "boolean") {
-      return (
-        <Col xs={24} key={key}>
-          <div className={`setting-row-item ${!isEditing ? 'readonly' : ''}`}>
-            <div className="setting-info">
-              <Text strong className="setting-label">{label}</Text>
-              <Text type="secondary" className="setting-desc">Kích hoạt hoặc vô hiệu hóa tính năng này</Text>
-            </div>
-            <Form.Item name={key} valuePropName="checked" noStyle>
-              <Switch disabled={!isEditing} size="medium" />
-            </Form.Item>
-          </div>
-        </Col>
-      );
+      return renderBooleanTile(namePath, label);
     }
 
-    // 2. Dạng Lựa chọn (Select/Segmented) - Nếu có trong FIELD_OPTIONS
-    const optionKey = Object.keys(FIELD_OPTIONS).find(optKey => key.toLowerCase().includes(optKey));
-    
+    const optionKey = findOptionKey(pathStrLower);
+    const isNumber = type === "number";
+
     return (
-      <Col xs={24} md={12} key={key}>
-        <div className="setting-input-card">
-          <Form.Item name={key} label={<Text strong className="input-label">{label}</Text>}>
+      <Col xs={24} md={12} key={namePath.join(".")}>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:bg-slate-950 dark:border-slate-800">
+          <Form.Item
+            name={namePath}
+            label={
+              <Text className="!text-slate-900 dark:!text-slate-100 !font-semibold">
+                {label}
+              </Text>
+            }
+            className="mb-0"
+          >
             {optionKey ? (
-              key.toLowerCase().includes('theme') ? (
-                <Segmented 
-                  options={FIELD_OPTIONS[optionKey]} 
-                  disabled={!isEditing} 
-                  block 
-                  className="modern-segmented"
+              pathStrLower.includes("theme") ? (
+                <Segmented
+                  options={FIELD_OPTIONS[optionKey]}
+                  disabled={!isEditing}
+                  block
+                  className="w-full"
                 />
               ) : (
-                <Select 
-                  options={FIELD_OPTIONS[optionKey]} 
-                  disabled={!isEditing} 
-                  className="modern-select"
-                  placeholder="Chọn giá trị..."
+                <Select
+                  options={FIELD_OPTIONS[optionKey]}
+                  disabled={!isEditing}
+                  className="w-full"
+                  placeholder={t("settings.placeholders.select")}
                 />
               )
+            ) : isNumber ? (
+              <InputNumber
+                disabled={!isEditing}
+                className="w-full"
+                style={{ width: "100%" }}
+                placeholder={t("settings.placeholders.number")}
+              />
             ) : (
-               /* Fallback cho các trường không xác định nhưng không phải boolean */
-              <Select 
-                disabled={!isEditing} 
-                className="modern-select"
-                options={[{label: value, value: value}]} 
+              <Input
+                disabled={!isEditing}
+                className="w-full"
+                placeholder={t("settings.placeholders.input")}
               />
             )}
           </Form.Item>
@@ -167,158 +325,243 @@ const SettingPage = () => {
     );
   };
 
-  return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: '#10b981',
-          borderRadius: 12,
-        },
-      }}
-    >
-      <div className="page-wrapper">
-        <div className="content-container">
-          <header className="page-header">
-            <Space size={16}>
-              <div className="icon-box"><SettingOutlined /></div>
-              <div>
-                <Title level={3} style={{ margin: 0 }}>Cấu hình ứng dụng</Title>
-                <Text type="secondary">Tùy chỉnh trải nghiệm cá nhân và bảo mật của bạn</Text>
-              </div>
-            </Space>
-            <div className="header-status">
-              {isEditing ? <Tag color="warning" className="pulse-tag">Đang chỉnh sửa</Tag> : <Tag color="success">Chế độ xem</Tag>}
+  const renderObjectGroup = (basePath, objValue, titleLabel, depth = 0) => {
+    const keys = getObjectKeys(objValue);
+
+    if (isAllBooleanObject(objValue)) {
+      return (
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:bg-slate-950 dark:border-slate-800">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Text className="!text-slate-900 dark:!text-slate-100 !font-semibold">
+                {titleLabel}
+              </Text>
+              <Tag className="m-0">
+                {t("settings.count.options", { count: keys.length })}
+              </Tag>
             </div>
-          </header>
+            {!isEditing && <Tag color="green">{t("settings.mode.view")}</Tag>}
+          </div>
 
-          {loading ? (
-            <div className="loading-state"><Spin size="large" /></div>
-          ) : (
-            <Form form={form} layout="vertical" requiredMark={false}>
-              {Object.values(groupedFields).map(group => (
-                group.keys.length > 0 && (
-                  <Card key={group.title} className="group-card" bordered={false}>
-                    <div className="group-header">
-                      <span className="group-icon">{group.icon}</span>
-                      <Text strong className="group-title">{group.title}</Text>
+          <Row gutter={[16, 12]}>
+            {keys.map((k) => {
+              const p = [...basePath, k];
+              return renderBooleanTile(p, getFieldLabel(t, p));
+            })}
+          </Row>
+        </div>
+      );
+    }
+
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:bg-slate-950 dark:border-slate-800">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Text className="!text-slate-900 dark:!text-slate-100 !font-semibold">
+              {titleLabel}
+            </Text>
+            <Tag className="m-0">
+              {t("settings.count.items", { count: keys.length })}
+            </Tag>
+          </div>
+          {!isEditing && <Tag color="green">{t("settings.mode.view")}</Tag>}
+        </div>
+
+        <Row gutter={[16, 12]}>
+          {keys.map((subKey) => {
+            const subVal = objValue[subKey];
+            const path = [...basePath, subKey];
+            const pathStrLower = path.join(".").toLowerCase();
+            const subLabel = getFieldLabel(t, path);
+
+            if (isPlainObject(subVal)) {
+              if (depth >= 1) {
+                if (isAllBooleanObject(subVal)) {
+                  return (
+                    <Col xs={24} key={path.join(".")}>
+                      {renderObjectGroup(path, subVal, subLabel, depth + 1)}
+                    </Col>
+                  );
+                }
+                return (
+                  <Col xs={24} md={12} key={path.join(".")}>
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:bg-slate-900/40 dark:border-slate-800">
+                      <Text className="!text-slate-900 dark:!text-slate-100 !font-semibold">
+                        {subLabel}
+                      </Text>
+                      <div className="mt-2">
+                        <Tag className="m-0">{t("settings.advancedConfig")}</Tag>
+                      </div>
                     </div>
-                    <Row gutter={[24, 8]}>
-                      {group.keys.map(k => renderSmartField(k))}
-                    </Row>
-                  </Card>
-                )
-              ))}
+                  </Col>
+                );
+              }
 
-              <div className="footer-actions">
-                <Popconfirm title="Xác nhận reset?" onConfirm={() => resetMySettingAPI().then(fetchSetting)}>
-                  <Button type="link" danger icon={<ReloadOutlined />} disabled={isEditing}>
-                    Khôi phục mặc định
+              return (
+                <Col xs={24} key={path.join(".")}>
+                  {renderObjectGroup(path, subVal, subLabel, depth + 1)}
+                </Col>
+              );
+            }
+
+            return renderPrimitiveField(path, subVal, subLabel, pathStrLower);
+          })}
+        </Row>
+      </div>
+    );
+  };
+
+  const renderSmartField = (key) => {
+    const value = rawSetting?.[key];
+    const label = getFieldLabel(t, [key]);
+
+    if (isPlainObject(value)) {
+      return (
+        <Col xs={24} key={key}>
+          {renderObjectGroup([key], value, label, 0)}
+        </Col>
+      );
+    }
+
+    return renderPrimitiveField([key], value, label, key.toLowerCase());
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 px-4 py-10 dark:bg-slate-950">
+      <div className="mx-auto w-full max-w-4xl">
+        {/* Header */}
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+              <SettingOutlined className="text-xl" />
+            </div>
+            <div>
+              <Title
+                level={3}
+                className="!m-0 !text-slate-900 dark:!text-slate-100"
+              >
+                {t("settings.title")}
+              </Title>
+              <Text type="secondary">{t("settings.subtitle")}</Text>
+            </div>
+          </div>
+
+          <div>
+            {isEditing ? (
+              <Tag color="gold" className="px-3 py-1">
+                {t("settings.mode.editing")}
+              </Tag>
+            ) : (
+              <Tag color="green" className="px-3 py-1">
+                {t("settings.mode.view")}
+              </Tag>
+            )}
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white py-16 dark:bg-slate-950 dark:border-slate-800">
+            <Spin size="large" />
+          </div>
+        ) : (
+          <Form
+            form={form}
+            layout="vertical"
+            requiredMark={false}
+            className="space-y-6"
+            onValuesChange={(changed) => {
+              if (!isEditing) return;
+
+              const all = form.getFieldsValue(true);
+              if (changed?.theme || changed?.language || changed?.currency) {
+                applySettings(pickAppSettings(all));
+              }
+            }}
+          >
+            {Object.values(groupedFields).map((group) =>
+              group.keys.length > 0 ? (
+                <Card
+                  key={group.title}
+                  bordered={false}
+                  className="!rounded-3xl !border !border-slate-200 !bg-white !shadow-sm dark:!bg-slate-950 dark:!border-slate-800"
+                  bodyStyle={{ padding: 20 }}
+                >
+                  <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-800">
+                    <span className="text-emerald-500">{group.icon}</span>
+                    <Text className="!text-xs !font-semibold !tracking-wide !text-slate-500 dark:!text-slate-300">
+                      {group.title.toUpperCase()}
+                    </Text>
+                  </div>
+
+                  <Row gutter={[16, 12]}>
+                    {group.keys.map((k) => renderSmartField(k))}
+                  </Row>
+                </Card>
+              ) : null
+            )}
+
+            {/* Footer actions */}
+            <div className="sticky bottom-4 z-10 rounded-3xl border border-slate-200 bg-white p-4 shadow-lg shadow-black/5 dark:bg-slate-950 dark:border-slate-800">
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <Popconfirm
+                  title={t("settings.resetConfirm")}
+                  onConfirm={async () => {
+                    await resetMySettingAPI();
+                    await fetchSetting();
+                  }}
+                  disabled={isEditing}
+                >
+                  <Button
+                    type="link"
+                    danger
+                    icon={<ReloadOutlined />}
+                    disabled={isEditing}
+                    className="!p-0"
+                  >
+                    {t("settings.reset")}
                   </Button>
                 </Popconfirm>
 
                 <Space>
                   {!isEditing ? (
-                    <Button type="primary" size="large" className="btn-main" onClick={() => setIsEditing(true)} icon={<EditOutlined />}>
-                      Thay đổi thiết lập
+                    <Button
+                      type="primary"
+                      size="large"
+                      onClick={() => setIsEditing(true)}
+                      icon={<EditOutlined />}
+                      className="!h-12 !rounded-2xl !bg-emerald-500 !shadow-md !shadow-emerald-500/20 hover:!bg-emerald-600"
+                    >
+                      {t("settings.editBtn")}
                     </Button>
                   ) : (
                     <>
-                      <Button size="large" onClick={() => { setIsEditing(false); form.setFieldsValue(rawSetting); }} icon={<CloseOutlined />}>Huỷ</Button>
-                      <Button type="primary" size="large" className="btn-main" onClick={onSave} loading={saving} icon={<SaveOutlined />}>
-                        Lưu cấu hình
+                      <Button
+                        size="large"
+                        onClick={onCancelEdit}
+                        icon={<CloseOutlined />}
+                        className="!h-12 !rounded-2xl"
+                      >
+                        {t("settings.cancelBtn")}
+                      </Button>
+                      <Button
+                        type="primary"
+                        size="large"
+                        onClick={onSave}
+                        loading={saving}
+                        icon={<SaveOutlined />}
+                        className="!h-12 !rounded-2xl !bg-emerald-500 !shadow-md !shadow-emerald-500/20 hover:!bg-emerald-600"
+                      >
+                        {t("settings.saveBtn")}
                       </Button>
                     </>
                   )}
                 </Space>
               </div>
-            </Form>
-          )}
-        </div>
-
-        <style jsx="true">{`
-          .page-wrapper {
-            min-height: 100vh;
-            background: #f8fafc;
-            padding: 40px 20px;
-          }
-          .content-container {
-            max-width: 850px;
-            margin: 0 auto;
-          }
-          .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-          }
-          .icon-box {
-            width: 50px; height: 50px;
-            background: #10b981;
-            color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px;
-            border-radius: 14px;
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
-          }
-          .group-card {
-            margin-bottom: 24px;
-            border-radius: 20px !important;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
-          }
-          .group-header {
-            display: flex; align-items: center; gap: 10px;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #f1f5f9;
-          }
-          .group-icon { color: #10b981; font-size: 18px; }
-          .group-title { text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-size: 12px; }
-
-          /* Item Style */
-          .setting-row-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            transition: 0.3s;
-          }
-          .setting-row-item.readonly { background: #ffffff; border: 1px solid #f1f5f9; }
-          .setting-info { display: flex; flex-direction: column; }
-          .setting-label { font-size: 15px; color: #1e293b; }
-          .setting-desc { font-size: 12px; }
-
-          .modern-select { width: 100% !important; }
-          .modern-segmented { background: #f1f5f9 !important; padding: 4px !important; }
-
-          .footer-actions {
-            margin-top: 40px;
-            display: flex; justify-content: space-between; align-items: center;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 20px;
-            box-shadow: 0 -10px 20px rgba(0,0,0,0.02);
-          }
-          .btn-main {
-            height: 48px !important;
-            padding: 0 32px !important;
-            font-weight: 600 !important;
-            border-radius: 12px !important;
-            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3) !important;
-          }
-          .pulse-tag { animation: pulse 2s infinite; }
-          @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-          }
-          @media (max-width: 640px) {
-            .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
-            .footer-actions { flex-direction: column-reverse; gap: 16px; }
-          }
-        `}</style>
+            </div>
+          </Form>
+        )}
       </div>
-    </ConfigProvider>
+    </div>
   );
 };
 

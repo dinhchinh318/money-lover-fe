@@ -42,6 +42,9 @@ import {
   Cell,
 } from "recharts";
 
+// ✅ i18n
+import { useTranslation } from "react-i18next";
+
 /* =========================
    Small UI helpers (Tailwind)
 ========================= */
@@ -152,7 +155,7 @@ const EmptyState = ({ title, hint }) => (
   </div>
 );
 
-const SkeletonScreen = () => (
+const SkeletonScreen = ({ text }) => (
   <div className="min-h-screen bg-slate-50 flex items-center justify-center">
     <div className="w-full max-w-md px-6">
       <div className="rounded-2xl bg-white border border-slate-200/70 p-5 shadow-sm">
@@ -165,7 +168,7 @@ const SkeletonScreen = () => (
         </div>
         <div className="h-10 w-1/2 bg-slate-100 rounded mt-5 animate-pulse" />
       </div>
-      <p className="text-center text-slate-500 mt-4">Đang tải...</p>
+      <p className="text-center text-slate-500 mt-4">{text}</p>
     </div>
   </div>
 );
@@ -174,6 +177,8 @@ const SkeletonScreen = () => (
    Main
 ========================= */
 const WalletDetail = () => {
+  const { t, i18n } = useTranslation();
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -186,7 +191,7 @@ const WalletDetail = () => {
   const [transactions, setTransactions] = useState([]);
   const [dateRange, setDateRange] = useState(null);
 
-  // NEW: paging state
+  // paging state
   const LIMIT = 50;
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -200,7 +205,7 @@ const WalletDetail = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // NEW: khi vào tab giao dịch/thống kê hoặc đổi filter -> reset trang + tải trang 1
+  // khi vào tab giao dịch/thống kê hoặc đổi filter -> reset trang + tải trang 1
   useEffect(() => {
     if ((activeTab === "transactions" || activeTab === "statistics") && wallet) {
       resetAndLoadTransactions();
@@ -212,14 +217,14 @@ const WalletDetail = () => {
     try {
       setLoading(true);
       const res = await getWalletByIdAPI(id);
-      if (res.EC === 0 && res.data) {
+      if (res?.EC === 0 && res?.data) {
         setWallet(res.data);
       } else {
-        message.error("Không tìm thấy ví!");
+        message.error(t("walletDetail.toast.notFound"));
         navigate("/wallets");
       }
     } catch (error) {
-      message.error("Có lỗi xảy ra khi tải thông tin ví!");
+      message.error(t("walletDetail.toast.loadWalletError"));
       navigate("/wallets");
     } finally {
       setLoading(false);
@@ -232,7 +237,7 @@ const WalletDetail = () => {
     await loadTransactions({ nextPage: 1, append: false });
   };
 
-  // NEW: loadTransactions hỗ trợ append
+  // loadTransactions hỗ trợ append
   const loadTransactions = async ({ nextPage = 1, append = false } = {}) => {
     try {
       if (!wallet?._id) return;
@@ -261,7 +266,7 @@ const WalletDetail = () => {
 
       // BE: { status, error, data: { transactions, pagination } }
       if (!res?.status || res?.error !== 0) {
-        message.error(res?.message || "Không thể tải giao dịch!");
+        message.error(res?.message || t("walletDetail.toast.loadTxFail"));
         if (!append) setTransactions([]);
         setHasMore(false);
         return;
@@ -270,48 +275,53 @@ const WalletDetail = () => {
       const raw = res?.data?.transactions || [];
       const pagination = res?.data?.pagination;
 
-      const mapped = raw.map((t) => {
-        const type = t.type;
-        const amount = Number(t.amount || 0);
+      const mapped = raw.map((tx) => {
+        const type = tx.type;
+        const amount = Number(tx.amount || 0);
 
         const categoryName =
-          t?.categoryId?.name ||
-          (type === "transfer" ? "Chuyển tiền" : type === "adjust" ? "Điều chỉnh" : "Khác");
+          tx?.categoryId?.name ||
+          (type === "transfer"
+            ? t("walletDetail.tx.type.transfer")
+            : type === "adjust"
+            ? t("walletDetail.tx.type.adjust")
+            : t("walletDetail.tx.type.other"));
 
         const description =
-          t.note ||
+          tx.note ||
           (type === "transfer"
-            ? `Sang ví: ${t?.toWalletId?.name || ""}`
+            ? t("walletDetail.tx.desc.transferTo", { name: tx?.toWalletId?.name || "" })
             : type === "adjust"
-            ? `Điều chỉnh: ${t.adjustFrom ?? ""} → ${t.adjustTo ?? ""}`
+            ? t("walletDetail.tx.desc.adjust", {
+                from: tx.adjustFrom ?? "",
+                to: tx.adjustTo ?? "",
+              })
             : "");
 
         const signedAmount =
           type === "expense" ? -Math.abs(amount) : type === "income" ? Math.abs(amount) : amount;
 
         return {
-          id: t._id,
+          id: tx._id,
           category: categoryName,
           amount: signedAmount,
-          date: t.date || t.createdAt,
+          date: tx.date || tx.createdAt,
           type,
           description,
-          raw: t,
+          raw: tx,
         };
       });
 
       setTransactions((prev) => (append ? [...prev, ...mapped] : mapped));
       setPage(nextPage);
 
-      // hasMore: ưu tiên totalPages nếu có
       if (pagination?.totalPages != null) {
         setHasMore(nextPage < pagination.totalPages);
       } else {
-        // fallback: nếu trả về ít hơn limit coi như hết
         setHasMore(raw.length === LIMIT);
       }
     } catch (error) {
-      message.error("Không thể tải giao dịch!");
+      message.error(t("walletDetail.toast.loadTxError"));
       if (!append) setTransactions([]);
       setHasMore(false);
     } finally {
@@ -320,8 +330,10 @@ const WalletDetail = () => {
     }
   };
 
-  const formatCurrency = (amount, currency = "VND") =>
-    new Intl.NumberFormat("vi-VN", { style: "currency", currency }).format(amount);
+  const formatCurrency = (amount, currency = "VND") => {
+    const locale = i18n.language === "en" ? "en-US" : "vi-VN";
+    return new Intl.NumberFormat(locale, { style: "currency", currency }).format(amount);
+  };
 
   const formatDate = (date) => dayjs(date).format("DD/MM/YYYY");
 
@@ -331,22 +343,22 @@ const WalletDetail = () => {
 
   const handleDelete = () => {
     Modal.confirm({
-      title: "Xác nhận xóa ví",
-      content: `Bạn có chắc chắn muốn xóa ví "${wallet.name}"? Hành động này không thể hoàn tác.`,
-      okText: "Xóa",
+      title: t("walletDetail.confirm.delete.title"),
+      content: t("walletDetail.confirm.delete.content", { name: wallet.name }),
+      okText: t("walletDetail.confirm.delete.ok"),
       okType: "danger",
-      cancelText: "Hủy",
+      cancelText: t("walletDetail.confirm.delete.cancel"),
       onOk: async () => {
         try {
           const res = await deleteWalletAPI(wallet._id);
-          if (res.EC === 0) {
-            message.success("Xóa ví thành công!");
+          if (res?.EC === 0) {
+            message.success(t("walletDetail.toast.deleteSuccess"));
             navigate("/wallets");
           } else {
-            message.error(res.message || "Xóa ví thất bại!");
+            message.error(res?.message || t("walletDetail.toast.deleteFail"));
           }
         } catch (error) {
-          message.error("Có lỗi xảy ra!");
+          message.error(t("walletDetail.toast.genericError"));
         }
       },
     });
@@ -355,53 +367,53 @@ const WalletDetail = () => {
   const handleSetDefault = async () => {
     try {
       const res = await setDefaultWalletAPI(wallet._id);
-      if (res.EC === 0) {
-        message.success("Đặt ví mặc định thành công!");
+      if (res?.EC === 0) {
+        message.success(t("walletDetail.toast.setDefaultSuccess"));
         loadWallet();
       } else {
-        message.error(res.message || "Thao tác thất bại!");
+        message.error(res?.message || t("walletDetail.toast.actionFail"));
       }
     } catch (error) {
-      message.error("Có lỗi xảy ra!");
+      message.error(t("walletDetail.toast.genericError"));
     }
   };
 
   const handleArchive = async () => {
     try {
       const res = await archiveWalletAPI(wallet._id);
-      if (res.EC === 0) {
-        message.success("Lưu trữ ví thành công!");
+      if (res?.EC === 0) {
+        message.success(t("walletDetail.toast.archiveSuccess"));
         navigate("/wallets");
       } else {
-        message.error(res.message || "Thao tác thất bại!");
+        message.error(res?.message || t("walletDetail.toast.actionFail"));
       }
     } catch (error) {
-      message.error("Có lỗi xảy ra!");
+      message.error(t("walletDetail.toast.genericError"));
     }
   };
 
   const handleUnarchive = async () => {
     try {
       const res = await unarchiveWalletAPI(wallet._id);
-      if (res.EC === 0) {
-        message.success("Khôi phục ví thành công!");
+      if (res?.EC === 0) {
+        message.success(t("walletDetail.toast.unarchiveSuccess"));
         loadWallet();
       } else {
-        message.error(res.message || "Thao tác thất bại!");
+        message.error(res?.message || t("walletDetail.toast.actionFail"));
       }
     } catch (error) {
-      message.error("Có lỗi xảy ra!");
+      message.error(t("walletDetail.toast.genericError"));
     }
   };
 
   const calculateTransactionStats = () => {
     const income = transactions
-      .filter((t) => t.type === "income")
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      .filter((tx) => tx.type === "income")
+      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
 
     const expense = transactions
-      .filter((t) => t.type === "expense")
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      .filter((tx) => tx.type === "expense")
+      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
 
     return { income, expense };
   };
@@ -430,7 +442,7 @@ const WalletDetail = () => {
   const formatShortDay = (iso) => dayjs(iso).format("DD/MM");
 
   const statsData = useMemo(() => {
-    const raws = (transactions || []).map((t) => t.raw).filter(Boolean);
+    const raws = (transactions || []).map((tx) => tx.raw).filter(Boolean);
 
     const byDay = new Map();
     for (const r of raws) {
@@ -467,7 +479,11 @@ const WalletDetail = () => {
 
       const name =
         r?.categoryId?.name ||
-        (r?.type === "transfer" ? "Chuyển tiền" : r?.type === "adjust" ? "Điều chỉnh" : "Khác");
+        (r?.type === "transfer"
+          ? t("walletDetail.tx.type.transfer")
+          : r?.type === "adjust"
+          ? t("walletDetail.tx.type.adjust")
+          : t("walletDetail.tx.type.other"));
 
       byCat.set(name, (byCat.get(name) || 0) + Math.abs(delta));
     }
@@ -477,18 +493,17 @@ const WalletDetail = () => {
       .sort((a, b) => b.value - a.value);
 
     return { line, pie };
-  }, [transactions]);
+  }, [transactions, t]);
 
   const txGroups = useMemo(() => {
-    // Group UI-only: theo ngày
     const map = new Map();
-    for (const t of transactions) {
-      const key = dayjs(t.date).format("YYYY-MM-DD");
+    for (const tx of transactions) {
+      const key = dayjs(tx.date).format("YYYY-MM-DD");
       const arr = map.get(key) || [];
-      arr.push(t);
+      arr.push(tx);
       map.set(key, arr);
     }
-    const keys = Array.from(map.keys()).sort((a, b) => (a > b ? -1 : 1)); // newest first
+    const keys = Array.from(map.keys()).sort((a, b) => (a > b ? -1 : 1));
     return keys.map((k) => ({
       dayKey: k,
       label: dayjs(k).format("DD/MM/YYYY"),
@@ -497,11 +512,11 @@ const WalletDetail = () => {
   }, [transactions]);
 
   const dateRangeLabel = useMemo(() => {
-    if (!dateRange?.[0] || !dateRange?.[1]) return "Tất cả thời gian";
+    if (!dateRange?.[0] || !dateRange?.[1]) return t("walletDetail.filters.allTime");
     return `${dayjs(dateRange[0]).format("DD/MM")} – ${dayjs(dateRange[1]).format("DD/MM")}`;
-  }, [dateRange]);
+  }, [dateRange, t]);
 
-  if (loading) return <SkeletonScreen />;
+  if (loading) return <SkeletonScreen text={t("walletDetail.loading")} />;
   if (!wallet) return null;
 
   const currency = wallet?.currency || "VND";
@@ -512,7 +527,7 @@ const WalletDetail = () => {
       key: "edit",
       label: (
         <span className="inline-flex items-center gap-2">
-          <Edit size={16} /> Sửa ví
+          <Edit size={16} /> {t("walletDetail.actions.edit")}
         </span>
       ),
       onClick: () => handleEdit(),
@@ -522,7 +537,7 @@ const WalletDetail = () => {
           key: "default",
           label: (
             <span className="inline-flex items-center gap-2">
-              <Star size={16} /> Đặt làm mặc định
+              <Star size={16} /> {t("walletDetail.actions.setDefault")}
             </span>
           ),
           onClick: () => handleSetDefault(),
@@ -533,7 +548,7 @@ const WalletDetail = () => {
           key: "archive",
           label: (
             <span className="inline-flex items-center gap-2">
-              <Archive size={16} /> Lưu trữ
+              <Archive size={16} /> {t("walletDetail.actions.archive")}
             </span>
           ),
           onClick: () => handleArchive(),
@@ -542,7 +557,7 @@ const WalletDetail = () => {
           key: "unarchive",
           label: (
             <span className="inline-flex items-center gap-2">
-              <Archive size={16} /> Khôi phục
+              <Archive size={16} /> {t("walletDetail.actions.unarchive")}
             </span>
           ),
           onClick: () => handleUnarchive(),
@@ -552,7 +567,7 @@ const WalletDetail = () => {
           key: "delete",
           label: (
             <span className="inline-flex items-center gap-2 text-rose-600">
-              <Trash2 size={16} /> Xóa ví
+              <Trash2 size={16} /> {t("walletDetail.actions.delete")}
             </span>
           ),
           onClick: () => handleDelete(),
@@ -574,9 +589,9 @@ const WalletDetail = () => {
     </Card>
   );
 
-  const TxRow = ({ t }) => {
-    const isIncomeTx = t.type === "income";
-    const isExpenseTx = t.type === "expense";
+  const TxRow = ({ tx }) => {
+    const isIncomeTx = tx.type === "income";
+    const isExpenseTx = tx.type === "expense";
     const tone = isIncomeTx ? "emerald" : isExpenseTx ? "red" : "slate";
 
     return (
@@ -596,7 +611,7 @@ const WalletDetail = () => {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
-            <p className="font-bold text-slate-900 truncate">{t.category}</p>
+            <p className="font-bold text-slate-900 truncate">{tx.category}</p>
             <p
               className={cn(
                 "shrink-0 font-extrabold",
@@ -605,15 +620,15 @@ const WalletDetail = () => {
               )}
             >
               {isIncomeTx ? "+" : isExpenseTx ? "-" : ""}
-              {formatCurrency(Math.abs(t.amount), currency)}
+              {formatCurrency(Math.abs(tx.amount), currency)}
             </p>
           </div>
 
           <div className="mt-1 flex items-center justify-between gap-3">
             <p className="text-sm text-slate-500 truncate">
-              {t.description ? t.description : dayjs(t.date).format("HH:mm")}
+              {tx.description ? tx.description : dayjs(tx.date).format("HH:mm")}
             </p>
-            <p className="text-xs font-semibold text-slate-400 shrink-0">{dayjs(t.date).format("DD/MM")}</p>
+            <p className="text-xs font-semibold text-slate-400 shrink-0">{dayjs(tx.date).format("DD/MM")}</p>
           </div>
         </div>
       </button>
@@ -645,7 +660,7 @@ const WalletDetail = () => {
   const tabItems = [
     {
       key: "info",
-      label: "Thông tin",
+      label: t("walletDetail.tabs.info"),
       children: (
         <div className="space-y-4 sm:space-y-6">
           <Card className="p-4 sm:p-6">
@@ -665,20 +680,22 @@ const WalletDetail = () => {
                     <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 truncate">{wallet.name}</h2>
 
                     <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <SoftBadge tone={isBank ? "blue" : "emerald"}>{isBank ? "Ngân hàng" : "Tiền mặt"}</SoftBadge>
-                      {wallet.is_default ? <SoftBadge tone="emerald">Mặc định</SoftBadge> : null}
-                      {wallet.is_archived ? <SoftBadge tone="amber">Đã lưu trữ</SoftBadge> : null}
+                      <SoftBadge tone={isBank ? "blue" : "emerald"}>
+                        {isBank ? t("walletDetail.labels.bank") : t("walletDetail.labels.cash")}
+                      </SoftBadge>
+                      {wallet.is_default ? <SoftBadge tone="emerald">{t("walletDetail.badges.default")}</SoftBadge> : null}
+                      {wallet.is_archived ? <SoftBadge tone="amber">{t("walletDetail.badges.archived")}</SoftBadge> : null}
                     </div>
 
                     <p className="mt-2 text-xs text-slate-500">
-                      Cập nhật:{" "}
+                      {t("walletDetail.labels.updatedAt")}:{" "}
                       <span className="font-semibold">{formatDate(wallet.updatedAt || wallet.createdAt)}</span>
                     </p>
                   </div>
 
                   <div className="hidden sm:flex items-center gap-2">
                     <PrimaryButton onClick={handleEdit} className="px-3 py-2 rounded-xl">
-                      <Edit size={16} /> Sửa
+                      <Edit size={16} /> {t("walletDetail.actions.editShort")}
                     </PrimaryButton>
 
                     <Dropdown
@@ -700,7 +717,7 @@ const WalletDetail = () => {
                 </div>
 
                 <div className="mt-4 sm:mt-5">
-                  <p className="text-xs font-semibold text-slate-500">Số dư</p>
+                  <p className="text-xs font-semibold text-slate-500">{t("walletDetail.labels.balance")}</p>
                   <p className="mt-1 text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight">
                     {formatCurrency(wallet.balance || 0, wallet.currency)}
                   </p>
@@ -709,15 +726,15 @@ const WalletDetail = () => {
                 {isBank ? (
                   <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-3">
-                      <p className="text-xs font-semibold text-slate-500">Ngân hàng</p>
+                      <p className="text-xs font-semibold text-slate-500">{t("walletDetail.bank.bankName")}</p>
                       <p className="mt-1 font-bold text-slate-900 truncate">{wallet.bankName || "—"}</p>
                     </div>
                     <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-3">
-                      <p className="text-xs font-semibold text-slate-500">Số tài khoản</p>
+                      <p className="text-xs font-semibold text-slate-500">{t("walletDetail.bank.bankAccount")}</p>
                       <p className="mt-1 font-bold text-slate-900">{maskAccount(wallet.bankAccount) || "—"}</p>
                     </div>
                     <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-3">
-                      <p className="text-xs font-semibold text-slate-500">Mã ngân hàng</p>
+                      <p className="text-xs font-semibold text-slate-500">{t("walletDetail.bank.bankCode")}</p>
                       <p className="mt-1 font-bold text-slate-900 truncate">{wallet.bankCode || "—"}</p>
                     </div>
                   </div>
@@ -727,10 +744,10 @@ const WalletDetail = () => {
 
             <div className="sm:hidden mt-5 grid grid-cols-2 gap-3">
               <PrimaryButton onClick={handleEdit} className="w-full">
-                <Edit size={18} /> Sửa ví
+                <Edit size={18} /> {t("walletDetail.actions.edit")}
               </PrimaryButton>
               <SecondaryButton onClick={() => setActionsOpen(true)} className="w-full" type="button">
-                <MoreVertical size={18} /> Thao tác
+                <MoreVertical size={18} /> {t("walletDetail.actions.more")}
               </SecondaryButton>
             </div>
           </Card>
@@ -740,32 +757,32 @@ const WalletDetail = () => {
 
     {
       key: "transactions",
-      label: "Giao dịch",
+      label: t("walletDetail.tabs.transactions"),
       children: (
         <div className="space-y-4 sm:space-y-6">
-          <FilterBar title="Lọc giao dịch" />
+          <FilterBar title={t("walletDetail.filters.txTitle")} />
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <SummaryCard
-              title="Tổng thu"
+              title={t("walletDetail.summary.income")}
               value={formatCurrency(stats.income, currency)}
               tone="text-emerald-600"
               icon={<TrendingUp size={18} />}
             />
             <SummaryCard
-              title="Tổng chi"
+              title={t("walletDetail.summary.expense")}
               value={formatCurrency(stats.expense, currency)}
               tone="text-rose-600"
               icon={<TrendingDown size={18} />}
             />
             <SummaryCard
-              title="Biến động"
+              title={t("walletDetail.summary.net")}
               value={`${netChange >= 0 ? "+" : "-"}${formatCurrency(Math.abs(netChange), currency)}`}
               tone={netChange >= 0 ? "text-emerald-600" : "text-rose-600"}
               icon={netChange >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
             />
             <SummaryCard
-              title="Số dư"
+              title={t("walletDetail.summary.balance")}
               value={formatCurrency(wallet.balance || 0, currency)}
               tone="text-sky-600"
               icon={<Wallet size={18} />}
@@ -775,10 +792,10 @@ const WalletDetail = () => {
           <Card className="p-4 sm:p-5">
             <div className="flex items-center justify-between gap-3 mb-3">
               <div>
-                <p className="text-base font-extrabold text-slate-900">Danh sách giao dịch</p>
-                <p className="text-sm text-slate-500">Nhóm theo ngày để dễ theo dõi</p>
+                <p className="text-base font-extrabold text-slate-900">{t("walletDetail.txList.title")}</p>
+                <p className="text-sm text-slate-500">{t("walletDetail.txList.subtitle")}</p>
               </div>
-              <SoftBadge tone="slate">{transactions.length} mục</SoftBadge>
+              <SoftBadge tone="slate">{t("walletDetail.txList.count", { n: transactions.length })}</SoftBadge>
             </div>
 
             {transactions.length > 0 ? (
@@ -790,14 +807,13 @@ const WalletDetail = () => {
                     </div>
 
                     <div className="mt-3 space-y-2.5">
-                      {g.items.map((t) => (
-                        <TxRow key={t.id} t={t} />
+                      {g.items.map((tx) => (
+                        <TxRow key={tx.id} tx={tx} />
                       ))}
                     </div>
                   </div>
                 ))}
 
-                {/* NEW: Load more */}
                 <div className="pt-4">
                   {hasMore ? (
                     <SecondaryButton
@@ -806,18 +822,15 @@ const WalletDetail = () => {
                       onClick={() => loadTransactions({ nextPage: page + 1, append: true })}
                       type="button"
                     >
-                      {loadingMore ? "Đang tải..." : "Tải thêm"}
+                      {loadingMore ? t("walletDetail.actions.loadingMore") : t("walletDetail.actions.loadMore")}
                     </SecondaryButton>
                   ) : (
-                    <p className="text-center text-xs text-slate-500">Đã tải hết giao dịch</p>
+                    <p className="text-center text-xs text-slate-500">{t("walletDetail.endOfList")}</p>
                   )}
                 </div>
               </div>
             ) : (
-              <EmptyState
-                title="Chưa có giao dịch nào"
-                hint="Hãy chọn khoảng thời gian khác hoặc thêm giao dịch để bắt đầu theo dõi dòng tiền."
-              />
+              <EmptyState title={t("walletDetail.empty.tx.title")} hint={t("walletDetail.empty.tx.hint")} />
             )}
           </Card>
         </div>
@@ -826,29 +839,26 @@ const WalletDetail = () => {
 
     {
       key: "statistics",
-      label: "Thống kê",
+      label: t("walletDetail.tabs.statistics"),
       children: (
         <div className="space-y-4 sm:space-y-6">
-          <FilterBar title="Bộ lọc thống kê" />
+          <FilterBar title={t("walletDetail.filters.statsTitle")} />
 
           {statsData.line.length === 0 ? (
             <Card>
-              <EmptyState
-                title="Chưa có dữ liệu để thống kê"
-                hint="Hãy chọn khoảng thời gian khác hoặc thêm giao dịch để biểu đồ hiển thị."
-              />
+              <EmptyState title={t("walletDetail.empty.stats.title")} hint={t("walletDetail.empty.stats.hint")} />
             </Card>
           ) : (
             <>
               <Card className="p-4 sm:p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                   <div>
-                    <p className="text-base font-extrabold text-slate-900">Biến động cộng dồn</p>
-                    <p className="text-sm text-slate-500">Theo ngày (cộng dồn thay đổi số dư)</p>
+                    <p className="text-base font-extrabold text-slate-900">{t("walletDetail.charts.cumulative.title")}</p>
+                    <p className="text-sm text-slate-500">{t("walletDetail.charts.cumulative.subtitle")}</p>
                   </div>
 
                   <div className="text-sm text-slate-500">
-                    Tổng biến động:{" "}
+                    {t("walletDetail.charts.cumulative.total")}:{" "}
                     <span
                       className={cn(
                         "font-extrabold",
@@ -869,7 +879,7 @@ const WalletDetail = () => {
                       <YAxis tickFormatter={(v) => `${Math.round(v / 1000)}k`} />
                       <Tooltip
                         formatter={(value, name) => {
-                          if (name === "cumulative") return [formatCurrency(value, currency), "Cộng dồn"];
+                          if (name === "cumulative") return [formatCurrency(value, currency), t("walletDetail.legend.cumulative")];
                           return [formatCurrency(value, currency), name];
                         }}
                         labelFormatter={(label, payload) => {
@@ -881,7 +891,7 @@ const WalletDetail = () => {
                       <Line
                         type="monotone"
                         dataKey="cumulative"
-                        name="Cộng dồn"
+                        name={t("walletDetail.legend.cumulative")}
                         stroke="#10B981"
                         strokeWidth={2}
                         dot={false}
@@ -893,8 +903,8 @@ const WalletDetail = () => {
 
               <Card className="p-4 sm:p-5">
                 <div className="mb-4">
-                  <p className="text-base font-extrabold text-slate-900">Thu / Chi theo ngày</p>
-                  <p className="text-sm text-slate-500">So sánh dòng tiền vào và ra</p>
+                  <p className="text-base font-extrabold text-slate-900">{t("walletDetail.charts.inout.title")}</p>
+                  <p className="text-sm text-slate-500">{t("walletDetail.charts.inout.subtitle")}</p>
                 </div>
 
                 <div className="h-64 sm:h-80">
@@ -911,8 +921,8 @@ const WalletDetail = () => {
                         }}
                       />
                       <Legend />
-                      <Bar dataKey="income" name="Thu" fill="#10B981" radius={[10, 10, 0, 0]} />
-                      <Bar dataKey="expense" name="Chi" fill="#F43F5E" radius={[10, 10, 0, 0]} />
+                      <Bar dataKey="income" name={t("walletDetail.legend.income")} fill="#10B981" radius={[10, 10, 0, 0]} />
+                      <Bar dataKey="expense" name={t("walletDetail.legend.expense")} fill="#F43F5E" radius={[10, 10, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -921,16 +931,17 @@ const WalletDetail = () => {
               <Card className="p-4 sm:p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                   <div>
-                    <p className="text-base font-extrabold text-slate-900">Phân bổ chi tiêu</p>
-                    <p className="text-sm text-slate-500">Theo danh mục</p>
+                    <p className="text-base font-extrabold text-slate-900">{t("walletDetail.charts.pie.title")}</p>
+                    <p className="text-sm text-slate-500">{t("walletDetail.charts.pie.subtitle")}</p>
                   </div>
                   <div className="text-sm text-slate-500">
-                    Tổng chi: <span className="font-extrabold text-rose-600">{formatCurrency(stats.expense, currency)}</span>
+                    {t("walletDetail.charts.pie.totalExpense")}:{" "}
+                    <span className="font-extrabold text-rose-600">{formatCurrency(stats.expense, currency)}</span>
                   </div>
                 </div>
 
                 {statsData.pie.length === 0 ? (
-                  <EmptyState title="Chưa có dữ liệu chi tiêu" hint="Thêm giao dịch “Chi tiêu” để xem biểu đồ phân bổ." />
+                  <EmptyState title={t("walletDetail.empty.pie.title")} hint={t("walletDetail.empty.pie.hint")} />
                 ) : (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-center">
                     <div className="h-72 sm:h-80">
@@ -958,7 +969,7 @@ const WalletDetail = () => {
                                   "#FB7185",
                                   "#60A5FA",
                                   "#A78BFA",
-                                  "#F59E0B",
+                                  "#F59E0B"
                                 ][idx % 9]}
                               />
                             ))}
@@ -992,8 +1003,6 @@ const WalletDetail = () => {
               </Card>
             </>
           )}
-
-          {/* NOTE: Statistics đang dựa trên data đã load (page). Nếu muốn thống kê chuẩn toàn bộ, cần API analytics riêng. */}
         </div>
       ),
     },
@@ -1014,12 +1023,14 @@ const WalletDetail = () => {
               type="button"
             >
               <ArrowLeft size={18} />
-              <span className="text-sm font-semibold">Quay lại</span>
+              <span className="text-sm font-semibold">{t("walletDetail.actions.back")}</span>
             </button>
 
             <div className="min-w-0 text-center">
               <p className="text-sm font-extrabold text-slate-900 truncate">{wallet.name}</p>
-              <p className="text-xs text-slate-500 truncate">{isBank ? "Ví ngân hàng" : "Ví tiền mặt"}</p>
+              <p className="text-xs text-slate-500 truncate">
+                {isBank ? t("walletDetail.labels.bankWallet") : t("walletDetail.labels.cashWallet")}
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1076,7 +1087,13 @@ const WalletDetail = () => {
         }}
       />
 
-      <Modal open={actionsOpen} onCancel={() => setActionsOpen(false)} footer={null} title="Thao tác với ví" centered>
+      <Modal
+        open={actionsOpen}
+        onCancel={() => setActionsOpen(false)}
+        footer={null}
+        title={t("walletDetail.mobileActions.title")}
+        centered
+      >
         <div className="space-y-2">
           <PrimaryButton
             className="w-full"
@@ -1085,7 +1102,7 @@ const WalletDetail = () => {
               setModalOpen(true);
             }}
           >
-            <Edit size={18} /> Sửa ví
+            <Edit size={18} /> {t("walletDetail.actions.edit")}
           </PrimaryButton>
 
           {!wallet.is_default ? (
@@ -1096,7 +1113,7 @@ const WalletDetail = () => {
                 await handleSetDefault();
               }}
             >
-              <Star size={18} /> Đặt làm mặc định
+              <Star size={18} /> {t("walletDetail.actions.setDefault")}
             </SecondaryButton>
           ) : null}
 
@@ -1108,7 +1125,7 @@ const WalletDetail = () => {
                 await handleArchive();
               }}
             >
-              <Archive size={18} /> Lưu trữ
+              <Archive size={18} /> {t("walletDetail.actions.archive")}
             </SecondaryButton>
           ) : (
             <SecondaryButton
@@ -1118,7 +1135,7 @@ const WalletDetail = () => {
                 await handleUnarchive();
               }}
             >
-              <Archive size={18} /> Khôi phục
+              <Archive size={18} /> {t("walletDetail.actions.unarchive")}
             </SecondaryButton>
           )}
 
@@ -1130,10 +1147,10 @@ const WalletDetail = () => {
                 handleDelete();
               }}
             >
-              <Trash2 size={18} /> Xóa ví
+              <Trash2 size={18} /> {t("walletDetail.actions.delete")}
             </DangerButton>
           ) : (
-            <div className="text-xs text-slate-500 pt-1">* Không thể xóa ví mặc định. Hãy đổi ví mặc định trước.</div>
+            <div className="text-xs text-slate-500 pt-1">{t("walletDetail.mobileActions.cannotDeleteDefault")}</div>
           )}
         </div>
       </Modal>
