@@ -3,17 +3,17 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { aiApi, normalizeApiError } from "../../services/api.ai";
 import "../../styles/ai.css";
-import { extractChatText, errorToText } from "./aiText";
+import {
+  extractChatText,
+  errorToText,
+  buildAiSnapshot,
+  snapshotToSystemText,
+  compactReply,
+  monthValueNow,
+} from "./aiText";
 
-/**
- * AiChatWidget (Messenger-like, responsive)
- * - Portal to body (avoid overlay/overflow blocking clicks)
- * - Minimized state shows a compact bottom bar like Messenger
- * - Mobile: opens as full-screen bottom sheet (100dvh)
- * - History stored per-user (avoid account A seeing account B on same browser)
- */
-
-const SYSTEM_STYLE = "Trả lời ngắn gọn (<= 6 dòng hoặc 5 gạch đầu dòng).";
+const SYSTEM_RULES =
+  "QUY TẮC TRẢ LỜI: Không chào hỏi. Không dùng markdown. Không bịa số liệu. Chỉ dùng số trong DATA_TEXT/DATA_JSON. Nếu thiếu dữ liệu thì ghi đúng câu: Không đủ dữ liệu để xác minh. Trả lời theo format:\n- Tóm tắt: (1-2 dòng)\n- Điểm chính: tối đa 3 gạch đầu dòng\n- Hành động: tối đa 3 gạch đầu dòng\nTối đa 8 dòng.";
 
 function nowIso() {
   return new Date().toISOString();
@@ -22,7 +22,7 @@ function nowIso() {
 function makeMsg(role, text) {
   return {
     id: `${role}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    role, // user | assistant | system
+    role,
     text,
     at: nowIso(),
   };
@@ -112,18 +112,18 @@ export default function AiChatWidget({ userKey: userKeyProp }) {
   const [messages, setMessages] = useState(() => {
     const cached = loadHistory(key);
     if (cached) return cached;
-    return [makeMsg("assistant", "AI sẵn sàng. Nhập tin nhắn để chat.")];
+    return [makeMsg("assistant", "AI sẵn sàng.")];
   });
 
-  // Reload history when user changes (logout/login another account)
   useEffect(() => {
     const cached = loadHistory(key);
-    setMessages(cached || [makeMsg("assistant", "AI sẵn sàng. Nhập tin nhắn để chat.")]);
+    setMessages(cached || [makeMsg("assistant", "AI sẵn sàng.")]);
     setErrText("");
   }, [key]);
 
   const bottomRef = useRef(null);
-  const scrollDown = () => bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  const scrollDown = () =>
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
 
   useEffect(() => {
     saveHistory(key, messages);
@@ -133,14 +133,22 @@ export default function AiChatWidget({ userKey: userKeyProp }) {
     if (open && !minimized) setTimeout(scrollDown, 0);
   }, [open, minimized]);
 
-  const context = useMemo(() => {
-    const tail = messages.slice(-10).map((m) => ({ role: m.role, text: m.text, at: m.at }));
-    return [{ role: "system", text: SYSTEM_STYLE }, ...tail];
+  const tailContext = useMemo(() => {
+    return messages.slice(-10).map((m) => ({ role: m.role, text: m.text, at: m.at }));
   }, [messages]);
 
   const push = (msg) => {
     setMessages((prev) => [...prev, msg]);
     setTimeout(scrollDown, 0);
+  };
+
+  const buildContext = async () => {
+    const snapshot = await buildAiSnapshot({ aiApi, monthValue: monthValueNow() });
+    return [
+      { role: "system", text: SYSTEM_RULES },
+      { role: "system", text: snapshotToSystemText(snapshot) },
+      ...tailContext,
+    ];
   };
 
   const send = async () => {
@@ -153,14 +161,15 @@ export default function AiChatWidget({ userKey: userKeyProp }) {
     setBusy(true);
 
     try {
+      const context = await buildContext();
       const res = await aiApi.chat({ message: text, context });
-      const ans = extractChatText(res?.data ?? res) || "Không có nội dung trả lời.";
-      push(makeMsg("assistant", ans));
+      const raw = extractChatText(res?.data ?? res) || "Không đủ dữ liệu để xác minh.";
+      push(makeMsg("assistant", compactReply(raw, 8) || "Không đủ dữ liệu để xác minh."));
     } catch (e) {
       const err = normalizeApiError(e);
       const t = errorToText(err);
       setErrText(t);
-      push(makeMsg("assistant", t));
+      push(makeMsg("assistant", "Lỗi: " + t));
     } finally {
       setBusy(false);
     }
@@ -172,17 +181,6 @@ export default function AiChatWidget({ userKey: userKeyProp }) {
     try { localStorage.removeItem(key); } catch {}
   };
 
-  useEffect(() => {
-    const onKey = (ev) => {
-      if (ev.key === "Escape") {
-        setOpen(false);
-        setMinimized(false);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
   const ui = (
     <div className="ai-portal-layer">
       {!open ? (
@@ -191,31 +189,18 @@ export default function AiChatWidget({ userKey: userKeyProp }) {
         </button>
       ) : (
         <div className={`ai-widget ai-widget--messenger ${minimized ? "is-minimized" : ""}`} role="dialog" aria-label="AI Chat">
-          <div
-            className="ai-widget__head ai-widget__head--messenger"
-            onClick={() => { if (minimized) setMinimized(false); }}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (minimized && (e.key === "Enter" || e.key === " ")) setMinimized(false);
-            }}
-          >
+          <div className="ai-widget__head ai-widget__head--messenger">
             <div className="ai-widget__title">
               <span className="ai-widget__dot" aria-hidden="true" />
               <span>MoneyLover AI</span>
             </div>
 
             <div className="ai-widget__headActions">
-              <button className="ai-widget__iconBtn" onClick={(e) => { e.stopPropagation(); nav("/ai"); }} title="Mở trang AI" type="button">↗</button>
-              <button
-                className="ai-widget__iconBtn"
-                onClick={(e) => { e.stopPropagation(); setMinimized((v) => !v); }}
-                title={minimized ? "Mở rộng" : "Thu nhỏ"}
-                type="button"
-              >
+              <button className="ai-widget__iconBtn" onClick={() => nav("/ai")} title="Mở trang AI" type="button">↗</button>
+              <button className="ai-widget__iconBtn" onClick={() => setMinimized((v) => !v)} title={minimized ? "Mở rộng" : "Thu nhỏ"} type="button">
                 {minimized ? "▢" : "—"}
               </button>
-              <button className="ai-widget__iconBtn" onClick={(e) => { e.stopPropagation(); setOpen(false); setMinimized(false); }} title="Đóng" type="button">✕</button>
+              <button className="ai-widget__iconBtn" onClick={() => { setOpen(false); setMinimized(false); }} title="Đóng" type="button">✕</button>
             </div>
           </div>
 
