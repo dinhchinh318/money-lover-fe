@@ -272,7 +272,7 @@ export default function GroupsPage() {
       <Modal open={!!deleteTarget} title="Delete group" onClose={closeDelete}>
         <form onSubmit={onDeleteSubmit} className="space-y-3">
           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            Bạn sắp xoá nhóm <b>{deleteTarget?.name}</b>. Hành động này không thể hoàn tác.
+            Bạn sắp xoá nhóm "<b>{deleteTarget?.name}</b>". Hành động này không thể hoàn tác.
           </div>
 
           <div>
