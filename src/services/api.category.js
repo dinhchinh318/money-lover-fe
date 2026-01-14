@@ -31,6 +31,5 @@ export {
     createCategoryAPI,
     updateCategoryAPI,
     deleteCategoryAPI,
-    setDefaultCategoryAPI,
 };
 
