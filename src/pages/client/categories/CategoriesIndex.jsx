@@ -1,15 +1,161 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Edit, Trash2, Folder, TrendingUp, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Folder, Search } from "lucide-react";
 import { message, Modal, Pagination, Input } from "antd";
-import {
-  getCategoriesAPI,
-  deleteCategoryAPI,
-  setDefaultCategoryAPI,
-} from "../../../services/api.category";
+import { getCategoriesAPI, deleteCategoryAPI } from "../../../services/api.category";
 import CategoryModal from "../../../components/categories/CategoryModal";
-
-// ✅ i18n
 import { useTranslation } from "react-i18next";
+
+function buildCategoryTree(list = []) {
+  const map = new Map();
+  const roots = [];
+
+  const getParentId = (c) => {
+    const p = c?.parent_id;
+    if (!p) return null;
+    if (typeof p === "string") return p;
+    if (typeof p === "object" && p._id) return String(p._id);
+    return String(p);
+  };
+
+  for (const c of list) {
+    map.set(String(c._id), { ...c, children: [] });
+  }
+
+  for (const c of list) {
+    const id = String(c._id);
+    const node = map.get(id);
+    const parentId = getParentId(c);
+
+    if (parentId && map.has(String(parentId))) {
+      map.get(String(parentId)).children.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+
+  const sortRec = (nodes) => {
+    nodes.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    nodes.forEach((n) => sortRec(n.children || []));
+  };
+  sortRec(roots);
+
+  return roots;
+}
+
+function filterTree(nodes, predicate, queryLower) {
+  const q = (queryLower || "").trim();
+
+  const dfs = (node) => {
+    const children = (node.children || []).map(dfs).filter(Boolean);
+
+    const name = (node.name || "").toLowerCase();
+    const selfMatch = !q || name.includes(q);
+
+    const typeMatch = predicate(node);
+
+    if (typeMatch && (selfMatch || children.length > 0)) {
+      return { ...node, children };
+    }
+    return null;
+  };
+
+  return (nodes || []).map(dfs).filter(Boolean);
+}
+
+function CategoryRow({ node, level = 0, t, getIconEmoji, onEdit, onDelete }) {
+  const [open, setOpen] = useState(true);
+  const hasChildren = (node.children || []).length > 0;
+
+  return (
+    <div className="w-full">
+      <div
+        className="ds-card group w-full flex items-center gap-4 px-4 py-3 hover:shadow-md transition"
+        style={{ marginLeft: level * 18 }}
+      >
+        {/* Expand / bullet */}
+        <div className="w-8 flex items-center justify-center shrink-0">
+          {hasChildren ? (
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center"
+              title={open ? t("common3.collapse") : t("common3.expand")}
+            >
+              <span className="text-lg leading-none">{open ? "▾" : "▸"}</span>
+            </button>
+          ) : (
+            <span className="text-slate-300">•</span>
+          )}
+        </div>
+
+        {/* Icon */}
+        <div
+          className={`w-11 h-11 rounded-full flex items-center justify-center text-2xl shrink-0 ${
+            node.type === "income" ? "bg-[#10B981]/10" : "bg-[#EF4444]/10"
+          }`}
+        >
+          {getIconEmoji(node.icon)}
+        </div>
+
+        {/* Name + meta */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="font-semibold text-slate-900 truncate">{node.name}</div>
+
+            <span
+              className={`ds-badge ${
+                node.type === "income" ? "ds-badge-success" : "ds-badge-danger"
+              }`}
+            >
+              {node.type === "income" ? t("categories.type.income") : t("categories.type.expense")}
+            </span>
+
+            {hasChildren && (
+              <span className="text-xs text-slate-500">
+                {t("categories.badge.child")} • {node.children.length}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={() => onEdit(node)}
+            className="p-2 bg-white rounded-lg shadow-sm hover:bg-[#F9FAFB] transition-colors"
+            title={t("common3.edit")}
+          >
+            <Edit size={16} className="text-[#6B7280]" />
+          </button>
+
+          <button
+            onClick={() => onDelete(node)}
+            className="p-2 bg-white rounded-lg shadow-sm hover:bg-red-50 transition-colors"
+            title={t("common3.delete")}
+          >
+            <Trash2 size={16} className="text-[#EF4444]" />
+          </button>
+        </div>
+      </div>
+
+      {/* Children */}
+      {hasChildren && open && (
+        <div className="mt-2 space-y-2">
+          {node.children.map((child) => (
+            <CategoryRow
+              key={child._id}
+              node={child}
+              level={level + 1}
+              t={t}
+              getIconEmoji={getIconEmoji}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const CategoriesIndex = () => {
   const { t } = useTranslation();
@@ -17,20 +163,17 @@ const CategoriesIndex = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState("all"); // all, income, expense
+  const [activeTab, setActiveTab] = useState("all");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
 
-  // pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
-  // search by name
   const [q, setQ] = useState("");
 
   useEffect(() => {
     loadCategories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -125,47 +268,30 @@ const CategoriesIndex = () => {
     });
   };
 
-  const handleSetDefault = async (category) => {
-    try {
-      const res = await setDefaultCategoryAPI(category._id);
-      if (res?.EC === 0) {
-        message.success(t("categories.toast.setDefaultSuccess"));
-        loadCategories();
-      } else {
-        message.error(res?.message || t("categories.toast.setDefaultFail"));
-      }
-    } catch (error) {
-      message.error(t("common3.error"));
-    }
-  };
-
   const tabs = [
     { key: "all", label: t("categories.tabs.all") },
     { key: "income", label: t("categories.tabs.income"), color: "#10B981" },
     { key: "expense", label: t("categories.tabs.expense"), color: "#EF4444" },
   ];
 
-  // FILTER + SEARCH
-  const filteredCategories = useMemo(() => {
-    let filtered = [...categories];
+  // TREE + FILTER + SEARCH
+  const treeRoots = useMemo(() => buildCategoryTree(categories), [categories]);
 
-    if (activeTab === "income") filtered = filtered.filter((c) => c.type === "income");
-    if (activeTab === "expense") filtered = filtered.filter((c) => c.type === "expense");
+  const filteredTree = useMemo(() => {
+    const predicate = (c) => {
+      if (activeTab === "income") return c.type === "income";
+      if (activeTab === "expense") return c.type === "expense";
+      return true;
+    };
+    return filterTree(treeRoots, predicate, q.toLowerCase());
+  }, [treeRoots, activeTab, q]);
 
-    const query = q.trim().toLowerCase();
-    if (query) {
-      filtered = filtered.filter((c) => (c.name || "").toLowerCase().includes(query));
-    }
-
-    return filtered;
-  }, [categories, activeTab, q]);
-
-  // PAGINATION
-  const total = filteredCategories.length;
-  const pagedCategories = useMemo(() => {
+  // PAGINATION (roots only)
+  const total = filteredTree.length;
+  const pagedRoots = useMemo(() => {
     const start = (page - 1) * pageSize;
-    return filteredCategories.slice(start, start + pageSize);
-  }, [filteredCategories, page, pageSize]);
+    return filteredTree.slice(start, start + pageSize);
+  }, [filteredTree, page, pageSize]);
 
   const emptyText =
     activeTab === "income"
@@ -234,102 +360,26 @@ const CategoriesIndex = () => {
           </div>
         </div>
 
-        {/* Grid */}
+        {/* Vertical Tree List */}
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="ds-card ds-skeleton" style={{ height: "180px" }} />
+          <div className="space-y-3">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="ds-card ds-skeleton w-full" style={{ height: 64 }} />
             ))}
           </div>
         ) : total > 0 ? (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-              {pagedCategories.map((category) => (
-                <div
-                  key={category._id}
-                  className="ds-card relative group cursor-pointer hover:scale-[1.02] transition-transform"
-                >
-                  {/* Actions hover */}
-                  <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                    {!category.is_default && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSetDefault(category);
-                        }}
-                        className="p-2 bg-white rounded-lg shadow-md hover:bg-green-50 transition-colors"
-                        title={t("categories.actions.setDefault")}
-                      >
-                        <TrendingUp size={16} className="text-[#10B981]" />
-                      </button>
-                    )}
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditCategory(category);
-                      }}
-                      className="p-2 bg-white rounded-lg shadow-md hover:bg-[#F9FAFB] transition-colors"
-                      title={t("common3.edit")}
-                    >
-                      <Edit size={16} className="text-[#6B7280]" />
-                    </button>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteCategory(category);
-                      }}
-                      className="p-2 bg-white rounded-lg shadow-md hover:bg-red-50 transition-colors"
-                      title={t("common3.delete")}
-                    >
-                      <Trash2 size={16} className="text-[#EF4444]" />
-                    </button>
-                  </div>
-
-                  {/* Type badge */}
-                  <div className="absolute top-2 left-2">
-                    <span
-                      className={`ds-badge ${
-                        category.type === "income" ? "ds-badge-success" : "ds-badge-danger"
-                      }`}
-                    >
-                      {category.type === "income"
-                        ? t("categories.type.income")
-                        : t("categories.type.expense")}
-                    </span>
-                  </div>
-
-                  {/* Default badge */}
-                  {category.is_default && (
-                    <div className="absolute top-2 left-2 mt-6">
-                      <span className="ds-badge ds-badge-primary">{t("categories.badge.default")}</span>
-                    </div>
-                  )}
-
-                  {/* Icon */}
-                  <div className="flex justify-center mb-4 mt-8">
-                    <div
-                      className={`w-16 h-16 rounded-full flex items-center justify-center text-4xl ${
-                        category.type === "income" ? "bg-[#10B981]/10" : "bg-[#EF4444]/10"
-                      }`}
-                    >
-                      {getIconEmoji(category.icon)}
-                    </div>
-                  </div>
-
-                  {/* Name */}
-                  <div className="text-center">
-                    <h3 className="ds-heading-3 mb-2 line-clamp-2">{category.name}</h3>
-
-                    {category.parent_id && (
-                      <p className="ds-text-small text-[#6B7280]">
-                        <Folder size={12} className="inline mr-1" />
-                        {t("categories.badge.child")}
-                      </p>
-                    )}
-                  </div>
-                </div>
+            <div className="space-y-3">
+              {pagedRoots.map((root) => (
+                <CategoryRow
+                  key={root._id}
+                  node={root}
+                  level={0}
+                  t={t}
+                  getIconEmoji={getIconEmoji}
+                  onEdit={handleEditCategory}
+                  onDelete={handleDeleteCategory}
+                />
               ))}
             </div>
 
@@ -337,7 +387,9 @@ const CategoriesIndex = () => {
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-sm text-slate-600">
                 {t("categories.pagination.showing")}{" "}
-                <span className="font-semibold text-slate-800">{(page - 1) * pageSize + 1}</span>
+                <span className="font-semibold text-slate-800">
+                  {total === 0 ? 0 : (page - 1) * pageSize + 1}
+                </span>
                 {" - "}
                 <span className="font-semibold text-slate-800">{Math.min(page * pageSize, total)}</span>{" "}
                 / {total} {t("categories.pagination.items")}

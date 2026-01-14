@@ -93,7 +93,6 @@ const CategoryModal = ({ open, onClose, category, onSuccess }) => {
         type,
         parent_id: category.parent_id || null,
         icon: category.icon || "default",
-        is_default: category.is_default || false,
       });
 
       loadParentCategories(type, category._id);
@@ -106,7 +105,6 @@ const CategoryModal = ({ open, onClose, category, onSuccess }) => {
       form.setFieldsValue({
         type: "expense",
         icon: "default",
-        is_default: false,
         parent_id: null,
       });
 
@@ -129,7 +127,6 @@ const CategoryModal = ({ open, onClose, category, onSuccess }) => {
         name: (values.name || "").trim(),
         type: values.type,
         icon: values.icon || "default",
-        is_default: !!values.is_default,
         ...(values.parent_id ? { parent_id: values.parent_id } : {}),
       };
 
@@ -330,36 +327,7 @@ const CategoryModal = ({ open, onClose, category, onSuccess }) => {
             </div>
           </div>
         </div>
-
-        {/* 3) Default switch */}
-        <div className="mt-6 flex items-center justify-between p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white rounded-xl shadow-sm ring-1 ring-emerald-100">
-              <CheckCircle2 size={20} className="text-emerald-600" />
-            </div>
-
-            <div>
-              <div className="font-semibold text-slate-800 text-sm">
-                {t("category.field.default.title")}
-              </div>
-              <div className="text-xs text-slate-600">
-                {t("category.field.default.desc")}
-              </div>
-            </div>
-          </div>
-
-          <Form.Item name="is_default" valuePropName="checked" noStyle>
-            <Switch />
-          </Form.Item>
-        </div>
       </Form>
-
-      {/* Switch ON màu emerald */}
-      <style>{`
-        .ant-switch.ant-switch-checked {
-          background: #10B981 !important;
-        }
-      `}</style>
     </Modal>
   );
 };
